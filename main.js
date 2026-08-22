@@ -146,7 +146,18 @@ document.getElementById('play-btn').addEventListener('click', () => {
     synthControl.init({ 
         visualObj: currentVisualObj[0],
         options: {
-            cursorControl: cursorControl
+            cursorControl: cursorControl,
+            onEnded: function() {
+                // Playback finished naturally
+                document.getElementById('play-btn').style.display = 'block';
+                document.getElementById('stop-btn').style.display = 'none';
+                
+                // Clear highlights
+                const lastSelection = document.querySelectorAll("#karaoke-paper .abcjs-highlight");
+                for (let i = 0; i < lastSelection.length; i++) {
+                    lastSelection[i].classList.remove("abcjs-highlight");
+                }
+            }
         }
     }).then(() => {
         synthControl.prime().then(() => {
