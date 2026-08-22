@@ -19,7 +19,13 @@
       <p class="subtitle">Môi trường soạn thảo ABC Notation chuyên nghiệp!</p>
     </header>
 
-    <main class="app-container">
+    <!-- TAB NAVIGATION -->
+    <nav class="app-tabs">
+      <button class="tab-btn active" id="tab-btn-write">✍️ Viết Nhạc</button>
+      <button class="tab-btn" id="tab-btn-listen">🎧 Nghe Nhạc (Studio)</button>
+    </nav>
+
+    <main class="app-container tab-content active" id="tab-write">
       <!-- Left side: Image Viewer (Top) + Sheet Music (Bottom) -->
       <section class="panel left-panel">
         <div class="panel-header">
@@ -78,6 +84,72 @@
       </section>
     </main>
 
+    <!-- NEW STUDIO TAB (Nghe Nhạc) -->
+    <main class="app-container tab-content" id="tab-listen" style="display: none;">
+      <!-- Left: Main Studio Area (Canvas & Controls) -->
+      <section class="panel left-panel" style="flex: 2;">
+        <div class="panel-header">
+          <h2>🎧 Canvas Studio Renderer</h2>
+        </div>
+        <div class="panel-content" style="display: flex; flex-direction: column; gap: 15px;">
+          <!-- Canvas -->
+          <div class="sheet-viewport" style="flex: 1; border: 2px solid #eee; border-radius: 12px; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #fff;">
+            <canvas id="sheetCanvas" width="960" height="680" style="max-width: 100%; height: auto;"></canvas>
+          </div>
+          <!-- Controls -->
+          <div class="karaoke-controls" style="margin-top: auto;">
+             <button class="ctrl-btn play" id="btnPlayPause" onclick="togglePlay()">▶ Phát Toàn Bộ</button>
+             <button class="ctrl-btn stop" onclick="stopPlayback()">⏹ Stop</button>
+             <div class="tempo-control">
+               <label>BPM:</label>
+               <input type="number" id="inputBpm" value="92" style="width: 60px;" />
+             </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Sidebar Settings -->
+      <section class="panel right-panel" style="flex: 1;">
+        <div class="panel-header" style="background: var(--primary);">
+          <h2 style="color: white;">🎛️ Bàn Trộn Full Band</h2>
+        </div>
+        <div class="panel-content editor-content" style="gap: 20px; display: flex; flex-direction: column;">
+           <!-- Mixers -->
+           <div style="display:flex; justify-content:space-between; align-items: center;"><label>🥁 Trống:</label><input type="range" id="volDrum" min="0" max="1" step="0.05" value="0.75" oninput="updateVolumes()"></div>
+           <div style="display:flex; justify-content:space-between; align-items: center;"><label>🎸 Bass:</label><input type="range" id="volBass" min="0" max="1" step="0.05" value="0.65" oninput="updateVolumes()"></div>
+           <div style="display:flex; justify-content:space-between; align-items: center;"><label>🎹 Đệm:</label><input type="range" id="volChord" min="0" max="1" step="0.05" value="0.5" oninput="updateVolumes()"></div>
+           <div style="display:flex; justify-content:space-between; align-items: center;"><label>🎤 Melody:</label><input type="range" id="volMelody" min="0" max="1" step="0.05" value="0.85" oninput="updateVolumes()"></div>
+           
+           <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0;">
+
+           <!-- Dropdowns -->
+           <div style="display:flex; flex-direction: column; gap: 5px;">
+               <label>Điệu Trống:</label>
+               <select id="selectDrumPattern" onchange="changeDrumPattern(this.value)" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+                   <option value="swing">Swing 4/4</option>
+                   <option value="pop">Pop 8-Beat</option>
+                   <option value="ballad">Slow Ballad</option>
+                   <option value="disco">Disco</option>
+                   <option value="none">Tắt Nhạc Nền</option>
+               </select>
+           </div>
+           <div style="display:flex; flex-direction: column; gap: 5px;">
+               <label>Nhạc Cụ Lead:</label>
+               <select id="selectSound" onchange="changeInstrument(this.value)" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+                   <option value="piano">Acoustic Piano</option>
+                   <option value="marimba">Marimba</option>
+                   <option value="flute">Flute</option>
+                   <option value="synth">Synth</option>
+               </select>
+           </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Global functions export for onclick handlers -->
+    <script>
+       // We will attach global handlers in main.js
+    </script>
     <script type="module" src="/main.js"></script>
   </body>
 </html>

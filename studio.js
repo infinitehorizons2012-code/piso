@@ -1,349 +1,3 @@
-import './style.css'
-import abcjs from 'abcjs'
-
-// --- Default ABC Notation ---
-const DEFAULT_ABC = `X:1
-T:Bản Nhạc Của Bé
-M:4/4
-L:1/4
-K:C
-C D E F | G A B c |`;
-
-const abcTextarea = document.getElementById('abc-code');
-const paperElement = document.getElementById('paper');
-
-// Initialize the editor
-abcTextarea.value = DEFAULT_ABC;
-
-let currentVisualObj = null;
-
-function renderSheetMusic() {
-  const abcCode = abcTextarea.value;
-  // Render using abcjs for the left panel
-  abcjs.renderAbc("paper", abcCode, {
-    add_classes: true,
-    staffwidth: 700,
-  });
-
-  // Render for Karaoke mode (returns visual obj for synth)
-  // Inject tempo Q: header for playback speed control
-  let karaokeAbc = abcCode;
-  const newTempo = Math.round(120 * (currentTempo / 100));
-  
-  if (!karaokeAbc.match(/^Q:/m)) {
-      // If no Q: exists, inject it after K:
-      karaokeAbc = karaokeAbc.replace(/^(K:.*)$/m, `$1\nQ: 1/4=${newTempo}`);
-  } else {
-      // Replace existing Q:
-      karaokeAbc = karaokeAbc.replace(/^Q:.*$/m, `Q: 1/4=${newTempo}`);
-  }
-
-  currentVisualObj = abcjs.renderAbc("karaoke-paper", karaokeAbc, {
-    add_classes: true,
-    responsive: 'resize'
-  });
-}
-
-// Render on startup
-renderSheetMusic();
-
-// Two-way binding (Text -> Sheet)
-abcTextarea.addEventListener('input', () => {
-  renderSheetMusic();
-  updateStudioFromABC();
-});
-
-// --- View Toggle Logic ---
-const toggleBtn = document.getElementById('toggle-view-btn');
-const abcView = document.getElementById('abc-view');
-const karaokeView = document.getElementById('karaoke-view');
-let isKaraokeMode = false;
-
-toggleBtn.addEventListener('click', () => {
-  isKaraokeMode = !isKaraokeMode;
-  if (isKaraokeMode) {
-    abcView.style.display = 'none';
-    karaokeView.style.display = 'flex';
-    toggleBtn.innerText = '✍️ Viết ABC';
-    // Re-render to ensure karaoke sheet sizing is correct when becoming visible
-    renderSheetMusic();
-  } else {
-    abcView.style.display = 'flex';
-    karaokeView.style.display = 'none';
-    toggleBtn.innerText = '🎵 Xem Sheet Nhạc';
-    // Stop playback if switching away
-    if (synthControl) synthControl.stop();
-    document.getElementById('play-btn').style.display = 'block';
-    document.getElementById('stop-btn').style.display = 'none';
-  }
-});
-
-// --- Karaoke Playback & Cursor Control ---
-let synthControl = null;
-let currentTempo = 100; // default 100%
-
-// A simplified cursor control that adds a CSS class to the active notes
-function CursorControl(rootSelector) {
-    this.onStart = function() {
-        this.clearSelection();
-    };
-    
-    this.onEvent = function(ev) {
-        this.clearSelection();
-        if (ev === null || ev === undefined) {
-            // Playback finished naturally
-            document.getElementById('play-btn').style.display = 'block';
-            document.getElementById('stop-btn').style.display = 'none';
-            return;
-        }
-        if (ev.elements) {
-            for (let i = 0; i < ev.elements.length; i++) {
-                const noteElems = ev.elements[i];
-                for (let j = 0; j < noteElems.length; j++) {
-                    noteElems[j].classList.add("abcjs-highlight");
-                }
-            }
-        }
-    };
-    
-    this.onFinished = function() {
-        this.clearSelection();
-        // Reset play button
-        document.getElementById('play-btn').style.display = 'block';
-        document.getElementById('stop-btn').style.display = 'none';
-    };
-
-    this.clearSelection = function() {
-        const lastSelection = document.querySelectorAll(rootSelector + " .abcjs-highlight");
-        for (let i = 0; i < lastSelection.length; i++) {
-            lastSelection[i].classList.remove("abcjs-highlight");
-        }
-    }
-}
-
-document.getElementById('play-btn').addEventListener('click', () => {
-    if (!abcjs.synth.supportsAudio()) {
-        alert("Trình duyệt không hỗ trợ Audio!");
-        return;
-    }
-    
-    document.getElementById('play-btn').style.display = 'none';
-    document.getElementById('stop-btn').style.display = 'block';
-    
-    const cursorControl = new CursorControl("#karaoke-paper");
-    
-    synthControl = new abcjs.synth.CreateSynth();
-    // Calculate tempo multiplier from slider (50% to 200%)
-    const tempoMultiplier = currentTempo / 100;
-    
-    // Find the default millisecondsPerMeasure from the visual object
-    // If not found, use a default
-    let defaultMpm = 1000;
-    if (currentVisualObj[0].getBeatLength) {
-        // Just let abcjs figure it out, we will use the audioContext playbackRate hack below, 
-        // or just let it play at default if complex.
-    }
-    
-    synthControl.init({ 
-        visualObj: currentVisualObj[0],
-        options: {
-            cursorControl: cursorControl,
-            onEnded: function() {
-                // Playback finished naturally
-                document.getElementById('play-btn').style.display = 'block';
-                document.getElementById('stop-btn').style.display = 'none';
-                
-                // Clear highlights
-                const lastSelection = document.querySelectorAll("#karaoke-paper .abcjs-highlight");
-                for (let i = 0; i < lastSelection.length; i++) {
-                    lastSelection[i].classList.remove("abcjs-highlight");
-                }
-            }
-        }
-    }).then(() => {
-        synthControl.prime().then(() => {
-            // Apply tempo multiplier to the internal audioContext if available
-            if (synthControl.audioContext && synthControl.audioContext.state !== 'closed') {
-                // Not standard, but sometimes we can just change the audioContext rate? No.
-            }
-            synthControl.start();
-        });
-    });
-});
-
-document.getElementById('stop-btn').addEventListener('click', () => {
-    if (synthControl) synthControl.stop();
-    document.getElementById('play-btn').style.display = 'block';
-    document.getElementById('stop-btn').style.display = 'none';
-    
-    // Clear highlights manually just in case
-    const lastSelection = document.querySelectorAll("#karaoke-paper .abcjs-highlight");
-    for (let i = 0; i < lastSelection.length; i++) {
-        lastSelection[i].classList.remove("abcjs-highlight");
-    }
-});
-
-// Tempo slider
-document.getElementById('tempo-slider').addEventListener('input', (e) => {
-    currentTempo = e.target.value;
-    document.getElementById('tempo-value').innerText = currentTempo;
-    
-    // Re-render karaoke sheet to apply new tempo
-    renderSheetMusic();
-    
-    if (synthControl && synthControl.audioContext && synthControl.audioContext.state === 'running') {
-        // If already playing, stop and restart with new tempo
-        synthControl.stop();
-        document.getElementById('play-btn').click();
-    }
-});
-
-// --- Image Upload Logic ---
-const uploadPrompt = document.getElementById('upload-prompt');
-const imageUpload = document.getElementById('image-upload');
-const uploadedImage = document.getElementById('uploaded-image');
-const imageContainer = document.getElementById('image-container');
-
-uploadPrompt.addEventListener('click', () => {
-  imageUpload.click();
-});
-
-imageUpload.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (file) {
-    loadImage(file);
-  }
-});
-
-function loadImage(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      uploadedImage.src = e.target.result;
-      uploadedImage.style.display = 'block';
-      uploadPrompt.style.display = 'none';
-      imageContainer.style.justifyContent = 'flex-start';
-    };
-    reader.readAsDataURL(file);
-}
-
-// Handle Drag and Drop for Image
-imageContainer.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  uploadPrompt.style.background = 'rgba(78, 205, 196, 0.2)';
-});
-imageContainer.addEventListener('dragleave', (e) => {
-  e.preventDefault();
-  uploadPrompt.style.background = 'rgba(78, 205, 196, 0.05)';
-});
-imageContainer.addEventListener('drop', (e) => {
-  e.preventDefault();
-  uploadPrompt.style.background = 'rgba(78, 205, 196, 0.05)';
-  const file = e.dataTransfer.files[0];
-  if (file && file.type.startsWith('image/')) {
-    loadImage(file);
-  }
-});
-
-
-
-// --- Tab Switching Logic ---
-document.getElementById('tab-btn-write').addEventListener('click', () => {
-    document.getElementById('tab-btn-write').classList.add('active');
-    document.getElementById('tab-btn-listen').classList.remove('active');
-    document.getElementById('tab-write').style.display = 'flex';
-    document.getElementById('tab-listen').style.display = 'none';
-});
-
-document.getElementById('tab-btn-listen').addEventListener('click', () => {
-    document.getElementById('tab-btn-listen').classList.add('active');
-    document.getElementById('tab-btn-write').classList.remove('active');
-    document.getElementById('tab-listen').style.display = 'flex';
-    document.getElementById('tab-write').style.display = 'none';
-    if(window.drawSheet) window.drawSheet();
-});
-
-// A basic regex parser to convert simple ABC to JSON for the studio engine
-function parseABCToJSON(abcCode) {
-    let song = {
-        title: "Tự Chọn (Từ ABC)",
-        composer: "",
-        rhythmStyle: "ABC",
-        timeSignature: "4/4",
-        bpm: 100,
-        drumPattern: "swing",
-        staves: []
-    };
-
-    let lines = abcCode.split('\n');
-    let currentMeasure = 1;
-    let measureNotes = [];
-    let currentChord = "";
-    
-    lines.forEach(line => {
-        if(line.startsWith('T:')) song.title = line.substring(2).trim();
-        else if(line.match(/^Q:/)) {
-            let match = line.match(/\d+/g);
-            if(match && match.length > 0) song.bpm = parseInt(match[match.length-1]);
-        }
-        else if(!line.match(/^[a-zA-Z]:/) && line.trim().length > 0) {
-            let parts = line.split('|');
-            parts.forEach(part => {
-                if(!part.trim()) return;
-                
-                let chordMatch = part.match(/"([^"]+)"/);
-                if(chordMatch) currentChord = chordMatch[1];
-                
-                let noteMatch = part.match(/([a-gA-Gz])([',]*)([1-9]*(\/2)?)/g);
-                if(noteMatch) {
-                    noteMatch.forEach(n => {
-                        let baseChar = n.charAt(0);
-                        let isRest = (baseChar.toLowerCase() === 'z');
-                        let duration = 0.5; // default 8th note
-                        if(n.includes('2')) duration = 1.0;
-                        if(n.includes('3')) duration = 1.5;
-                        if(n.includes('4')) duration = 2.0;
-                        if(n.includes('/2')) duration = 0.25;
-                        
-                        let pitch = "";
-                        if(!isRest) {
-                            let noteLetter = baseChar.toUpperCase();
-                            let octave = 4;
-                            if(baseChar === baseChar.toLowerCase()) octave = 5;
-                            if(n.includes("'")) octave++;
-                            if(n.includes(",")) octave--;
-                            pitch = noteLetter + octave;
-                        }
-                        
-                        measureNotes.push({ pitch: pitch, duration: duration, type: isRest? "rest" : "note" });
-                    });
-                }
-                song.staves.push({ measureNum: currentMeasure++, chord: currentChord, notes: measureNotes });
-                measureNotes = [];
-                currentChord = "";
-            });
-        }
-    });
-    
-    // Fallback if empty
-    if(song.staves.length === 0) {
-        song.staves.push({ measureNum:1, chord:"C", notes:[{pitch:"C4", duration:1.0, type:"note"}] });
-    }
-    return song;
-}
-
-function updateStudioFromABC() {
-    if(typeof window.currentSong !== 'undefined') {
-        const parsed = parseABCToJSON(document.getElementById('abc-code').value);
-        window.currentSong = parsed;
-        if(typeof window.drawSheet === 'function') window.drawSheet();
-        if(document.getElementById('jsonEditor')) {
-            document.getElementById('jsonEditor').value = JSON.stringify(parsed, null, 2);
-        }
-    }
-}
-
-
-// --- STUDIO ENGINE ---
 
         // --- PRESET SONGS DATA ---
         const PRESETS = {
@@ -499,7 +153,7 @@ function updateStudioFromABC() {
             drawSheet();
         });
 
-        window.loadPreset = function loadPreset(presetKey) {
+        function loadPreset(presetKey) {
             document.querySelectorAll('.song-btn').forEach(btn => btn.classList.remove('active'));
             if (presetKey === 'devuong') {
                 document.getElementById('btnPresetDeVuong').classList.add('active');
@@ -518,7 +172,7 @@ function updateStudioFromABC() {
             drawSheet();
         }
 
-        window.applyJsonEditor = function applyJsonEditor() {
+        function applyJsonEditor() {
             try {
                 const updated = JSON.parse(document.getElementById('jsonEditor').value);
                 currentSong = updated;
@@ -529,20 +183,20 @@ function updateStudioFromABC() {
             }
         }
 
-        window.updateTempo = function updateTempo(val) {
+        function updateTempo(val) {
             currentSong.bpm = parseInt(val) || 90;
         }
 
-        window.changeDrumPattern = function changeDrumPattern(val) {
+        function changeDrumPattern(val) {
             currentSong.drumPattern = val;
         }
 
-        window.changeInstrument = function changeInstrument(val) {
+        function changeInstrument(val) {
             currentInstrument = val;
         }
 
         // --- AUDIO ENGINE ---
-        window.initAudio = function initAudio() {
+        function initAudio() {
             if (!audioCtx) {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioCtx = new AudioContext();
@@ -576,7 +230,7 @@ function updateStudioFromABC() {
             }
         }
 
-        window.updateVolumes = function updateVolumes() {
+        function updateVolumes() {
             if (drumGain) drumGain.gain.value = parseFloat(document.getElementById('volDrum').value);
             if (bassGain) bassGain.gain.value = parseFloat(document.getElementById('volBass').value);
             if (chordGain) chordGain.gain.value = parseFloat(document.getElementById('volChord').value);
@@ -732,7 +386,7 @@ function updateStudioFromABC() {
             }
         }
 
-        window.handleAudioUpload = function handleAudioUpload(input) {
+        function handleAudioUpload(input) {
             const file = input.files[0];
             if (!file) return;
             initAudio();
@@ -750,7 +404,7 @@ function updateStudioFromABC() {
         }
 
         // --- DRAWING CANVAS SHEET MUSIC (FIXED LAYOUT - NO OVERFLOW) ---
-        window.drawSheet = function drawSheet() {
+        function drawSheet() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             // Background
@@ -979,7 +633,7 @@ function updateStudioFromABC() {
         }
 
         // --- PLAYBACK ENGINE ---
-        window.togglePlay = function togglePlay() {
+        function togglePlay() {
             if (isPlaying) {
                 stopPlayback();
             } else {
@@ -1063,7 +717,7 @@ function updateStudioFromABC() {
             step();
         }
 
-        window.stopPlayback = function stopPlayback() {
+        function stopPlayback() {
             isPlaying = false;
             if (playbackTimer) clearTimeout(playbackTimer);
             if (audioBufferSource) {
@@ -1076,7 +730,7 @@ function updateStudioFromABC() {
         }
 
         // --- BUILT-IN SCREEN & AUDIO RECORDER ---
-        window.toggleRecording = async function toggleRecording() {
+        async function toggleRecording() {
             const btn = document.getElementById('btnRecord');
             if (isRecording) {
                 if (mediaRecorder && mediaRecorder.state !== 'inactive') {
