@@ -73,12 +73,10 @@
 
       <!-- Right side: ABC Editor / Karaoke Mode -->
       <section class="panel right-panel">
-        <div class="panel-header" style="background: var(--primary); display: flex; justify-content: space-between; align-items: center;">
+        <div class="panel-header" style="background: var(--primary); display: flex; justify-content: space-between; align-items: center; position: relative;">
+          <button onclick="saveToCloud()" class="toggle-btn" style="background: white; color: var(--primary); position: absolute; left: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">☁️ Lưu lên Cloud</button>
           <h2 style="color: white; margin: 0 auto;">📝 Viết Mã ABC</h2>
-          <div style="display: flex; gap: 10px; position: absolute; right: 20px;">
-             <button onclick="saveToCloud()" class="toggle-btn" style="background: var(--secondary);">☁️ Lưu lên Cloud</button>
-             <button id="toggle-view-btn" class="toggle-btn">📖 Xem Sheet Nhạc</button>
-          </div>
+          <button id="toggle-view-btn" class="toggle-btn" style="position: absolute; right: 20px;">📖 Xem Sheet Nhạc</button>
         </div>
         
         <div class="panel-content editor-content">
