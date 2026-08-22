@@ -11,20 +11,17 @@
     <link rel="stylesheet" href="./style.css">
   </head>
   <body>
-    <header class="app-header">
-      <div class="logo">
+    <header class="app-header" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 40px;">
+      <div class="logo" style="justify-content: flex-start; margin: 0;">
         <span class="logo-icon">🎵</span>
-        <h1>Piso Music</h1>
+        <h1 style="margin: 0;">Piso Music</h1>
       </div>
-      <p class="subtitle">Môi trường soạn thảo ABC Notation chuyên nghiệp!</p>
+      <nav class="app-tabs" style="margin: 0;">
+        <button class="tab-btn" id="tab-btn-library">📚 Thư Viện</button>
+        <button class="tab-btn active" id="tab-btn-write">📝 Viết Nhạc</button>
+        <button class="tab-btn" id="tab-btn-listen">🎧 Nghe Nhạc (Studio)</button>
+      </nav>
     </header>
-
-    <!-- Top Tabs Navigation -->
-    <nav class="app-tabs">
-      <button class="tab-btn" id="tab-btn-library">📚 Thư Viện</button>
-      <button class="tab-btn active" id="tab-btn-write">📝 Viết Nhạc</button>
-      <button class="tab-btn" id="tab-btn-listen">🎧 Nghe Nhạc (Studio)</button>
-    </nav>
 
     <!-- NEW LIBRARY TAB (Thư Viện) -->
     <main class="app-container tab-content" id="tab-library" style="display: none;">
