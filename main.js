@@ -588,11 +588,15 @@ window.exportToJson = function() {
     let currentChord = '';
     let currentMeasure = { measureNum, chord: currentChord, notes: [] };
 
-    // Function to convert MIDI pitch to standard note name (e.g. 60 -> C4)
-    function midiToNoteName(midi) {
-        const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
-        const octave = Math.floor(midi / 12) - 1;
-        const noteName = notes[midi % 12];
+    // Function to convert abcjs diatonic pitch to standard note name (e.g. 7 -> C4)
+    function abcPitchToStandard(pitchVal, accidental) {
+        const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+        let normalized = pitchVal % 7;
+        if (normalized < 0) normalized += 7;
+        let noteName = notes[normalized];
+        if (accidental === 'sharp') noteName += '#';
+        else if (accidental === 'flat') noteName += 'b';
+        let octave = Math.floor(pitchVal / 7) + 3;
         return noteName + octave;
     }
 
@@ -621,7 +625,7 @@ window.exportToJson = function() {
                     let pitch = 'C4';
                     let solfege = '';
                     if (elem.pitches && elem.pitches.length > 0) {
-                        pitch = midiToNoteName(elem.pitches[0].pitch);
+                        pitch = abcPitchToStandard(elem.pitches[0].pitch, elem.pitches[0].accidental);
                         // Optional: basic solfege guess (very naive)
                         let rawName = elem.pitches[0].name || '';
                         let solfegeMap = { 'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si' };
