@@ -657,3 +657,37 @@ window.exportToJson = function() {
         alert('Đã tạo JSON và sao chép vào bộ nhớ tạm (Clipboard)! Bạn có thể dán vào Full Band Studio.');
     }
 };
+
+
+
+window.downloadMidi = function() {
+    if (!studioAudioVisualObj || !studioAudioVisualObj[0]) {
+        alert('Vui lòng Nhấn "Phát Nhạc" ít nhất 1 lần để hệ thống xử lý bản nhạc!');
+        return;
+    }
+
+    try {
+        // Generate MIDI data URI
+        const midiDataUri = abcjs.synth.getMidiFile(studioAudioVisualObj[0], { midiOutputType: "encoded" });
+        
+        // Create an invisible download link
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = midiDataUri;
+        
+        // Use the title from the visual object if available
+        let title = studioAudioVisualObj[0].metaText.title || "Ban_Nhac";
+        a.download = title + ".mid";
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(a);
+        }, 100);
+    } catch (e) {
+        console.error("MIDI Export Error:", e);
+        alert("Có lỗi xảy ra khi tạo file MIDI.");
+    }
+};
