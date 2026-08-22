@@ -89,6 +89,12 @@ function CursorControl(rootSelector) {
     
     this.onEvent = function(ev) {
         this.clearSelection();
+        if (ev === null || ev === undefined) {
+            // Playback finished naturally
+            document.getElementById('play-btn').style.display = 'block';
+            document.getElementById('stop-btn').style.display = 'none';
+            return;
+        }
         if (ev.elements) {
             for (let i = 0; i < ev.elements.length; i++) {
                 const noteElems = ev.elements[i];
