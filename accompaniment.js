@@ -2,6 +2,13 @@
 // Auto-generates Bass and Drum tracks based on chords in the ABC notation for audio synthesis.
 
 window.generateAccompaniment = function(abcCode) {
+    const drumStyleEl = document.getElementById('drumStyle');
+    const style = drumStyleEl ? drumStyleEl.value : 'pop';
+    
+    if (style === 'none') {
+        return abcCode;
+    }
+
     let lines = abcCode.split('\n');
     let header = [];
     let body = [];
@@ -51,8 +58,22 @@ window.generateAccompaniment = function(abcCode) {
         let drumMeasure = '';
         
         if (beatsPerMeasure === 4) {
-            bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`;
-            drumMeasure = `[C,^F,] D, [C,^F,] D,`; 
+            if (style === 'pop') {
+                bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`;
+                drumMeasure = `[C,^F,] ^F, [D,^F,] ^F, [C,^F,] ^F, [D,^F,] ^F,`; // 8-beat hi-hat
+            } else if (style === 'disco') {
+                bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`; // Four on the floor
+                drumMeasure = `[C,^F,] [C,^F,] [C,D,^F,] [C,^F,]`; 
+            } else if (style === 'swing') {
+                bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`; // Walking bass idea
+                drumMeasure = `[C,^F,] z/2 ^F,/2 [D,^F,] ^F, [C,^F,] z/2 ^F,/2 [D,^F,] ^F,`; // Swing ride
+            } else if (style === 'ballad') {
+                bassMeasure = `${bassNote}4`; // Whole note bass
+                drumMeasure = `[C,^F,] ^F, [D,^F,] ^F, [C,^F,] ^F, [D,^F,] ^F,`; // Slow 8-beat
+            } else {
+                bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`;
+                drumMeasure = `[C,^F,] D, [C,^F,] D,`; 
+            }
         } else if (beatsPerMeasure === 3) {
             bassMeasure = `${bassNote} ${bassNote} ${bassNote}`;
             drumMeasure = `[C,^F,] D, D,`; 
@@ -78,15 +99,37 @@ window.generateAccompaniment = function(abcCode) {
     
     newAbc += 'V:2 name="Bass" clef=bass\n';
     newAbc += 'L:1/4\n';
-    newAbc += '%%MIDI program 33\n';
+    if (style === 'pop' || style === 'disco' || style === 'swing') newAbc += 'L:1/8\n';
+    if (style === 'ballad') newAbc += 'L:1/4\n';
+    
+    newAbc += '%%MIDI program 33\n'; // Electric Bass
     newAbc += `%%MIDI control 7 ${Math.round(volBass * 1.27)}\n`;
-    newAbc += bassTrack.join(' | ') + ' |]\n\n';
+    
+    // Adjust bass track parsing if L is changed
+    let finalBassTrack = bassTrack.join(' | ');
+    if (style === 'pop' || style === 'disco' || style === 'swing') {
+        // If we switched to L:1/8, we need to double the lengths of our 1/4 notes
+        finalBassTrack = finalBassTrack.replace(/([A-Ga-g][#b]?,+,?)/g, "$12");
+    }
+
+    newAbc += finalBassTrack + ' |]\n\n';
     
     newAbc += 'V:3 name="Drums" clef=perc\n';
-    newAbc += 'L:1/4\n';
+    newAbc += 'L:1/8\n'; // Drums always use 1/8 for more granularity
     newAbc += '%%MIDI channel 10\n';
     newAbc += `%%MIDI control 7 ${Math.round(volDrum * 1.27)}\n`;
-    newAbc += drumTrack.join(' | ') + ' |]\n';
+    
+    // Our drum strings were written with L:1/4 in mind previously, need to adjust for L:1/8
+    let finalDrumTrack = drumTrack.join(' | ');
+    // Not adjusting manually for now because the new strings above are written assuming L:1/8 for pop/disco/swing/ballad 
+    // Wait, the generic ones assumed L:1/4. Let's fix generic ones too:
+    if (beatsPerMeasure === 3) {
+        finalDrumTrack = drumTrack.map(m => `[C,^F,]2 D,2 D,2`).join(' | ');
+    } else if (beatsPerMeasure === 2 && timeSignature !== '6/8') {
+        finalDrumTrack = drumTrack.map(m => `[C,^F,]2 D,2`).join(' | ');
+    }
+    
+    newAbc += finalDrumTrack + ' |]\n';
     
     return newAbc;
 };
