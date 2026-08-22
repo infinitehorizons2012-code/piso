@@ -158,7 +158,7 @@
            <div style="display: flex; gap: 10px; margin-top: 15px;">
                <button class="ctrl-btn play" id="studioPlayBtn" onclick="toggleStudioPlay()" style="flex: 1; font-size: 14px;">▶ Phát Nhạc</button>
                <button class="ctrl-btn stop" id="studioStopBtn" style="display: none; flex: 1; font-size: 14px;" onclick="stopStudioPlay()">⏹ Dừng Lại</button>
-               <button class="ctrl-btn play" onclick="downloadMidi()" style="flex: 1; font-size: 14px; background: #6366f1;">🎵 Tải MIDI</button>
+               <button class="ctrl-btn play" onclick="toggleRecording()" id="btn-record" style="flex: 1; font-size: 14px; background: #ef4444;">🎥 Quay Video Reel (MP4/WebM)</button>
            </div>
            <!-- Textarea to display exported JSON -->
            <textarea id="jsonExportResult" style="display:none; width: 100%; height: 100px; margin-top: 10px; font-size: 11px; font-family: monospace; border: 1px solid #ddd; border-radius: 4px; padding: 4px;" readonly></textarea>

@@ -34,6 +34,9 @@ let drumGain = null;
 let bassGain = null;
 let chordGain = null;
 
+export function getAudioCtx() { return audioCtx; }
+export function getMasterGain() { return masterGain; }
+
 export function initFullBandAudio() {
     if (!audioCtx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;

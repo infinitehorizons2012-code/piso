@@ -365,7 +365,7 @@ window.saveToCloud = async function() {
 
 
 // --- STUDIO TAB LOGIC (OPTION A) ---
-import { initFullBandAudio, updateFullBandVolumes } from './fullband-synth.js';
+import { initFullBandAudio, updateFullBandVolumes, getAudioCtx, getMasterGain } from './fullband-synth.js';
 
 let studioVisualObj = null;
 let studioAudioVisualObj = null;
@@ -377,8 +377,8 @@ let proxyAudioCtx = null;
 // Initialize custom audio context and proxy for abcjs
 function initAbcjsAudioContext() {
     if (!abcjsAudioCtx) {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        abcjsAudioCtx = new AudioContext();
+        initFullBandAudio();
+        abcjsAudioCtx = getAudioCtx();
         melodyMasterGain = abcjsAudioCtx.createGain();
         melodyMasterGain.gain.value = document.getElementById('volMelody') ? parseFloat(document.getElementById('volMelody').value) * 3.0 : 3.0;
         melodyMasterGain.connect(abcjsAudioCtx.destination);
@@ -461,6 +461,117 @@ window.updateVolumes = function() {
             window.toggleStudioPlay();
         }
     }, 200);
+};
+
+// --- RECORDING LOGIC ---
+let mediaRecorder = null;
+let recordedChunks = [];
+let isRecording = false;
+let recordingCanvas = null;
+let recordingCtx = null;
+let recordingInterval = null;
+
+window.toggleRecording = function() {
+    const btn = document.getElementById('btn-record');
+    if (isRecording) {
+        // Stop recording
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+        }
+        isRecording = false;
+        clearInterval(recordingInterval);
+        btn.classList.remove('recording');
+        btn.innerText = "🎥 Quay Video Reel (MP4/WebM)";
+        btn.style.background = "#ef4444";
+        
+        // Stop playback when recording stops
+        if (studioSynthControl && studioSynthControl.audioContext && studioSynthControl.audioContext.state === 'running') {
+            window.stopStudioPlay();
+        }
+    } else {
+        // Start recording
+        initAbcjsAudioContext();
+        const svgEl = document.querySelector('#studio-abc-paper svg');
+        if (!svgEl) return alert("Không tìm thấy bản nhạc để quay!");
+
+        if (!recordingCanvas) {
+            recordingCanvas = document.createElement('canvas');
+            document.body.appendChild(recordingCanvas);
+            recordingCanvas.style.display = 'none';
+        }
+        
+        // Auto start playback if not playing
+        window.stopStudioPlay(); // reset state
+        window.toggleStudioPlay();
+
+        const rect = svgEl.getBoundingClientRect();
+        recordingCanvas.width = rect.width || 800;
+        recordingCanvas.height = rect.height || 1000;
+        recordingCtx = recordingCanvas.getContext('2d');
+
+        try {
+            const canvasStream = recordingCanvas.captureStream(30);
+            const audioCtx = getAudioCtx();
+            const audioDest = audioCtx.createMediaStreamDestination();
+            
+            // Connect both melodies and fullband to the recording destination
+            if (melodyMasterGain) melodyMasterGain.connect(audioDest);
+            const masterGain = getMasterGain();
+            if (masterGain) masterGain.connect(audioDest);
+
+            const combinedStream = new MediaStream([
+                ...canvasStream.getVideoTracks(),
+                ...audioDest.stream.getAudioTracks()
+            ]);
+
+            recordedChunks = [];
+            let options = { mimeType: 'video/webm;codecs=vp9,opus' };
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                options = { mimeType: 'video/webm' };
+            }
+
+            mediaRecorder = new MediaRecorder(combinedStream, options);
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                let title = "Bản_nhạc_Reel";
+                const match = document.getElementById('abc-code').value.match(/^T:\s*(.+)$/m);
+                if (match) title = match[1].replace(/\s+/g, '_');
+                a.download = title + '.webm';
+                a.click();
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            btn.classList.add('recording');
+            btn.innerText = "⏹ Đang Quay... (Bấm để Dừng & Tải Video)";
+            btn.style.background = "#3b82f6";
+            
+            // Loop to render SVG to canvas at 30fps
+            recordingInterval = setInterval(() => {
+                const svgString = new XMLSerializer().serializeToString(svgEl);
+                const img = new Image();
+                const svgBlob = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"});
+                const url = URL.createObjectURL(svgBlob);
+                img.onload = function() {
+                    recordingCtx.fillStyle = 'white';
+                    recordingCtx.fillRect(0, 0, recordingCanvas.width, recordingCanvas.height);
+                    recordingCtx.drawImage(img, 0, 0);
+                    URL.revokeObjectURL(url);
+                };
+                img.src = url;
+            }, 1000 / 30); // 30 FPS
+
+        } catch(err) {
+            alert("Lỗi khi quay video: " + err.message);
+        }
+    }
 };
 
 window.toggleStudioPlay = function() {
