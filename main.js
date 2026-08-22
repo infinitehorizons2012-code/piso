@@ -19,7 +19,6 @@ function renderSheetMusic() {
   const abcCode = abcTextarea.value;
   // Render using abcjs
   abcjs.renderAbc("paper", abcCode, {
-    responsive: 'resize',
     add_classes: true,
     staffwidth: 700,
   });

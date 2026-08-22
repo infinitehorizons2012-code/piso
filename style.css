@@ -187,8 +187,9 @@ h1 {
   background: #fff;
   border-radius: 12px;
   padding: 10px;
-  height: 250px; /* Fixed height to show ~1 line */
-  overflow: auto; /* Enable scrollbars */
+  height: 250px !important; /* Fixed height to show ~1 line */
+  overflow-y: scroll !important; /* Force scrollbar */
+  overflow-x: auto;
   border: 2px solid #eee;
 }
 
