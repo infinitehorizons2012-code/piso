@@ -134,12 +134,13 @@
                    <option value="81">Synth Lead</option>
                </select>
            </div>
+           
+           <button class="ctrl-btn play" onclick="exportToJson()" style="margin-top: 15px; width: 100%; font-size: 14px; background: var(--secondary);">⬇️ Xuất JSON cho Full Band Studio</button>
+           <!-- Textarea to display exported JSON -->
+           <textarea id="jsonExportResult" style="display:none; width: 100%; height: 100px; margin-top: 10px; font-size: 11px; font-family: monospace; border: 1px solid #ddd; border-radius: 4px; padding: 4px;" readonly></textarea>
         </div>
       </section>
-       <button class="ctrl-btn play" onclick="exportToJson()" style="margin-top: 15px; width: 100%; font-size: 14px; background: var(--secondary);">⬇️ Xuất JSON cho Full Band Studio</button>
-       <!-- Textarea to display exported JSON -->
-       <textarea id="jsonExportResult" style="display:none; width: 100%; height: 100px; margin-top: 10px; font-size: 11px; font-family: monospace; border: 1px solid #ddd; border-radius: 4px; padding: 4px;" readonly></textarea>
-     </main>
+    </main>
 
     <!-- Global functions export for onclick handlers -->
     <script>
