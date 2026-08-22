@@ -272,7 +272,7 @@ document.getElementById('tab-btn-listen')?.addEventListener('click', () => {
 });
 
 // --- CLOUDFLARE LIBRARY API ---
-const CF_WORKER_URL = 'https://piano-library.YOU.workers.dev'; // User needs to update this
+const CF_WORKER_URL = 'https://piano-library.infinite-horizons-2012.workers.dev'; // User needs to update this
 
 window.fetchLibrary = async function() {
     const listEl = document.getElementById('library-list');
