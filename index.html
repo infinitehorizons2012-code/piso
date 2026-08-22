@@ -60,7 +60,11 @@
           </div>
 
           <!-- Divider -->
-          <div class="divider">Kết Quả (Sheet Music)</div>
+          <div class="divider" style="display: flex; justify-content: center; align-items: center;">
+             Kết Quả (Sheet Music)
+             <button onclick="window.zoomSheet(0.2)" style="margin-left: 15px; font-size: 11px; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer;">🔍 Phóng to</button>
+             <button onclick="window.zoomSheet(-0.2)" style="margin-left: 5px; font-size: 11px; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer;">🔍 Thu nhỏ</button>
+          </div>
 
           <!-- ABCJS visual rendering -->
           <div id="paper" class="sheet-music-display"></div>

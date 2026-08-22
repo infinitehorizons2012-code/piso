@@ -80,7 +80,10 @@ h1 {
 
 /* Make left panel wider to fit sheet music */
 .left-panel {
-  flex: 1.6;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .right-panel {
@@ -117,7 +120,9 @@ h1 {
 #comparison-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Image Upload Styles */
@@ -125,7 +130,8 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: flex-start; /* Better for scrolling tall images */
-  height: 250px; /* Fixed height to show ~1 line */
+  height: 35%; /* Show enough for 1-2 lines */
+  flex-shrink: 0;
   background: #f8f9fa;
   border-radius: 12px;
   overflow: auto; /* Enable scrollbars */

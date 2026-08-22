@@ -19,12 +19,22 @@ abcTextarea.value = DEFAULT_ABC;
 let currentVisualObj = null;
 let currentTempo = 100; // default 100%
 
+window.currentSheetScale = 1.0;
+window.zoomSheet = function(delta) {
+    window.currentSheetScale += delta;
+    if (window.currentSheetScale < 0.4) window.currentSheetScale = 0.4;
+    if (window.currentSheetScale > 3.0) window.currentSheetScale = 3.0;
+    document.getElementById('abc-code').dispatchEvent(new Event('input'));
+};
+
 function renderSheetMusic() {
   const abcCode = abcTextarea.value;
   // Render using abcjs for the left panel
   abcjs.renderAbc("paper", abcCode, {
     add_classes: true,
     staffwidth: 700,
+    scale: window.currentSheetScale,
+    responsive: 'resize'
   });
 
   // Render for Karaoke mode (returns visual obj for synth)
@@ -461,7 +471,8 @@ window.renderStudioSheet = function() {
     // Visual ABC: just the melody
     studioVisualObj = abcjs.renderAbc('studio-abc-paper', studioAbc, {
         add_classes: true,
-        responsive: 'resize'
+        responsive: 'resize',
+        scale: window.currentSheetScale
     });
     
     // Inject Instrument
