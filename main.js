@@ -3,11 +3,18 @@ import abcjs from 'abcjs'
 
 // --- Default ABC Notation ---
 const DEFAULT_ABC = `X:1
-T:Bản Nhạc Của Bé
-M:4/4
-L:1/4
+T:THẰNG CUỘI
+M:2/4
+L:1/8
 K:C
-C D E F | G A B c |`;
+z2 (cA) | "C" G3 A | "C" C3 G |"Am" E2 (ED)
+w: Bóng * trăng trắng ngà, có cây đa
+"Am" E3 G | "F" C2 (A,C) | "G" G,3 C | "F" (A,C) (DE) |
+w: to, có  thằng cuội *  già, ôm một * mối *
+"C" C4- | "C" C2 (CD) | "C" G3 G | "C" (GA) (CD) | "Em" G4- | "Em" G2 (GA)|
+w: mơ. * Lặng * yên ta nói * cuội * nghe: * "Ở *
+"F" c2 c2 | "G" (cd) (GA) | "C" c4- | "C" c2 (cA) |]
+w: cung trăng mãi * làm *  chi?" * Bóng... *`;
 
 const abcTextarea = document.getElementById('abc-code');
 const paperElement = document.getElementById('paper');
