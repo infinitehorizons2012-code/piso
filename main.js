@@ -486,6 +486,7 @@ window.renderStudioSheet = function() {
     // Visual ABC: just the melody
     studioVisualObj = abcjs.renderAbc('studio-abc-paper', studioAbc, {
         add_classes: true,
+        staffwidth: 700,
         scale: window.currentSheetScale
     });
     
