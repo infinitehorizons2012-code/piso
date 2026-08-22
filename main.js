@@ -639,21 +639,29 @@ window.exportToJson = function() {
                 } else {
                     let pitch = 'C4';
                     let solfege = '';
+                    let tieToNext = false;
                     if (elem.pitches && elem.pitches.length > 0) {
                         let rawName = elem.pitches[0].name || '';
                         pitch = abcPitchToStandard(elem.pitches[0].pitch, elem.pitches[0].accidental, rawName);
                         // Optional: basic solfege guess (very naive)
                         let solfegeMap = { 'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si' };
                         solfege = solfegeMap[rawName.toLowerCase().charAt(0)] || '';
+                        
+                        if (elem.pitches[0].startTie || elem.pitches[0].startSlur) {
+                            tieToNext = true;
+                        }
                     }
 
-                    currentMeasure.notes.push({
+                    const noteObj = {
                         type: 'note',
                         pitch: pitch, 
                         duration: beatDuration,
                         lyric: elem.lyric ? elem.lyric[0].syllable : '',
                         solfege: solfege
-                    });
+                    };
+                    if (tieToNext) noteObj.tieToNext = true;
+                    
+                    currentMeasure.notes.push(noteObj);
                 }
             }
         }
