@@ -86,7 +86,7 @@ export function playBassHit(chordName, durationSec) {
     filter.frequency.value = 350;
 
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.7, now + 0.03);
+    gain.gain.linearRampToValueAtTime(0.4, now + 0.03);
     gain.gain.exponentialRampToValueAtTime(0.001, now + durationSec + 0.2);
 
     osc.frequency.setValueAtTime(freq, now);
@@ -116,7 +116,7 @@ export function playChordPadHit(chordName, durationSec) {
         osc.type = 'triangle';
 
         gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
+        gain.gain.linearRampToValueAtTime(0.15, now + 0.05);
         gain.gain.exponentialRampToValueAtTime(0.001, now + durationSec + 0.4);
 
         osc.frequency.setValueAtTime(freq, now);
@@ -140,7 +140,7 @@ export function playDrumHit(type) {
         const gain = audioCtx.createGain();
         osc.frequency.setValueAtTime(130, now);
         osc.frequency.exponentialRampToValueAtTime(32, now + 0.12);
-        gain.gain.setValueAtTime(1, now);
+        gain.gain.setValueAtTime(0.6, now);
         gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
         osc.connect(gain);
         gain.connect(drumGain);
@@ -161,7 +161,7 @@ export function playDrumHit(type) {
         filter.frequency.value = 1000;
 
         const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.7, now);
+        gain.gain.setValueAtTime(0.4, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
 
         noise.connect(filter);
@@ -183,7 +183,7 @@ export function playDrumHit(type) {
         filter.frequency.value = 7000;
 
         const gain = audioCtx.createGain();
-        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.setValueAtTime(0.2, now);
         gain.gain.exponentialRampToValueAtTime(0.01, now + 0.04);
 
         noise.connect(filter);
