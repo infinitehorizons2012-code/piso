@@ -52,7 +52,7 @@ window.generateAccompaniment = function(abcCode) {
         
         let root = currentChord.charAt(0);
         let accidental = currentChord.length > 1 && (currentChord[1] === '#' || currentChord[1] === 'b') ? currentChord[1] : '';
-        let bassNote = root + accidental + ',,'; 
+        let bassNote = root + accidental + ','; 
         
         let bassMeasure = '';
         let drumMeasure = '';
@@ -95,6 +95,7 @@ window.generateAccompaniment = function(abcCode) {
     newAbc += 'V:1 name="Melody"\n';
     newAbc += `%%MIDI control 7 ${Math.round(volMelody * 1.27)}\n`;
     newAbc += `%%MIDI chordvol ${Math.round(volChord * 1.27)}\n`;
+    newAbc += `%%MIDI chordprog 0\n`; // Default Piano for chords
     newAbc += bodyText + '\n\n';
     
     newAbc += 'V:2 name="Bass" clef=bass\n';
