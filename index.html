@@ -98,15 +98,6 @@
           </div>
           <!-- Hidden ABCJS Paper for Audio Generation -->
           <div id="hidden-audio-paper" style="position: absolute; visibility: hidden; width: 1000px; z-index: -1;"></div>
-          <!-- Controls -->
-          <div class="karaoke-controls" style="margin-top: auto;">
-             <button class="ctrl-btn play" id="studioPlayBtn" onclick="toggleStudioPlay()">▶ Phát Nhạc</button>
-             <button class="ctrl-btn stop" id="studioStopBtn" style="display: none;" onclick="stopStudioPlay()">⏹ Dừng Lại</button>
-             <div class="tempo-control">
-               <label>Tempo:</label>
-               <input type="range" id="studioTempo" min="50" max="200" value="100" />
-             </div>
-          </div>
         </div>
       </section>
 
@@ -121,6 +112,7 @@
            <div style="display:flex; justify-content:space-between; align-items: center;"><label>🎸 Bass:</label><input type="range" id="volBass" min="0" max="1" step="0.05" value="0.65" oninput="updateVolumes()"></div>
            <div style="display:flex; justify-content:space-between; align-items: center;"><label>🎹 Đệm:</label><input type="range" id="volChord" min="0" max="1" step="0.05" value="0.5" oninput="updateVolumes()"></div>
            <div style="display:flex; justify-content:space-between; align-items: center;"><label>🎤 Melody:</label><input type="range" id="volMelody" min="0" max="1" step="0.05" value="0.85" oninput="updateVolumes()"></div>
+           <div style="display:flex; justify-content:space-between; align-items: center; margin-top: 5px;"><label>⏱ Tempo:</label><input type="range" id="studioTempo" min="50" max="200" value="100" /></div>
            
            <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0;">
 
@@ -147,7 +139,8 @@
            </div>
            
            <div style="display: flex; gap: 10px; margin-top: 15px;">
-               <button class="ctrl-btn play" onclick="exportToJson()" style="flex: 1; font-size: 14px; background: var(--secondary);">⬇️ Xuất JSON</button>
+               <button class="ctrl-btn play" id="studioPlayBtn" onclick="toggleStudioPlay()" style="flex: 1; font-size: 14px;">▶ Phát Nhạc</button>
+               <button class="ctrl-btn stop" id="studioStopBtn" style="display: none; flex: 1; font-size: 14px;" onclick="stopStudioPlay()">⏹ Dừng Lại</button>
                <button class="ctrl-btn play" onclick="downloadMidi()" style="flex: 1; font-size: 14px; background: #6366f1;">🎵 Tải MIDI</button>
            </div>
            <!-- Textarea to display exported JSON -->
