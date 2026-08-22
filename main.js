@@ -267,43 +267,56 @@ document.getElementById('tab-btn-listen').addEventListener('click', () => {
 
 
 
+
 // --- STUDIO TAB LOGIC (OPTION A) ---
 let studioVisualObj = null;
+let studioAudioVisualObj = null;
 let studioSynthControl = null;
 let studioTimingCallbacks = null;
 
 window.renderStudioSheet = function() {
     const abcCode = document.getElementById('abc-code').value;
     let studioAbc = abcCode;
+    let studioAudioAbc = abcCode;
     
-    if (window.generateAccompaniment) {
-        studioAbc = window.generateAccompaniment(studioAbc);
-    }
-    
-    // Inject Instrument (MIDI Program) for Melody (V:1)
-    const instrumentId = document.getElementById('studioInstrument') ? document.getElementById('studioInstrument').value : '0';
-    if (studioAbc.includes('V:1 name="Melody"')) {
-        studioAbc = studioAbc.replace('V:1 name="Melody"\n', 'V:1 name="Melody"\n%%MIDI program ' + instrumentId + '\n');
-    } else {
-        if (!studioAbc.match(/^%%MIDI program/m)) {
-            studioAbc = studioAbc.replace(/^(K:.*)$/m, '$1\n%%MIDI program ' + instrumentId);
-        } else {
-            studioAbc = studioAbc.replace(/^%%MIDI program.*$/m, '%%MIDI program ' + instrumentId);
-        }
-    }
-    
+    // Inject Tempo
     const currentTempo = document.getElementById('studioTempo') ? parseInt(document.getElementById('studioTempo').value) : 100;
     const newTempo = Math.round(120 * (currentTempo / 100));
     
     if (!studioAbc.match(/^Q:/m)) {
         studioAbc = studioAbc.replace(/^(K:.*)$/m, '$1\nQ: 1/4=' + newTempo);
+        studioAudioAbc = studioAudioAbc.replace(/^(K:.*)$/m, '$1\nQ: 1/4=' + newTempo);
     } else {
         studioAbc = studioAbc.replace(/^Q:.*$/m, 'Q: 1/4=' + newTempo);
+        studioAudioAbc = studioAudioAbc.replace(/^Q:.*$/m, 'Q: 1/4=' + newTempo);
     }
-
+    
+    // Visual ABC: just the melody
     studioVisualObj = abcjs.renderAbc('studio-abc-paper', studioAbc, {
         add_classes: true,
         responsive: 'resize'
+    });
+    
+    // Audio ABC: Melody + Injected Accompaniment
+    if (window.generateAccompaniment) {
+        studioAudioAbc = window.generateAccompaniment(studioAudioAbc);
+    }
+    
+    // Inject Instrument for Melody
+    const instrumentId = document.getElementById('studioInstrument') ? document.getElementById('studioInstrument').value : '0';
+    if (studioAudioAbc.includes('V:1 name="Melody"')) {
+        studioAudioAbc = studioAudioAbc.replace('V:1 name="Melody"\n', 'V:1 name="Melody"\n%%MIDI program ' + instrumentId + '\n');
+    } else {
+        if (!studioAudioAbc.match(/^%%MIDI program/m)) {
+            studioAudioAbc = studioAudioAbc.replace(/^(K:.*)$/m, '$1\n%%MIDI program ' + instrumentId);
+        } else {
+            studioAudioAbc = studioAudioAbc.replace(/^%%MIDI program.*$/m, '%%MIDI program ' + instrumentId);
+        }
+    }
+    
+    // Render Audio ABC to hidden div
+    studioAudioVisualObj = abcjs.renderAbc('hidden-audio-paper', studioAudioAbc, {
+        add_classes: true
     });
 };
 
@@ -319,14 +332,16 @@ window.toggleStudioPlay = function() {
     const cursorControl = new CursorControl('#studio-abc-paper', 'studioPlayBtn', 'studioStopBtn');
     studioSynthControl = new abcjs.synth.CreateSynth();
     
+    // Use studioVisualObj[0] for timing/highlighting (Visual)
     studioTimingCallbacks = new abcjs.TimingCallbacks(studioVisualObj[0], {
         eventCallback: function(ev) {
             cursorControl.onEvent(ev);
         }
     });
 
+    // Use studioAudioVisualObj[0] for actual sound generation (Audio)
     studioSynthControl.init({ 
-        visualObj: studioVisualObj[0],
+        visualObj: studioAudioVisualObj[0],
         options: {
             onEnded: function() {
                 document.getElementById('studioPlayBtn').style.display = 'block';
@@ -348,8 +363,9 @@ window.toggleStudioPlay = function() {
 };
 
 window.stopStudioPlay = function() {
-    if(studioTimingCallbacks) studioTimingCallbacks.stop();
     if (studioSynthControl) studioSynthControl.stop();
+    if (studioTimingCallbacks) studioTimingCallbacks.stop();
+    
     document.getElementById('studioPlayBtn').style.display = 'block';
     document.getElementById('studioStopBtn').style.display = 'none';
     
@@ -359,17 +375,6 @@ window.stopStudioPlay = function() {
     }
 };
 
-if (document.getElementById('studioTempo')) {
-    document.getElementById('studioTempo').addEventListener('input', (e) => {
-        window.renderStudioSheet();
-        if (studioSynthControl && studioSynthControl.audioContext && studioSynthControl.audioContext.state === 'running') {
-            studioSynthControl.stop();
-            document.getElementById('studioPlayBtn').click();
-        }
-    });
-}
-
-
 // Add event listeners for volume sliders to update accompaniment dynamically
 ['volMelody', 'volChord', 'volBass', 'volDrum'].forEach(id => {
     const el = document.getElementById(id);
@@ -377,108 +382,9 @@ if (document.getElementById('studioTempo')) {
         el.addEventListener('input', () => {
             if (window.renderStudioSheet) window.renderStudioSheet();
             if (studioSynthControl && studioSynthControl.audioContext && studioSynthControl.audioContext.state === 'running') {
-                studioSynthControl.stop();
+                window.stopStudioPlay();
                 if(document.getElementById('studioPlayBtn')) document.getElementById('studioPlayBtn').click();
             }
         });
     }
 });
-
-
-// accompaniment.js
-// Auto-generates Bass and Drum tracks based on chords in the ABC notation.
-
-window.generateAccompaniment = function(abcCode) {
-    let lines = abcCode.split('\n');
-    let header = [];
-    let body = [];
-    let inHeader = true;
-    
-    let timeSignature = '4/4';
-    let beatsPerMeasure = 4;
-    
-    for (let line of lines) {
-        if (inHeader) {
-            header.push(line);
-            if (line.startsWith('M:')) {
-                timeSignature = line.substring(2).trim();
-                if (timeSignature === '3/4') beatsPerMeasure = 3;
-                else if (timeSignature === '2/4') beatsPerMeasure = 2;
-                else if (timeSignature === '6/8') beatsPerMeasure = 2; 
-                else beatsPerMeasure = 4;
-            }
-            if (line.startsWith('K:')) {
-                inHeader = false; 
-            }
-        } else {
-            body.push(line);
-        }
-    }
-    
-    const kIndex = header.findIndex(l => l.startsWith('K:'));
-    if (kIndex !== -1) {
-        header.splice(kIndex, 0, '%%score 1');
-    }
-    
-    let bodyText = body.join('\n');
-    let measures = bodyText.split(/[:|\]]+/); 
-    
-    let bassTrack = [];
-    let drumTrack = [];
-    let currentChord = 'C'; 
-    
-    for (let m of measures) {
-        if (m.trim() === '') continue;
-        
-        let chordMatch = m.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/);
-        if (chordMatch) {
-            currentChord = chordMatch[1];
-        }
-        
-        let root = currentChord.charAt(0);
-        let accidental = currentChord.length > 1 && (currentChord[1] === '#' || currentChord[1] === 'b') ? currentChord[1] : '';
-        let bassNote = root + accidental + ',,'; 
-        
-        let bassMeasure = '';
-        let drumMeasure = '';
-        
-        if (beatsPerMeasure === 4) {
-            bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`;
-            drumMeasure = `[c2F2] [c2F2]`; 
-        } else if (beatsPerMeasure === 3) {
-            bassMeasure = `${bassNote} ${bassNote} ${bassNote}`;
-            drumMeasure = `[cF] [cF] [cF]`; 
-        } else if (beatsPerMeasure === 2) {
-            bassMeasure = `${bassNote}2`;
-            drumMeasure = `[c2F2]`;
-        }
-        
-        bassTrack.push(bassMeasure);
-        drumTrack.push(drumMeasure);
-    }
-    
-    const volMelody = document.getElementById('volMelody') ? document.getElementById('volMelody').value : 100;
-    const volChord = document.getElementById('volChord') ? document.getElementById('volChord').value : 80;
-    const volBass = document.getElementById('volBass') ? document.getElementById('volBass').value : 80;
-    const volDrum = document.getElementById('volDrum') ? document.getElementById('volDrum').value : 100;
-    
-    let newAbc = header.join('\n') + '\n';
-    newAbc += 'V:1 name="Melody"\n';
-    newAbc += `%%MIDI control 7 ${Math.round(volMelody * 1.27)}\n`;
-    newAbc += `%%MIDI chordvol ${Math.round(volChord * 1.27)}\n`;
-    newAbc += bodyText + '\n\n';
-    
-    newAbc += 'V:2 name="Bass" clef=bass\n';
-    newAbc += 'L:1/4\n';
-    newAbc += '%%MIDI program 33\n';
-    newAbc += `%%MIDI control 7 ${Math.round(volBass * 1.27)}\n`;
-    newAbc += bassTrack.join(' | ') + ' |]\n\n';
-    
-    newAbc += 'V:3 name="Drums" clef=perc\n';
-    newAbc += 'L:1/4\n';
-    newAbc += '%%MIDI channel 10\n';
-    newAbc += `%%MIDI control 7 ${Math.round(volDrum * 1.27)}\n`;
-    newAbc += drumTrack.join(' | ') + ' |]\n';
-    
-    return newAbc;
-};

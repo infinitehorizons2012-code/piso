@@ -1,5 +1,5 @@
 // accompaniment.js
-// Auto-generates Bass and Drum tracks based on chords in the ABC notation.
+// Auto-generates Bass and Drum tracks based on chords in the ABC notation for audio synthesis.
 
 window.generateAccompaniment = function(abcCode) {
     let lines = abcCode.split('\n');
@@ -26,11 +26,6 @@ window.generateAccompaniment = function(abcCode) {
         } else {
             body.push(line);
         }
-    }
-    
-    const kIndex = header.findIndex(l => l.startsWith('K:'));
-    if (kIndex !== -1) {
-        header.splice(kIndex, 0, '%%score 1');
     }
     
     let bodyText = body.join('\n');
