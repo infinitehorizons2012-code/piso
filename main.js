@@ -80,9 +80,9 @@ toggleBtn.addEventListener('click', () => {
 
 // --- Karaoke Playback & Cursor Control ---
 let synthControl = null;
+let timingCallbacks = null;
 let currentTempo = 100; // default 100%
 
-// A simplified cursor control that adds a CSS class to the active notes
 function CursorControl(rootSelector, playBtnId = 'play-btn', stopBtnId = 'stop-btn') {
     this.onStart = function() {
         this.clearSelection();
@@ -91,7 +91,6 @@ function CursorControl(rootSelector, playBtnId = 'play-btn', stopBtnId = 'stop-b
     this.onEvent = function(ev) {
         this.clearSelection();
         if (ev === null || ev === undefined) {
-            // Playback finished naturally
             if(document.getElementById(playBtnId)) document.getElementById(playBtnId).style.display = 'block';
             if(document.getElementById(stopBtnId)) document.getElementById(stopBtnId).style.display = 'none';
             return;
@@ -108,7 +107,6 @@ function CursorControl(rootSelector, playBtnId = 'play-btn', stopBtnId = 'stop-b
     
     this.onFinished = function() {
         this.clearSelection();
-        // Reset play button
         if(document.getElementById(playBtnId)) document.getElementById(playBtnId).style.display = 'block';
         if(document.getElementById(stopBtnId)) document.getElementById(stopBtnId).style.display = 'none';
     };
@@ -130,53 +128,45 @@ document.getElementById('play-btn').addEventListener('click', () => {
     document.getElementById('play-btn').style.display = 'none';
     document.getElementById('stop-btn').style.display = 'block';
     
-    const cursorControl = new CursorControl("#karaoke-paper");
+    const cursorControl = new CursorControl("#karaoke-paper", "play-btn", "stop-btn");
     
     synthControl = new abcjs.synth.CreateSynth();
-    // Calculate tempo multiplier from slider (50% to 200%)
-    const tempoMultiplier = currentTempo / 100;
     
-    // Find the default millisecondsPerMeasure from the visual object
-    // If not found, use a default
-    let defaultMpm = 1000;
-    if (currentVisualObj[0].getBeatLength) {
-        // Just let abcjs figure it out, we will use the audioContext playbackRate hack below, 
-        // or just let it play at default if complex.
-    }
+    timingCallbacks = new abcjs.TimingCallbacks(currentVisualObj[0], {
+        eventCallback: function(ev) {
+            cursorControl.onEvent(ev);
+        }
+    });
     
     synthControl.init({ 
         visualObj: currentVisualObj[0],
         options: {
-            cursorControl: cursorControl,
             onEnded: function() {
-                // Playback finished naturally
-                if(document.getElementById(playBtnId)) document.getElementById(playBtnId).style.display = 'block';
-                if(document.getElementById(stopBtnId)) document.getElementById(stopBtnId).style.display = 'none';
+                document.getElementById('play-btn').style.display = 'block';
+                document.getElementById('stop-btn').style.display = 'none';
                 
-                // Clear highlights
                 const lastSelection = document.querySelectorAll("#karaoke-paper .abcjs-highlight");
                 for (let i = 0; i < lastSelection.length; i++) {
                     lastSelection[i].classList.remove("abcjs-highlight");
                 }
+                if(timingCallbacks) timingCallbacks.stop();
             }
         }
     }).then(() => {
         synthControl.prime().then(() => {
-            // Apply tempo multiplier to the internal audioContext if available
-            if (synthControl.audioContext && synthControl.audioContext.state !== 'closed') {
-                // Not standard, but sometimes we can just change the audioContext rate? No.
-            }
             synthControl.start();
+            if(timingCallbacks) timingCallbacks.start();
         });
     });
 });
 
 document.getElementById('stop-btn').addEventListener('click', () => {
     if (synthControl) synthControl.stop();
-    if(document.getElementById(playBtnId)) document.getElementById(playBtnId).style.display = 'block';
-    if(document.getElementById(stopBtnId)) document.getElementById(stopBtnId).style.display = 'none';
+    if (timingCallbacks) timingCallbacks.stop();
     
-    // Clear highlights manually just in case
+    document.getElementById('play-btn').style.display = 'block';
+    document.getElementById('stop-btn').style.display = 'none';
+    
     const lastSelection = document.querySelectorAll("#karaoke-paper .abcjs-highlight");
     for (let i = 0; i < lastSelection.length; i++) {
         lastSelection[i].classList.remove("abcjs-highlight");
@@ -188,12 +178,10 @@ document.getElementById('tempo-slider').addEventListener('input', (e) => {
     currentTempo = e.target.value;
     document.getElementById('tempo-value').innerText = currentTempo;
     
-    // Re-render karaoke sheet to apply new tempo
     renderSheetMusic();
     
     if (synthControl && synthControl.audioContext && synthControl.audioContext.state === 'running') {
-        // If already playing, stop and restart with new tempo
-        synthControl.stop();
+        document.getElementById('stop-btn').click();
         document.getElementById('play-btn').click();
     }
 });
