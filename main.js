@@ -564,3 +564,92 @@ window.generateAccompaniment = function(abcCode) {
     
     return newAbc;
 };
+
+
+
+window.exportToJson = function() {
+    if (!studioVisualObj || !studioVisualObj[0]) {
+        alert('Vui lòng Nhấn "Phát Nhạc" ít nhất 1 lần để hệ thống xử lý bản nhạc!');
+        return;
+    }
+
+    const visualObj = studioVisualObj[0];
+    const output = {
+        title: visualObj.metaText.title || 'Bản Nhạc ABC',
+        composer: visualObj.metaText.author || '',
+        rhythmStyle: 'Pop',
+        timeSignature: visualObj.getMeter ? (visualObj.getMeter().type || '4/4') : '4/4',
+        bpm: visualObj.metaText.tempo ? visualObj.metaText.tempo.bpm : 100,
+        drumPattern: 'pop',
+        staves: []
+    };
+
+    let measureNum = 1;
+    let currentChord = '';
+    let currentMeasure = { measureNum, chord: currentChord, notes: [] };
+
+    // Function to convert MIDI pitch to standard note name (e.g. 60 -> C4)
+    function midiToNoteName(midi) {
+        const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
+        const octave = Math.floor(midi / 12) - 1;
+        const noteName = notes[midi % 12];
+        return noteName + octave;
+    }
+
+    for (const line of visualObj.lines) {
+        if (!line.staff) continue;
+        const voice = line.staff[0].voices[0];
+        
+        for (const elem of voice) {
+            if (elem.el_type === 'bar') {
+                if (currentMeasure.notes.length > 0) {
+                    output.staves.push(currentMeasure);
+                }
+                measureNum++;
+                currentMeasure = { measureNum, chord: currentChord, notes: [] };
+            } else if (elem.el_type === 'note') {
+                if (elem.chord) {
+                    currentChord = elem.chord[0].name;
+                    currentMeasure.chord = currentChord;
+                }
+                
+                let beatDuration = elem.duration * 4; 
+                
+                if (elem.rest) {
+                    currentMeasure.notes.push({ type: 'rest', duration: beatDuration });
+                } else {
+                    let pitch = 'C4';
+                    let solfege = '';
+                    if (elem.pitches && elem.pitches.length > 0) {
+                        pitch = midiToNoteName(elem.pitches[0].pitch);
+                        // Optional: basic solfege guess (very naive)
+                        let rawName = elem.pitches[0].name || '';
+                        let solfegeMap = { 'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si' };
+                        solfege = solfegeMap[rawName.toLowerCase().charAt(0)] || '';
+                    }
+
+                    currentMeasure.notes.push({
+                        type: 'note',
+                        pitch: pitch, 
+                        duration: beatDuration,
+                        lyric: elem.lyric ? elem.lyric[0].syllable : '',
+                        solfege: solfege
+                    });
+                }
+            }
+        }
+    }
+    
+    if (currentMeasure.notes.length > 0) {
+        output.staves.push(currentMeasure);
+    }
+
+    const resultBox = document.getElementById('jsonExportResult');
+    if (resultBox) {
+        resultBox.value = JSON.stringify(output, null, 2);
+        resultBox.style.display = 'block';
+        resultBox.select();
+        document.execCommand('copy');
+        alert('Đã tạo JSON và sao chép vào bộ nhớ tạm (Clipboard)! Bạn có thể dán vào Full Band Studio.');
+    }
+};
