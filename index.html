@@ -92,17 +92,17 @@
           <h2>🎧 Canvas Studio Renderer</h2>
         </div>
         <div class="panel-content" style="display: flex; flex-direction: column; gap: 15px;">
-          <!-- Canvas -->
-          <div class="sheet-viewport" style="flex: 1; border: 2px solid #eee; border-radius: 12px; overflow: hidden; display: flex; justify-content: center; align-items: center; background: #fff;">
-            <canvas id="sheetCanvas" width="960" height="680" style="max-width: 100%; height: auto;"></canvas>
+          <!-- ABCJS Paper for Studio -->
+          <div class="sheet-viewport" style="flex: 1; border: 2px solid #eee; border-radius: 12px; overflow-y: auto; background: #fff; padding: 20px;">
+            <div id="studio-abc-paper" class="sheet-music-display"></div>
           </div>
           <!-- Controls -->
           <div class="karaoke-controls" style="margin-top: auto;">
-             <button class="ctrl-btn play" id="btnPlayPause" onclick="togglePlay()">▶ Phát Toàn Bộ</button>
-             <button class="ctrl-btn stop" onclick="stopPlayback()">⏹ Stop</button>
+             <button class="ctrl-btn play" id="studioPlayBtn" onclick="toggleStudioPlay()">▶ Phát Nhạc</button>
+             <button class="ctrl-btn stop" id="studioStopBtn" style="display: none;" onclick="stopStudioPlay()">⏹ Dừng Lại</button>
              <div class="tempo-control">
-               <label>BPM:</label>
-               <input type="number" id="inputBpm" value="92" style="width: 60px;" />
+               <label>Tempo:</label>
+               <input type="range" id="studioTempo" min="50" max="200" value="100" />
              </div>
           </div>
         </div>
@@ -124,22 +124,12 @@
 
            <!-- Dropdowns -->
            <div style="display:flex; flex-direction: column; gap: 5px;">
-               <label>Điệu Trống:</label>
-               <select id="selectDrumPattern" onchange="changeDrumPattern(this.value)" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
-                   <option value="swing">Swing 4/4</option>
-                   <option value="pop">Pop 8-Beat</option>
-                   <option value="ballad">Slow Ballad</option>
-                   <option value="disco">Disco</option>
-                   <option value="none">Tắt Nhạc Nền</option>
-               </select>
-           </div>
-           <div style="display:flex; flex-direction: column; gap: 5px;">
-               <label>Nhạc Cụ Lead:</label>
-               <select id="selectSound" onchange="changeInstrument(this.value)" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
-                   <option value="piano">Acoustic Piano</option>
-                   <option value="marimba">Marimba</option>
-                   <option value="flute">Flute</option>
-                   <option value="synth">Synth</option>
+               <label>Nhạc Cụ (Áp dụng cho toàn bài):</label>
+               <select id="studioInstrument" onchange="renderStudioSheet()" style="padding: 8px; border-radius: 6px; border: 1px solid #ddd;">
+                   <option value="0">Acoustic Piano</option>
+                   <option value="12">Marimba</option>
+                   <option value="73">Flute</option>
+                   <option value="81">Synth Lead</option>
                </select>
            </div>
         </div>
