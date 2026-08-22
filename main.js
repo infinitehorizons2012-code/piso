@@ -286,19 +286,16 @@ window.renderStudioSheet = function() {
         responsive: 'resize'
     });
     
-    
-    // Inject Instrument and Melody Volume
+    // Inject Instrument
     const instrumentId = document.getElementById('studioInstrument') ? document.getElementById('studioInstrument').value : '0';
-    const volMelody = document.getElementById('volMelody') ? parseFloat(document.getElementById('volMelody').value) : 1;
-    const midiVol = Math.round(volMelody * 127);
     
     if (studioAudioAbc.includes('V:1 name="Melody"')) {
-        studioAudioAbc = studioAudioAbc.replace('V:1 name="Melody"\n', 'V:1 name="Melody"\n%%MIDI control 7 ' + midiVol + '\n%%MIDI program ' + instrumentId + '\n');
+        studioAudioAbc = studioAudioAbc.replace('V:1 name="Melody"\n', 'V:1 name="Melody"\n%%MIDI program ' + instrumentId + '\n');
     } else {
         if (!studioAudioAbc.match(/^%%MIDI program/m)) {
-            studioAudioAbc = studioAudioAbc.replace(/^(K:.*)$/m, '$1\n%%MIDI control 7 ' + midiVol + '\n%%MIDI program ' + instrumentId);
+            studioAudioAbc = studioAudioAbc.replace(/^(K:.*)$/m, '$1\n%%MIDI program ' + instrumentId);
         } else {
-            studioAudioAbc = studioAudioAbc.replace(/^%%MIDI program.*$/m, '%%MIDI control 7 ' + midiVol + '\n%%MIDI program ' + instrumentId);
+            studioAudioAbc = studioAudioAbc.replace(/^%%MIDI program.*$/m, '%%MIDI program ' + instrumentId);
         }
     }
     
@@ -346,10 +343,12 @@ window.toggleStudioPlay = function() {
     });
 
     // Use studioAudioVisualObj[0] for actual sound generation (Audio)
+    const volMelody = document.getElementById('volMelody') ? parseFloat(document.getElementById('volMelody').value) : 1;
     studioSynthControl.init({ 
         visualObj: studioAudioVisualObj[0],
         options: {
             chordsOff: true,
+            soundFontVolumeMultiplier: volMelody,
             onEnded: function() {
                 document.getElementById('studioPlayBtn').style.display = 'block';
                 document.getElementById('studioStopBtn').style.display = 'none';
@@ -363,7 +362,7 @@ window.toggleStudioPlay = function() {
         }
     }).then(() => {
         studioSynthControl.prime().then(() => {
-            studioSynthControl.start();
+            // studioSynthControl.start();
             AccompEngine.startAccompanimentEngine(document.getElementById('studioTempo').value);
             studioTimingCallbacks.start();
         }).catch(function (error) {

@@ -72,11 +72,11 @@ export function updateFullBandVolumes() {
 }
 
 export function playBassHit(chordName, durationSec) {
-    if (!audioCtx) return;
-    // Basic chord extraction (remove 7, maj7, etc for bass)
-    const baseChord = chordName.replace(/7|maj7|m7|sus4/g, '');
-    const freq = BASS_FREQS[baseChord];
-    if (!freq) return;
+    if (!audioCtx || !chordName) return;
+    // Extract root note (e.g. "C#m7" -> "C#")
+    const baseMatch = chordName.match(/^[A-G][#b]?/);
+    const baseChord = baseMatch ? baseMatch[0] : 'C';
+    const freq = BASS_FREQS[baseChord] || 130.81; // Default to C if not found
     
     const now = audioCtx.currentTime;
     const osc = audioCtx.createOscillator();
@@ -101,10 +101,15 @@ export function playBassHit(chordName, durationSec) {
 }
 
 export function playChordPadHit(chordName, durationSec) {
-    if (!audioCtx) return;
-    const baseChord = chordName.replace(/7|maj7|m7|sus4/g, '');
-    const freqs = CHORD_FREQS[baseChord];
-    if (!freqs) return;
+    if (!audioCtx || !chordName) return;
+    let freqs = CHORD_FREQS[chordName];
+    if (!freqs) {
+        // Fallback to major chord of the root note if specific chord (like G7, Cadd9) is not found
+        const baseMatch = chordName.match(/^[A-G][#b]?/);
+        const baseChord = baseMatch ? baseMatch[0] : 'C';
+        freqs = CHORD_FREQS[baseChord] || CHORD_FREQS['C'];
+    }
+    
     const now = audioCtx.currentTime;
 
     freqs.forEach(freq => {
