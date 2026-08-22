@@ -27,6 +27,14 @@ window.zoomSheet = function(delta) {
     document.getElementById('abc-code').dispatchEvent(new Event('input'));
 };
 
+window.currentImageScale = 1.0;
+window.zoomImage = function(delta) {
+    window.currentImageScale += delta;
+    if (window.currentImageScale < 0.2) window.currentImageScale = 0.2;
+    if (window.currentImageScale > 5.0) window.currentImageScale = 5.0;
+    document.getElementById('uploaded-image').style.transform = `scale(${window.currentImageScale})`;
+};
+
 function renderSheetMusic() {
   const abcCode = abcTextarea.value;
   // Render using abcjs for the left panel

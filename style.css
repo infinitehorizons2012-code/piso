@@ -114,7 +114,7 @@ h1 {
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow: auto;
+  overflow: hidden; /* Changed from auto to hidden to allow internal scrolling */
 }
 
 #comparison-container {
@@ -130,7 +130,7 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: flex-start; /* Better for scrolling tall images */
-  height: 35%; /* Show enough for 1-2 lines */
+  height: 250px; /* Show enough for 1-2 lines */
   flex-shrink: 0;
   background: #f8f9fa;
   border-radius: 12px;
@@ -166,6 +166,7 @@ h1 {
   height: auto; /* Let height grow to natural size based on width */
   object-fit: contain;
   cursor: grab;
+  transform-origin: top center;
 }
 #uploaded-image:active {
   cursor: grabbing;
