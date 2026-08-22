@@ -33,40 +33,6 @@ abcTextarea.addEventListener('input', () => {
   renderSheetMusic();
 });
 
-// --- Toolbar Logic ---
-const toolBtns = document.querySelectorAll('.tool-btn[data-abc]');
-const clearBtn = document.getElementById('clear-btn');
-
-toolBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    const note = btn.getAttribute('data-abc');
-    insertTextAtCursor(abcTextarea, note + " ");
-    renderSheetMusic();
-    abcTextarea.focus();
-  });
-});
-
-clearBtn.addEventListener('click', () => {
-  if (confirm('Bé có chắc muốn xóa hết bản nhạc không?')) {
-    abcTextarea.value = `X:1
-T:Bản Nhạc Của Bé
-M:4/4
-L:1/4
-K:C\n`;
-    renderSheetMusic();
-    abcTextarea.focus();
-  }
-});
-
-function insertTextAtCursor(el, text) {
-  const start = el.selectionStart;
-  const end = el.selectionEnd;
-  const textBefore = el.value.substring(0, start);
-  const textAfter  = el.value.substring(end, el.value.length);
-  el.value = textBefore + text + textAfter;
-  el.selectionStart = el.selectionEnd = start + text.length;
-}
-
 // --- Image Upload Logic ---
 const uploadPrompt = document.getElementById('upload-prompt');
 const imageUpload = document.getElementById('image-upload');

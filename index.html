@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Piso - Viết Nhạc Vui Nhộn</title>
+    <title>Piso - Viết Nhạc Nhanh</title>
     <!-- Add Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <!-- abcjs CSS -->
@@ -16,61 +16,46 @@
         <span class="logo-icon">🎵</span>
         <h1>Piso Music</h1>
       </div>
-      <p class="subtitle">Ứng dụng viết nhạc dành cho bé!</p>
+      <p class="subtitle">Môi trường soạn thảo ABC Notation chuyên nghiệp!</p>
     </header>
 
     <main class="app-container">
-      <!-- Left side: Image uploader & viewer -->
+      <!-- Left side: Image Viewer (Top) + Sheet Music (Bottom) -->
       <section class="panel left-panel">
         <div class="panel-header">
-          <h2>📷 Bản Nhạc Mẫu</h2>
+          <h2>👁️ So Sánh Bản Nhạc</h2>
         </div>
-        <div class="panel-content" id="image-container">
-          <div id="upload-prompt" class="upload-prompt">
-            <span class="upload-icon">📂</span>
-            <p>Kéo thả ảnh hoặc nhấn vào đây để tải ảnh bản nhạc lên</p>
-            <input type="file" id="image-upload" accept="image/*" hidden />
+        <div class="panel-content" id="comparison-container">
+          
+          <!-- Image Upload & Viewer -->
+          <div id="image-container">
+            <div id="upload-prompt" class="upload-prompt">
+              <span class="upload-icon">📂</span>
+              <p>Kéo thả ảnh hoặc nhấn vào đây để tải ảnh bản nhạc mẫu lên</p>
+              <input type="file" id="image-upload" accept="image/*" hidden />
+            </div>
+            <img id="uploaded-image" style="display: none;" alt="Bản nhạc mẫu" />
           </div>
-          <img id="uploaded-image" style="display: none;" alt="Bản nhạc của bạn" />
+
+          <!-- Divider -->
+          <div class="divider">Kết Quả (Sheet Music)</div>
+
+          <!-- ABCJS visual rendering -->
+          <div id="paper" class="sheet-music-display"></div>
+
         </div>
       </section>
 
       <!-- Right side: ABC Editor -->
       <section class="panel right-panel">
-        <div class="panel-header">
-          <h2>🎼 Viết Nhạc Của Bé</h2>
+        <div class="panel-header" style="background: var(--primary);">
+          <h2 style="color: white;">✍️ Viết Mã ABC</h2>
         </div>
         
-        <!-- Toolbar -->
-        <div class="toolbar">
-          <div class="toolbar-group">
-            <button class="tool-btn note-btn" data-abc="C">C (Đồ)</button>
-            <button class="tool-btn note-btn" data-abc="D">D (Rê)</button>
-            <button class="tool-btn note-btn" data-abc="E">E (Mi)</button>
-            <button class="tool-btn note-btn" data-abc="F">F (Fa)</button>
-            <button class="tool-btn note-btn" data-abc="G">G (Son)</button>
-            <button class="tool-btn note-btn" data-abc="A">A (La)</button>
-            <button class="tool-btn note-btn" data-abc="B">B (Si)</button>
-          </div>
-          <div class="toolbar-group">
-            <button class="tool-btn note-btn" data-abc="c">c (Đồ cao)</button>
-            <button class="tool-btn note-btn" data-abc="d">d (Rê cao)</button>
-            <button class="tool-btn note-btn" data-abc="e">e (Mi cao)</button>
-          </div>
-          <div class="toolbar-group">
-            <button class="tool-btn utility-btn" data-abc="z">Lặng (z)</button>
-            <button class="tool-btn utility-btn" data-abc="|">Vạch Nhịp (|)</button>
-            <button class="tool-btn action-btn" id="clear-btn">Xóa Hết</button>
-          </div>
-        </div>
-
         <div class="panel-content editor-content">
-          <!-- ABCJS visual rendering -->
-          <div id="paper" class="sheet-music-display"></div>
-          
           <!-- Text area for ABC Notation -->
           <div class="abc-input-container">
-            <label for="abc-code">Mã ABC Notation (Thay đổi chữ ở đây nhạc sẽ đổi!)</label>
+            <label for="abc-code">Mã ABC Notation (Gõ đến đâu, nhạc cập nhật đến đó!)</label>
             <textarea id="abc-code" spellcheck="false" placeholder="Gõ abc vào đây..."></textarea>
           </div>
         </div>
