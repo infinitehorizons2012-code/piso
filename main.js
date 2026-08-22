@@ -349,6 +349,7 @@ window.toggleStudioPlay = function() {
     const volMelody = document.getElementById('volMelody') ? parseFloat(document.getElementById('volMelody').value) : 1;
     studioSynthControl.init({ 
         visualObj: studioAudioVisualObj[0],
+        soundFontVolumeMultiplier: volMelody * 3.0,
         options: {
             chordsOff: true,
             soundFontVolumeMultiplier: volMelody,

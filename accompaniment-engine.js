@@ -41,10 +41,14 @@ export function handleBeatCallback(beatNumber) {
     
     const beatDurationMs = 60000 / currentTempo;
     
-    // Play Bass and Chords on every beat (quarter note)
+    // Play Bass and Chords
     if (activeChord) {
-        playBassHit(activeChord, 60 / currentTempo);
-        playChordPadHit(activeChord, 60 / currentTempo);
+        // Classic "Oom-Pah" pattern: Bass on even beats, Chords on odd beats
+        if (beatNumber % 2 === 0) {
+            playBassHit(activeChord, 60 / currentTempo);
+        } else {
+            playChordPadHit(activeChord, 60 / currentTempo);
+        }
     }
     
     // Play Drums based on style

@@ -1,14 +1,12 @@
 // Full Band Studio Custom Web Audio API Synthesizer
 
 export const BASS_FREQS = {
-    "Am": 110.00, "A": 110.00,
-    "C":  130.81, "Cm": 130.81,
-    "G":  98.00, "Gm": 98.00,
-    "Dm": 73.42, "D": 73.42,
-    "F": 87.31, "Fm": 87.31,
-    "Em": 82.41, "E": 82.41,
-    "Bb": 116.54, "Bbm": 116.54,
-    "B": 123.47, "Bm": 123.47
+    'C': 65.41, 'C#': 69.30, 'Db': 69.30,
+    'D': 73.42, 'D#': 77.78, 'Eb': 77.78,
+    'E': 82.41, 'F': 87.31, 'F#': 92.50, 'Gb': 92.50,
+    'G': 98.00, 'G#': 103.83, 'Ab': 103.83,
+    'A': 55.00, 'A#': 58.27, 'Bb': 58.27,
+    'B': 61.74
 };
 
 export const CHORD_FREQS = {
@@ -76,12 +74,12 @@ export function playBassHit(chordName, durationSec) {
     // Extract root note (e.g. "C#m7" -> "C#")
     const baseMatch = chordName.match(/^[A-G][#b]?/);
     const baseChord = baseMatch ? baseMatch[0] : 'C';
-    const freq = BASS_FREQS[baseChord] || 130.81; // Default to C if not found
+    const freq = BASS_FREQS[baseChord] || 65.41; // Default to C2 if not found
     
     const now = audioCtx.currentTime;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = 'sawtooth';
+    osc.type = 'triangle';
 
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
