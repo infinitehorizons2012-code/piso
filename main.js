@@ -314,7 +314,9 @@ window.updateVolumes = function() {
     if (volumeTimeout) clearTimeout(volumeTimeout);
     volumeTimeout = setTimeout(() => {
         window.renderStudioSheet();
-        if (studioSynthControl && studioSynthControl.audioContext && studioSynthControl.audioContext.state === 'running') {
+        const stopBtn = document.getElementById('studioStopBtn');
+        const isPlaying = stopBtn && stopBtn.style.display === 'block';
+        if (isPlaying) {
             window.stopStudioPlay();
             window.toggleStudioPlay();
         }

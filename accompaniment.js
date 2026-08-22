@@ -61,26 +61,26 @@ window.generateAccompaniment = function(abcCode) {
         if (beatsPerMeasure === 4) {
             if (style === 'pop') {
                 bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`;
-                drumMeasure = `[C,^F,] ^F, [D,^F,] ^F, [C,^F,] ^F, [D,^F,] ^F,`; // 8-beat hi-hat
+                drumMeasure = `[C,,^F,,] ^F,, [D,,^F,,] ^F,, [C,,^F,,] ^F,, [D,,^F,,] ^F,,`;
             } else if (style === 'disco') {
-                bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`; // Four on the floor
-                drumMeasure = `[C,^F,] [C,^F,] [C,D,^F,] [C,^F,] [C,^F,] [C,^F,] [C,D,^F,] [C,^F,]`; 
+                bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`;
+                drumMeasure = `[C,,^F,,] [C,,^F,,] [C,,D,,^F,,] [C,,^F,,] [C,,^F,,] [C,,^F,,] [C,,D,,^F,,] [C,,^F,,]`;
             } else if (style === 'swing') {
-                bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`; // Walking bass idea
-                drumMeasure = `[C,^F,] z/2 ^F,/2 [D,^F,] ^F, [C,^F,] z/2 ^F,/2 [D,^F,] ^F,`; // Swing ride
+                bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`;
+                drumMeasure = `[C,,^F,,] z/2 ^F,,/2 [D,,^F,,] ^F,, [C,,^F,,] z/2 ^F,,/2 [D,,^F,,] ^F,,`;
             } else if (style === 'ballad') {
-                bassMeasure = `${bassNote}4`; // Whole note bass
-                drumMeasure = `[C,^F,] ^F, [D,^F,] ^F, [C,^F,] ^F, [D,^F,] ^F,`; // Slow 8-beat
+                bassMeasure = `${bassNote}4`;
+                drumMeasure = `[C,,^F,,] ^F,, [D,,^F,,] ^F,, [C,,^F,,] ^F,, [D,,^F,,] ^F,,`;
             } else {
                 bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`;
-                drumMeasure = `[C,^F,] D, [C,^F,] D,`; 
+                drumMeasure = `[C,,^F,,] D,, [C,,^F,,] D,,`; 
             }
         } else if (beatsPerMeasure === 3) {
             bassMeasure = `${bassNote} ${bassNote} ${bassNote}`;
-            drumMeasure = `[C,^F,] D, D,`; 
+            drumMeasure = `[C,,^F,,] ^F,, [D,,^F,,] ^F,, [C,,^F,,] ^F,,`;
         } else if (beatsPerMeasure === 2) {
             bassMeasure = `${bassNote} ${bassNote}`;
-            drumMeasure = `[C,^F,] D,`;
+            drumMeasure = `[C,,^F,,] ^F,, [D,,^F,,] ^F,,`;
         }
         
         bassTrack.push(bassMeasure);

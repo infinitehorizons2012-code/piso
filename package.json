@@ -12,6 +12,7 @@
     "vite": "^8.2.0"
   },
   "dependencies": {
-    "abcjs": "^6.7.0"
+    "abcjs": "^6.7.0",
+    "jsdom": "^30.0.1"
   }
 }
