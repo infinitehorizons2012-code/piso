@@ -40,7 +40,7 @@ export function initFullBandAudio() {
         audioCtx = new AudioContext();
         
         masterGain = audioCtx.createGain();
-        masterGain.gain.value = 1.0;
+        masterGain.gain.value = 2.5;
         masterGain.connect(audioCtx.destination);
 
         drumGain = audioCtx.createGain();
