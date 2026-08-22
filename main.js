@@ -332,13 +332,15 @@ function parseABCToJSON(abcCode) {
 }
 
 function updateStudioFromABC() {
-    if(typeof window.currentSong !== 'undefined') {
+    try {
         const parsed = parseABCToJSON(document.getElementById('abc-code').value);
-        window.currentSong = parsed;
+        currentSong = parsed;
         if(typeof window.drawSheet === 'function') window.drawSheet();
         if(document.getElementById('jsonEditor')) {
             document.getElementById('jsonEditor').value = JSON.stringify(parsed, null, 2);
         }
+    } catch(e) {
+        console.error("ABC parse error", e);
     }
 }
 
