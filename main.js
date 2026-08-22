@@ -574,6 +574,14 @@ window.exportToJson = function() {
     }
 
     const visualObj = studioVisualObj[0];
+    const keySig = visualObj.getKeySignature ? visualObj.getKeySignature() : null;
+    const keyAccidentals = {};
+    if (keySig && keySig.accidentals) {
+        keySig.accidentals.forEach(a => {
+            if (a.note) keyAccidentals[a.note.toLowerCase()] = a.acc;
+        });
+    }
+
     const output = {
         title: visualObj.metaText.title || 'Bản Nhạc ABC',
         composer: visualObj.metaText.author || '',
@@ -588,15 +596,22 @@ window.exportToJson = function() {
     let currentChord = '';
     let currentMeasure = { measureNum, chord: currentChord, notes: [] };
 
-    // Function to convert abcjs diatonic pitch to standard note name (e.g. 7 -> C4)
-    function abcPitchToStandard(pitchVal, accidental) {
+    // Function to convert abcjs diatonic pitch to standard note name (e.g. 7 -> C5)
+    function abcPitchToStandard(pitchVal, accidental, noteBaseName) {
         const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
         let normalized = pitchVal % 7;
         if (normalized < 0) normalized += 7;
         let noteName = notes[normalized];
-        if (accidental === 'sharp') noteName += '#';
-        else if (accidental === 'flat') noteName += 'b';
-        let octave = Math.floor(pitchVal / 7) + 3;
+        
+        let finalAccidental = accidental;
+        if (!finalAccidental && noteBaseName && keyAccidentals[noteBaseName.toLowerCase()]) {
+            finalAccidental = keyAccidentals[noteBaseName.toLowerCase()];
+        }
+
+        if (finalAccidental === 'sharp') noteName += '#';
+        else if (finalAccidental === 'flat') noteName += 'b';
+        
+        let octave = Math.floor(pitchVal / 7) + 4;
         return noteName + octave;
     }
 
@@ -625,9 +640,9 @@ window.exportToJson = function() {
                     let pitch = 'C4';
                     let solfege = '';
                     if (elem.pitches && elem.pitches.length > 0) {
-                        pitch = abcPitchToStandard(elem.pitches[0].pitch, elem.pitches[0].accidental);
-                        // Optional: basic solfege guess (very naive)
                         let rawName = elem.pitches[0].name || '';
+                        pitch = abcPitchToStandard(elem.pitches[0].pitch, elem.pitches[0].accidental, rawName);
+                        // Optional: basic solfege guess (very naive)
                         let solfegeMap = { 'c': 'do', 'd': 're', 'e': 'mi', 'f': 'fa', 'g': 'sol', 'a': 'la', 'b': 'si' };
                         solfege = solfegeMap[rawName.toLowerCase().charAt(0)] || '';
                     }
