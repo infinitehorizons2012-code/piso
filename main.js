@@ -73,8 +73,8 @@ toggleBtn.addEventListener('click', () => {
     toggleBtn.innerText = '🎵 Xem Sheet Nhạc';
     // Stop playback if switching away
     if (synthControl) synthControl.stop();
-    document.getElementById('play-btn').style.display = 'block';
-    document.getElementById('stop-btn').style.display = 'none';
+    if(document.getElementById(playBtnId)) document.getElementById(playBtnId).style.display = 'block';
+    if(document.getElementById(stopBtnId)) document.getElementById(stopBtnId).style.display = 'none';
   }
 });
 
@@ -83,7 +83,7 @@ let synthControl = null;
 let currentTempo = 100; // default 100%
 
 // A simplified cursor control that adds a CSS class to the active notes
-function CursorControl(rootSelector) {
+function CursorControl(rootSelector, playBtnId = 'play-btn', stopBtnId = 'stop-btn') {
     this.onStart = function() {
         this.clearSelection();
     };
@@ -92,8 +92,8 @@ function CursorControl(rootSelector) {
         this.clearSelection();
         if (ev === null || ev === undefined) {
             // Playback finished naturally
-            document.getElementById('play-btn').style.display = 'block';
-            document.getElementById('stop-btn').style.display = 'none';
+            if(document.getElementById(playBtnId)) document.getElementById(playBtnId).style.display = 'block';
+            if(document.getElementById(stopBtnId)) document.getElementById(stopBtnId).style.display = 'none';
             return;
         }
         if (ev.elements) {
@@ -109,8 +109,8 @@ function CursorControl(rootSelector) {
     this.onFinished = function() {
         this.clearSelection();
         // Reset play button
-        document.getElementById('play-btn').style.display = 'block';
-        document.getElementById('stop-btn').style.display = 'none';
+        if(document.getElementById(playBtnId)) document.getElementById(playBtnId).style.display = 'block';
+        if(document.getElementById(stopBtnId)) document.getElementById(stopBtnId).style.display = 'none';
     };
 
     this.clearSelection = function() {
@@ -150,8 +150,8 @@ document.getElementById('play-btn').addEventListener('click', () => {
             cursorControl: cursorControl,
             onEnded: function() {
                 // Playback finished naturally
-                document.getElementById('play-btn').style.display = 'block';
-                document.getElementById('stop-btn').style.display = 'none';
+                if(document.getElementById(playBtnId)) document.getElementById(playBtnId).style.display = 'block';
+                if(document.getElementById(stopBtnId)) document.getElementById(stopBtnId).style.display = 'none';
                 
                 // Clear highlights
                 const lastSelection = document.querySelectorAll("#karaoke-paper .abcjs-highlight");
@@ -173,8 +173,8 @@ document.getElementById('play-btn').addEventListener('click', () => {
 
 document.getElementById('stop-btn').addEventListener('click', () => {
     if (synthControl) synthControl.stop();
-    document.getElementById('play-btn').style.display = 'block';
-    document.getElementById('stop-btn').style.display = 'none';
+    if(document.getElementById(playBtnId)) document.getElementById(playBtnId).style.display = 'block';
+    if(document.getElementById(stopBtnId)) document.getElementById(stopBtnId).style.display = 'none';
     
     // Clear highlights manually just in case
     const lastSelection = document.querySelectorAll("#karaoke-paper .abcjs-highlight");
@@ -270,6 +270,7 @@ document.getElementById('tab-btn-listen').addEventListener('click', () => {
 // --- STUDIO TAB LOGIC (OPTION A) ---
 let studioVisualObj = null;
 let studioSynthControl = null;
+let studioTimingCallbacks = null;
 
 window.renderStudioSheet = function() {
     const abcCode = document.getElementById('abc-code').value;
@@ -309,13 +310,18 @@ window.toggleStudioPlay = function() {
     document.getElementById('studioPlayBtn').style.display = 'none';
     document.getElementById('studioStopBtn').style.display = 'block';
     
-    const cursorControl = new CursorControl('#studio-abc-paper');
+    const cursorControl = new CursorControl('#studio-abc-paper', 'studioPlayBtn', 'studioStopBtn');
     studioSynthControl = new abcjs.synth.CreateSynth();
     
+    studioTimingCallbacks = new abcjs.TimingCallbacks(studioVisualObj[0], {
+        eventCallback: function(ev) {
+            cursorControl.onEvent(ev);
+        }
+    });
+
     studioSynthControl.init({ 
         visualObj: studioVisualObj[0],
         options: {
-            cursorControl: cursorControl,
             onEnded: function() {
                 document.getElementById('studioPlayBtn').style.display = 'block';
                 document.getElementById('studioStopBtn').style.display = 'none';
@@ -324,16 +330,19 @@ window.toggleStudioPlay = function() {
                 for (let i = 0; i < lastSelection.length; i++) {
                     lastSelection[i].classList.remove('abcjs-highlight');
                 }
+                if(studioTimingCallbacks) studioTimingCallbacks.stop();
             }
         }
     }).then(() => {
         studioSynthControl.prime().then(() => {
             studioSynthControl.start();
+            if(studioTimingCallbacks) studioTimingCallbacks.start();
         });
     });
 };
 
 window.stopStudioPlay = function() {
+    if(studioTimingCallbacks) studioTimingCallbacks.stop();
     if (studioSynthControl) studioSynthControl.stop();
     document.getElementById('studioPlayBtn').style.display = 'block';
     document.getElementById('studioStopBtn').style.display = 'none';
