@@ -259,9 +259,36 @@ document.getElementById('tab-btn-listen').addEventListener('click', () => {
 
 
 // --- STUDIO TAB LOGIC (OPTION A) ---
+import { initFullBandAudio, updateFullBandVolumes } from './fullband-synth.js';
+
 let studioVisualObj = null;
 let studioAudioVisualObj = null;
 let studioSynthControl = null;
+let abcjsAudioCtx = null;
+let melodyMasterGain = null;
+let proxyAudioCtx = null;
+
+// Initialize custom audio context and proxy for abcjs
+function initAbcjsAudioContext() {
+    if (!abcjsAudioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        abcjsAudioCtx = new AudioContext();
+        melodyMasterGain = abcjsAudioCtx.createGain();
+        melodyMasterGain.gain.value = document.getElementById('volMelody') ? parseFloat(document.getElementById('volMelody').value) * 3.0 : 3.0;
+        melodyMasterGain.connect(abcjsAudioCtx.destination);
+        
+        proxyAudioCtx = new Proxy(abcjsAudioCtx, {
+            get: function(target, prop) {
+                if (prop === 'destination') return melodyMasterGain;
+                const val = target[prop];
+                return typeof val === 'function' ? val.bind(target) : val;
+            }
+        });
+    }
+    if (abcjsAudioCtx.state === 'suspended') {
+        abcjsAudioCtx.resume();
+    }
+}
 let studioTimingCallbacks = null;
 
 window.renderStudioSheet = function() {
@@ -310,6 +337,14 @@ window.renderStudioSheet = function() {
 
 let volumeTimeout = null;
 window.updateVolumes = function() {
+    import('./fullband-synth.js').then(module => {
+        module.updateFullBandVolumes();
+    });
+    if (melodyMasterGain) {
+        const volMelody = document.getElementById('volMelody') ? parseFloat(document.getElementById('volMelody').value) : 1;
+        // Map 0-1 slider to 0-3.0 gain (or up to 6.0 if needed, let's do 4.0 for extra headroom)
+        melodyMasterGain.gain.value = volMelody * 4.0;
+    }
     // Debounce to prevent stuttering while dragging slider
     if (volumeTimeout) clearTimeout(volumeTimeout);
     volumeTimeout = setTimeout(() => {
@@ -347,9 +382,12 @@ window.toggleStudioPlay = function() {
 
     // Use studioAudioVisualObj[0] for actual sound generation (Audio)
     const volMelody = document.getElementById('volMelody') ? parseFloat(document.getElementById('volMelody').value) : 1;
+    
+    initAbcjsAudioContext();
+    
     studioSynthControl.init({ 
         visualObj: studioAudioVisualObj[0],
-        soundFontVolumeMultiplier: 8.0,
+        audioContext: proxyAudioCtx,
         options: {
             chordsOff: true,
             soundFontVolumeMultiplier: volMelody,

@@ -40,7 +40,7 @@ export function initFullBandAudio() {
         audioCtx = new AudioContext();
         
         masterGain = audioCtx.createGain();
-        masterGain.gain.value = 2.5;
+        masterGain.gain.value = 0.2; // Drastically reduce accompaniment to let melody shine
         masterGain.connect(audioCtx.destination);
 
         drumGain = audioCtx.createGain();
