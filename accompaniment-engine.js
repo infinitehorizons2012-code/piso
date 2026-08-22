@@ -23,15 +23,12 @@ export function updateVolumes() {
 }
 
 export function handleEventCallback(ev) {
-    if (ev && ev.measureStart) {
-        // Measure start
-    }
-    if (ev && ev.chord) {
-        // abcjs v6 passes chord as an array of objects
-        if (typeof ev.chord === 'string') {
-            activeChord = ev.chord.replace(/"/g, '');
-        } else if (Array.isArray(ev.chord) && ev.chord.length > 0) {
-            activeChord = ev.chord[0].name.replace(/"/g, '');
+    if (ev && ev.startChar !== undefined && window.studioAbcString) {
+        // Extract chord directly from the ABC string chunk for this event
+        const chunk = window.studioAbcString.substring(ev.startChar, ev.endChar || ev.startChar + 20);
+        const match = chunk.match(/"([^"]+)"/);
+        if (match) {
+            activeChord = match[1].trim();
         }
     }
 }

@@ -281,6 +281,8 @@ window.renderStudioSheet = function() {
         studioAudioAbc = studioAudioAbc.replace(/^Q:.*$/m, 'Q: 1/4=' + newTempo);
     }
     
+    window.studioAbcString = studioAbc;
+    
     // Visual ABC: just the melody
     studioVisualObj = abcjs.renderAbc('studio-abc-paper', studioAbc, {
         add_classes: true,
