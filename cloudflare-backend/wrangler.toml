@@ -1,0 +1,11 @@
+name = "piano-library"
+main = "src/index.js"
+compatibility_date = "2024-03-29"
+
+# Bạn sẽ cần tạo 1 KV namespace bằng lệnh:
+# npx wrangler kv:namespace create "PIANO_LIBRARY_KV"
+# Sau đó copy id sinh ra và dán vào bên dưới:
+
+[[kv_namespaces]]
+binding = "PIANO_LIBRARY_KV"
+id = "thay_id_cua_ban_vao_day"

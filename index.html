@@ -19,11 +19,30 @@
       <p class="subtitle">Môi trường soạn thảo ABC Notation chuyên nghiệp!</p>
     </header>
 
-    <!-- TAB NAVIGATION -->
+    <!-- Top Tabs Navigation -->
     <nav class="app-tabs">
-      <button class="tab-btn active" id="tab-btn-write">✍️ Viết Nhạc</button>
+      <button class="tab-btn" id="tab-btn-library">📚 Thư Viện</button>
+      <button class="tab-btn active" id="tab-btn-write">📝 Viết Nhạc</button>
       <button class="tab-btn" id="tab-btn-listen">🎧 Nghe Nhạc (Studio)</button>
     </nav>
+
+    <!-- NEW LIBRARY TAB (Thư Viện) -->
+    <main class="app-container tab-content" id="tab-library" style="display: none;">
+      <section class="panel" style="width: 100%; max-width: 800px; margin: 0 auto; padding: 20px;">
+        <div class="panel-header" style="background: var(--primary);">
+          <h2 style="color: white; margin: 0 auto;">📚 Thư Viện Bản Nhạc</h2>
+        </div>
+        <div class="panel-content" style="display: flex; flex-direction: column; gap: 15px;">
+          <div style="display: flex; gap: 10px;">
+            <input type="text" id="search-library" placeholder="Tìm kiếm bản nhạc..." style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ddd;" />
+            <button class="ctrl-btn play" onclick="fetchLibrary()" style="font-size: 14px;">🔄 Làm Mới</button>
+          </div>
+          <div id="library-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; padding: 10px; background: #fafafa;">
+             <p style="text-align: center; color: #888;">Đang tải danh sách...</p>
+          </div>
+        </div>
+      </section>
+    </main>
 
     <main class="app-container tab-content active" id="tab-write">
       <!-- Left side: Image Viewer (Top) + Sheet Music (Bottom) -->
@@ -55,8 +74,11 @@
       <!-- Right side: ABC Editor / Karaoke Mode -->
       <section class="panel right-panel">
         <div class="panel-header" style="background: var(--primary); display: flex; justify-content: space-between; align-items: center;">
-          <h2 style="color: white; margin: 0 auto;">✍️ Viết Mã ABC</h2>
-          <button id="toggle-view-btn" class="toggle-btn" style="position: absolute; right: 20px;">🎵 Xem Sheet Nhạc</button>
+          <h2 style="color: white; margin: 0 auto;">📝 Viết Mã ABC</h2>
+          <div style="display: flex; gap: 10px; position: absolute; right: 20px;">
+             <button onclick="saveToCloud()" class="toggle-btn" style="background: var(--secondary);">☁️ Lưu lên Cloud</button>
+             <button id="toggle-view-btn" class="toggle-btn">📖 Xem Sheet Nhạc</button>
+          </div>
         </div>
         
         <div class="panel-content editor-content">

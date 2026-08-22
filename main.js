@@ -237,20 +237,118 @@ imageContainer.addEventListener('drop', (e) => {
 
 
 // --- Tab Switching Logic ---
-document.getElementById('tab-btn-write').addEventListener('click', () => {
-    document.getElementById('tab-btn-write').classList.add('active');
-    document.getElementById('tab-btn-listen').classList.remove('active');
-    document.getElementById('tab-write').style.display = 'flex';
-    document.getElementById('tab-listen').style.display = 'none';
+// --- TAB SWITCHING LOGIC ---
+const tabs = ['tab-btn-library', 'tab-btn-write', 'tab-btn-listen'];
+const panels = ['tab-library', 'tab-write', 'tab-listen'];
+
+function switchTab(activeTabId, activePanelId) {
+    tabs.forEach(tabId => {
+        const el = document.getElementById(tabId);
+        if (el) {
+            if (tabId === activeTabId) el.classList.add('active');
+            else el.classList.remove('active');
+        }
+    });
+    panels.forEach(panelId => {
+        const el = document.getElementById(panelId);
+        if (el) {
+            if (panelId === activePanelId) el.style.display = panelId === 'tab-library' ? 'block' : 'flex';
+            else el.style.display = 'none';
+        }
+    });
+}
+
+document.getElementById('tab-btn-library')?.addEventListener('click', () => {
+    switchTab('tab-btn-library', 'tab-library');
+    window.fetchLibrary();
 });
 
-document.getElementById('tab-btn-listen').addEventListener('click', () => {
-    document.getElementById('tab-btn-listen').classList.add('active');
-    document.getElementById('tab-btn-write').classList.remove('active');
-    document.getElementById('tab-listen').style.display = 'flex';
-    document.getElementById('tab-write').style.display = 'none';
-    // window.drawSheet();
+document.getElementById('tab-btn-write')?.addEventListener('click', () => {
+    switchTab('tab-btn-write', 'tab-write');
 });
+
+document.getElementById('tab-btn-listen')?.addEventListener('click', () => {
+    switchTab('tab-btn-listen', 'tab-listen');
+});
+
+// --- CLOUDFLARE LIBRARY API ---
+const CF_WORKER_URL = 'https://piano-library.YOU.workers.dev'; // User needs to update this
+
+window.fetchLibrary = async function() {
+    const listEl = document.getElementById('library-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<p style="text-align: center; color: #888;">Đang tải danh sách...</p>';
+    
+    try {
+        // In real app, fetch from CF_WORKER_URL + '/api/songs'
+        // For now, if URL is dummy, simulate error/mock
+        if (CF_WORKER_URL.includes('YOU.workers.dev')) {
+            throw new Error("Vui lòng thay thế CF_WORKER_URL trong main.js bằng URL của Worker bạn đã deploy.");
+        }
+        const res = await fetch(CF_WORKER_URL + '/api/songs');
+        const songs = await res.json();
+        
+        listEl.innerHTML = '';
+        if (songs.length === 0) {
+            listEl.innerHTML = '<p style="text-align: center; color: #888;">Thư viện trống.</p>';
+            return;
+        }
+        
+        songs.forEach(song => {
+            const div = document.createElement('div');
+            div.style = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
+            div.innerHTML = `
+                <div>
+                    <h3 style="margin: 0; font-size: 16px;">${song.title}</h3>
+                    <small style="color: #666;">${new Date(song.createdAt).toLocaleString()}</small>
+                </div>
+                <button class="ctrl-btn play" style="font-size: 13px; padding: 5px 15px;" onclick="loadSong(\`${song.abc.replace(/\n/g, '\\n').replace(/"/g, '\\"')}\`)">Tải vào Editor</button>
+            `;
+            listEl.appendChild(div);
+        });
+    } catch (err) {
+        listEl.innerHTML = `<p style="text-align: center; color: red;">Lỗi tải dữ liệu: ${err.message}</p>`;
+    }
+};
+
+window.loadSong = function(abc) {
+    document.getElementById('abc-code').value = abc;
+    switchTab('tab-btn-write', 'tab-write');
+    // Trigger input event to re-render sheet
+    document.getElementById('abc-code').dispatchEvent(new Event('input'));
+};
+
+window.saveToCloud = async function() {
+    const abc = document.getElementById('abc-code').value.trim();
+    if (!abc) return alert("Không có dữ liệu ABC để lưu!");
+    
+    let title = "Bản nhạc không tên";
+    const titleMatch = abc.match(/^T:\s*(.+)$/m);
+    if (titleMatch) title = titleMatch[1];
+    else {
+        title = prompt("Nhập tên bản nhạc:", "Bản nhạc mới");
+        if (!title) return;
+    }
+    
+    try {
+        if (CF_WORKER_URL.includes('YOU.workers.dev')) {
+            return alert("Vui lòng thay thế CF_WORKER_URL trong main.js bằng URL của Worker bạn đã deploy.");
+        }
+        const res = await fetch(CF_WORKER_URL + '/api/songs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, abc })
+        });
+        
+        if (res.ok) {
+            alert("Đã lưu bản nhạc thành công lên Cloud!");
+        } else {
+            alert("Lỗi khi lưu bản nhạc.");
+        }
+    } catch (err) {
+        alert("Lỗi mạng: " + err.message);
+    }
+};
 
 // A basic regex parser to convert simple ABC to JSON for the studio engine
 
