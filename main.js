@@ -304,14 +304,26 @@ window.fetchLibrary = async function() {
                 <small style="color: #666;">${new Date(song.createdAt).toLocaleString()}</small>
             `;
             
+            const btnGroup = document.createElement('div');
+            btnGroup.style = 'display: flex; gap: 10px;';
+            
+            const delBtn = document.createElement('button');
+            delBtn.className = 'ctrl-btn stop';
+            delBtn.style = 'font-size: 13px; padding: 5px 15px; background: #ef4444;';
+            delBtn.innerText = 'Xóa';
+            delBtn.onclick = () => window.deleteSong(song.id);
+            
             const btn = document.createElement('button');
             btn.className = 'ctrl-btn play';
             btn.style = 'font-size: 13px; padding: 5px 15px;';
             btn.innerText = 'Tải vào Editor';
-            btn.onclick = () => window.loadSong(song.abc);
+            btn.onclick = () => window.loadSong(song);
+            
+            btnGroup.appendChild(delBtn);
+            btnGroup.appendChild(btn);
             
             div.appendChild(infoDiv);
-            div.appendChild(btn);
+            div.appendChild(btnGroup);
             listEl.appendChild(div);
         });
     } catch (err) {
@@ -319,8 +331,31 @@ window.fetchLibrary = async function() {
     }
 };
 
-window.loadSong = function(abc) {
-    document.getElementById('abc-code').value = abc;
+window.deleteSong = async function(id) {
+    if (!confirm("Bạn có chắc chắn muốn xóa bản nhạc này không?")) return;
+    try {
+        const res = await fetch(CF_WORKER_URL + '/api/songs', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        });
+        if (res.ok) {
+            alert("Đã xóa bản nhạc!");
+            window.loadLibrary(); // Reload list
+        } else {
+            const err = await res.json();
+            alert("Lỗi khi xóa: " + err.error);
+        }
+    } catch (err) {
+        alert("Không thể kết nối đến máy chủ: " + err.message);
+    }
+};
+
+let currentSongId = null;
+
+window.loadSong = function(song) {
+    document.getElementById('abc-code').value = song.abc;
+    currentSongId = song.id; // Store ID for overwriting
     switchTab('tab-btn-write', 'tab-write');
     // Trigger input event to re-render sheet
     document.getElementById('abc-code').dispatchEvent(new Event('input'));
@@ -342,21 +377,28 @@ window.saveToCloud = async function() {
         if (CF_WORKER_URL.includes('YOU.workers.dev')) {
             return alert("Vui lòng thay thế CF_WORKER_URL trong main.js bằng URL của Worker bạn đã deploy.");
         }
+        
+        const payload = { title, abc };
+        if (currentSongId) payload.id = currentSongId; // Attach ID if updating
+        
         const res = await fetch(CF_WORKER_URL + '/api/songs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, abc })
+            body: JSON.stringify(payload)
         });
         
-        if (res.ok) {
-            alert("Đã lưu bản nhạc thành công lên Cloud!");
+        const data = await res.json();
+        if (data.success) {
+            currentSongId = data.id; // Update current ID (either new or existing)
+            alert("Đã lưu thành công!");
         } else {
-            alert("Lỗi khi lưu bản nhạc.");
+            alert("Lỗi khi lưu: " + data.error);
         }
     } catch (err) {
-        alert("Lỗi mạng: " + err.message);
+        alert("Không thể kết nối đến máy chủ: " + err.message);
     }
 };
+
 
 // A basic regex parser to convert simple ABC to JSON for the studio engine
 
