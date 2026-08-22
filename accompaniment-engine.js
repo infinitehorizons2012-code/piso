@@ -27,8 +27,12 @@ export function handleEventCallback(ev) {
         // Measure start
     }
     if (ev && ev.chord) {
-        // Remove quotes around the chord if any
-        activeChord = ev.chord.replace(/"/g, '');
+        // abcjs v6 passes chord as an array of objects
+        if (typeof ev.chord === 'string') {
+            activeChord = ev.chord.replace(/"/g, '');
+        } else if (Array.isArray(ev.chord) && ev.chord.length > 0) {
+            activeChord = ev.chord[0].name.replace(/"/g, '');
+        }
     }
 }
 
