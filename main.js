@@ -349,6 +349,7 @@ window.toggleStudioPlay = function() {
     studioSynthControl.init({ 
         visualObj: studioAudioVisualObj[0],
         options: {
+            chordsOff: true,
             onEnded: function() {
                 document.getElementById('studioPlayBtn').style.display = 'block';
                 document.getElementById('studioStopBtn').style.display = 'none';
