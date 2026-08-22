@@ -120,8 +120,12 @@
     <main class="app-container tab-content" id="tab-listen" style="display: none;">
       <!-- Left: Main Studio Area (Canvas & Controls) -->
       <section class="panel left-panel" style="flex: 2;">
-        <div class="panel-header">
+        <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
           <h2>🎧 Canvas Studio Renderer</h2>
+          <div>
+            <button onclick="window.zoomSheet(0.2)" style="margin-left: 15px; font-size: 11px; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #333;">🔍 Phóng to</button>
+            <button onclick="window.zoomSheet(-0.2)" style="margin-left: 5px; font-size: 11px; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #333;">🔍 Thu nhỏ</button>
+          </div>
         </div>
         <div class="panel-content" style="display: flex; flex-direction: column; gap: 15px;">
           <!-- ABCJS Paper for Studio -->

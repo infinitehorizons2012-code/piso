@@ -45,8 +45,19 @@ window.zoomText = function(delta) {
 
 function renderSheetMusic() {
   const abcCode = abcTextarea.value;
+  let visualAbc = abcCode;
+  try {
+      if (abcCode.includes('"')) {
+          let accomp = window.generateAccompaniment(abcCode);
+          let v3Index = accomp.indexOf('V:3 name="Drums"');
+          if (v3Index !== -1) accomp = accomp.substring(0, v3Index);
+          accomp = accomp.replace(/V:1 name="Melody"/, "%%score {1 | 2}\nV:1 name=\"Melody\"");
+          visualAbc = accomp;
+      }
+  } catch(e) {}
+  
   // Render using abcjs for the left panel
-  abcjs.renderAbc("paper", abcCode, {
+  abcjs.renderAbc("paper", visualAbc, {
     add_classes: true,
     staffwidth: 700,
     scale: window.currentSheetScale
@@ -467,6 +478,16 @@ let studioTimingCallbacks = null;
 window.renderStudioSheet = function() {
     const abcCode = document.getElementById('abc-code').value;
     let studioAbc = abcCode;
+    try {
+        if (abcCode.includes('"')) {
+            let accomp = window.generateAccompaniment(abcCode);
+            let v3Index = accomp.indexOf('V:3 name="Drums"');
+            if (v3Index !== -1) accomp = accomp.substring(0, v3Index);
+            accomp = accomp.replace(/V:1 name="Melody"/, "%%score {1 | 2}\nV:1 name=\"Melody\"");
+            studioAbc = accomp;
+        }
+    } catch(e) {}
+    
     let studioAudioAbc = abcCode;
     
     // Inject Tempo
@@ -486,7 +507,6 @@ window.renderStudioSheet = function() {
     // Visual ABC: just the melody
     studioVisualObj = abcjs.renderAbc('studio-abc-paper', studioAbc, {
         add_classes: true,
-        staffwidth: 700,
         scale: window.currentSheetScale
     });
     
