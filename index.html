@@ -46,17 +46,33 @@
         </div>
       </section>
 
-      <!-- Right side: ABC Editor -->
+      <!-- Right side: ABC Editor / Karaoke Mode -->
       <section class="panel right-panel">
-        <div class="panel-header" style="background: var(--primary);">
-          <h2 style="color: white;">✍️ Viết Mã ABC</h2>
+        <div class="panel-header" style="background: var(--primary); display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="color: white; margin: 0 auto;">✍️ Viết Mã ABC</h2>
+          <button id="toggle-view-btn" class="toggle-btn" style="position: absolute; right: 20px;">🎵 Xem Sheet Nhạc</button>
         </div>
         
         <div class="panel-content editor-content">
           <!-- Text area for ABC Notation -->
-          <div class="abc-input-container">
+          <div class="abc-input-container" id="abc-view">
             <label for="abc-code">Mã ABC Notation (Gõ đến đâu, nhạc cập nhật đến đó!)</label>
             <textarea id="abc-code" spellcheck="false" placeholder="Gõ abc vào đây..."></textarea>
+          </div>
+
+          <!-- Karaoke Mode Container -->
+          <div class="karaoke-container" id="karaoke-view" style="display: none;">
+            <div class="karaoke-controls">
+              <button id="play-btn" class="ctrl-btn play">▶ Phát Nhạc</button>
+              <button id="stop-btn" class="ctrl-btn stop" style="display: none;">⏹ Dừng Lại</button>
+              
+              <div class="tempo-control">
+                <label for="tempo-slider">Tốc độ (Tempo): <span id="tempo-value">100</span>%</label>
+                <input type="range" id="tempo-slider" min="50" max="200" value="100" />
+              </div>
+            </div>
+            <!-- Second Sheet Music display for Karaoke -->
+            <div id="karaoke-paper" class="sheet-music-display karaoke-paper"></div>
           </div>
         </div>
       </section>
