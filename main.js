@@ -1,20 +1,14 @@
+import * as AccompEngine from './accompaniment-engine.js';
 import './style.css'
 import abcjs from 'abcjs'
 
 // --- Default ABC Notation ---
 const DEFAULT_ABC = `X:1
-T:THẰNG CUỘI
-M:2/4
-L:1/8
+T:Bản Nhạc Của Bé
+M:4/4
+L:1/4
 K:C
-z2 (cA) | "C" G3 A | "C" C3 G |"Am" E2 (ED)
-w: Bóng * trăng trắng ngà, có cây đa
-"Am" E3 G | "F" C2 (A,C) | "G" G,3 C | "F" (A,C) (DE) |
-w: to, có  thằng cuội *  già, ôm một * mối *
-"C" C4- | "C" C2 (CD) | "C" G3 G | "C" (GA) (CD) | "Em" G4- | "Em" G2 (GA)|
-w: mơ. * Lặng * yên ta nói * cuội * nghe: * "Ở *
-"F" c2 c2 | "G" (cd) (GA) | "C" c4- | "C" c2 (cA) |]
-w: cung trăng mãi * làm *  chi?" * Bóng... *`;
+C D E F | G A B c |`;
 
 const abcTextarea = document.getElementById('abc-code');
 const paperElement = document.getElementById('paper');
@@ -292,20 +286,19 @@ window.renderStudioSheet = function() {
         responsive: 'resize'
     });
     
-    // Audio ABC: Melody + Injected Accompaniment
-    if (window.generateAccompaniment) {
-        studioAudioAbc = window.generateAccompaniment(studioAudioAbc);
-    }
     
-    // Inject Instrument for Melody
+    // Inject Instrument and Melody Volume
     const instrumentId = document.getElementById('studioInstrument') ? document.getElementById('studioInstrument').value : '0';
+    const volMelody = document.getElementById('volMelody') ? parseFloat(document.getElementById('volMelody').value) : 1;
+    const midiVol = Math.round(volMelody * 127);
+    
     if (studioAudioAbc.includes('V:1 name="Melody"')) {
-        studioAudioAbc = studioAudioAbc.replace('V:1 name="Melody"\n', 'V:1 name="Melody"\n%%MIDI program ' + instrumentId + '\n');
+        studioAudioAbc = studioAudioAbc.replace('V:1 name="Melody"\n', 'V:1 name="Melody"\n%%MIDI control 7 ' + midiVol + '\n%%MIDI program ' + instrumentId + '\n');
     } else {
         if (!studioAudioAbc.match(/^%%MIDI program/m)) {
-            studioAudioAbc = studioAudioAbc.replace(/^(K:.*)$/m, '$1\n%%MIDI program ' + instrumentId);
+            studioAudioAbc = studioAudioAbc.replace(/^(K:.*)$/m, '$1\n%%MIDI control 7 ' + midiVol + '\n%%MIDI program ' + instrumentId);
         } else {
-            studioAudioAbc = studioAudioAbc.replace(/^%%MIDI program.*$/m, '%%MIDI program ' + instrumentId);
+            studioAudioAbc = studioAudioAbc.replace(/^%%MIDI program.*$/m, '%%MIDI control 7 ' + midiVol + '\n%%MIDI program ' + instrumentId);
         }
     }
     
@@ -320,10 +313,9 @@ window.updateVolumes = function() {
     // Debounce to prevent stuttering while dragging slider
     if (volumeTimeout) clearTimeout(volumeTimeout);
     volumeTimeout = setTimeout(() => {
+        AccompEngine.updateVolumes();
         window.renderStudioSheet();
-        const stopBtn = document.getElementById('studioStopBtn');
-        const isPlaying = stopBtn && stopBtn.style.display === 'block';
-        if (isPlaying) {
+        if (studioSynthControl && studioSynthControl.audioContext && studioSynthControl.audioContext.state === 'running') {
             window.stopStudioPlay();
             window.toggleStudioPlay();
         }
@@ -346,6 +338,10 @@ window.toggleStudioPlay = function() {
     studioTimingCallbacks = new abcjs.TimingCallbacks(studioVisualObj[0], {
         eventCallback: function(ev) {
             cursorControl.onEvent(ev);
+            AccompEngine.handleEventCallback(ev);
+        },
+        beatCallback: function(beatNumber) {
+            AccompEngine.handleBeatCallback(beatNumber);
         }
     });
 
@@ -367,12 +363,16 @@ window.toggleStudioPlay = function() {
     }).then(() => {
         studioSynthControl.prime().then(() => {
             studioSynthControl.start();
-            if(studioTimingCallbacks) studioTimingCallbacks.start();
+            AccompEngine.startAccompanimentEngine(document.getElementById('studioTempo').value);
+            studioTimingCallbacks.start();
+        }).catch(function (error) {
+            console.error("Audio error", error);
         });
     });
 };
 
 window.stopStudioPlay = function() {
+    AccompEngine.stopAccompanimentEngine();
     if (studioSynthControl) studioSynthControl.stop();
     if (studioTimingCallbacks) studioTimingCallbacks.stop();
     
