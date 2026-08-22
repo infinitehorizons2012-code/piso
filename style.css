@@ -124,11 +124,12 @@ h1 {
 #image-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  min-height: 300px;
+  align-items: flex-start; /* Better for scrolling tall images */
+  height: 250px; /* Fixed height to show ~1 line */
   background: #f8f9fa;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: auto; /* Enable scrollbars */
+  position: relative;
 }
 
 .upload-prompt {
@@ -140,6 +141,7 @@ h1 {
   transition: all 0.3s;
   background: rgba(78, 205, 196, 0.05);
   width: 80%;
+  margin-top: 20px; /* Since align-items is flex-start now */
 }
 
 .upload-prompt:hover {
@@ -154,8 +156,8 @@ h1 {
 }
 
 #uploaded-image {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%; /* Force width to fit container */
+  height: auto; /* Let height grow to natural size based on width */
   object-fit: contain;
   cursor: grab;
 }
@@ -181,12 +183,12 @@ h1 {
 }
 
 .sheet-music-display {
-  flex: 1;
+  flex: none; /* Prevent flex from overriding height */
   background: #fff;
   border-radius: 12px;
   padding: 10px;
-  min-height: 300px;
-  overflow-x: auto;
+  height: 250px; /* Fixed height to show ~1 line */
+  overflow: auto; /* Enable scrollbars */
   border: 2px solid #eee;
 }
 
