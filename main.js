@@ -308,6 +308,19 @@ window.renderStudioSheet = function() {
     });
 };
 
+let volumeTimeout = null;
+window.updateVolumes = function() {
+    // Debounce to prevent stuttering while dragging slider
+    if (volumeTimeout) clearTimeout(volumeTimeout);
+    volumeTimeout = setTimeout(() => {
+        window.renderStudioSheet();
+        if (studioSynthControl && studioSynthControl.audioContext && studioSynthControl.audioContext.state === 'running') {
+            window.stopStudioPlay();
+            window.toggleStudioPlay();
+        }
+    }, 200);
+};
+
 window.toggleStudioPlay = function() {
     if (!abcjs.synth.supportsAudio()) {
         alert('Trình duyệt không hỗ trợ Audio!');

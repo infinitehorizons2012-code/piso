@@ -6,7 +6,8 @@ window.generateAccompaniment = function(abcCode) {
     const style = drumStyleEl ? drumStyleEl.value : 'pop';
     
     if (style === 'none') {
-        return abcCode;
+        // Strip out chords so no piano accompaniment is generated
+        return abcCode.replace(/"[^"]*"/g, '');
     }
 
     let lines = abcCode.split('\n');
@@ -63,7 +64,7 @@ window.generateAccompaniment = function(abcCode) {
                 drumMeasure = `[C,^F,] ^F, [D,^F,] ^F, [C,^F,] ^F, [D,^F,] ^F,`; // 8-beat hi-hat
             } else if (style === 'disco') {
                 bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`; // Four on the floor
-                drumMeasure = `[C,^F,] [C,^F,] [C,D,^F,] [C,^F,]`; 
+                drumMeasure = `[C,^F,] [C,^F,] [C,D,^F,] [C,^F,] [C,^F,] [C,^F,] [C,D,^F,] [C,^F,]`; 
             } else if (style === 'swing') {
                 bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`; // Walking bass idea
                 drumMeasure = `[C,^F,] z/2 ^F,/2 [D,^F,] ^F, [C,^F,] z/2 ^F,/2 [D,^F,] ^F,`; // Swing ride
@@ -86,15 +87,15 @@ window.generateAccompaniment = function(abcCode) {
         drumTrack.push(drumMeasure);
     }
     
-    const volMelody = document.getElementById('volMelody') ? document.getElementById('volMelody').value : 100;
-    const volChord = document.getElementById('volChord') ? document.getElementById('volChord').value : 80;
-    const volBass = document.getElementById('volBass') ? document.getElementById('volBass').value : 80;
-    const volDrum = document.getElementById('volDrum') ? document.getElementById('volDrum').value : 100;
+    const volMelody = document.getElementById('volMelody') ? parseFloat(document.getElementById('volMelody').value) : 1;
+    const volChord = document.getElementById('volChord') ? parseFloat(document.getElementById('volChord').value) : 0.8;
+    const volBass = document.getElementById('volBass') ? parseFloat(document.getElementById('volBass').value) : 0.8;
+    const volDrum = document.getElementById('volDrum') ? parseFloat(document.getElementById('volDrum').value) : 1;
     
     let newAbc = header.join('\n') + '\n';
     newAbc += 'V:1 name="Melody"\n';
-    newAbc += `%%MIDI control 7 ${Math.round(volMelody * 1.27)}\n`;
-    newAbc += `%%MIDI chordvol ${Math.round(volChord * 1.27)}\n`;
+    newAbc += `%%MIDI control 7 ${Math.round(volMelody * 127)}\n`;
+    newAbc += `%%MIDI chordvol ${Math.round(volChord * 127)}\n`;
     newAbc += `%%MIDI chordprog 0\n`; // Default Piano for chords
     newAbc += bodyText + '\n\n';
     
@@ -104,7 +105,7 @@ window.generateAccompaniment = function(abcCode) {
     if (style === 'ballad') newAbc += 'L:1/4\n';
     
     newAbc += '%%MIDI program 33\n'; // Electric Bass
-    newAbc += `%%MIDI control 7 ${Math.round(volBass * 1.27)}\n`;
+    newAbc += `%%MIDI control 7 ${Math.round(volBass * 127)}\n`;
     
     // Adjust bass track parsing if L is changed
     let finalBassTrack = bassTrack.join(' | ');
@@ -118,7 +119,7 @@ window.generateAccompaniment = function(abcCode) {
     newAbc += 'V:3 name="Drums" clef=perc\n';
     newAbc += 'L:1/8\n'; // Drums always use 1/8 for more granularity
     newAbc += '%%MIDI channel 10\n';
-    newAbc += `%%MIDI control 7 ${Math.round(volDrum * 1.27)}\n`;
+    newAbc += `%%MIDI control 7 ${Math.round(volDrum * 127)}\n`;
     
     // Our drum strings were written with L:1/4 in mind previously, need to adjust for L:1/8
     let finalDrumTrack = drumTrack.join(' | ');
