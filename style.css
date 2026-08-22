@@ -1,0 +1,255 @@
+:root {
+  --bg-color: #f0f8ff; /* Alice Blue */
+  --panel-bg: #ffffff;
+  --primary: #ff6b6b; /* Pastel Red/Pink */
+  --secondary: #4ecdc4; /* Pastel Teal */
+  --accent: #ffe66d; /* Pastel Yellow */
+  --text-dark: #2d3436;
+  --text-light: #636e72;
+  --border-radius: 20px;
+  --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  text-align: center;
+  padding: 20px 0;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: var(--primary);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.subtitle {
+  color: var(--secondary);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.app-container {
+  display: flex;
+  flex: 1;
+  gap: 20px;
+  padding: 0 20px 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.panel {
+  background: var(--panel-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 4px solid white;
+}
+
+.left-panel {
+  flex: 1;
+  max-width: 40%;
+}
+
+.right-panel {
+  flex: 1.5;
+}
+
+.panel-header {
+  background: var(--accent);
+  padding: 15px;
+  text-align: center;
+}
+
+.panel-header h2 {
+  font-size: 1.5rem;
+  color: var(--text-dark);
+}
+
+.left-panel .panel-header {
+  background: var(--secondary);
+}
+.left-panel .panel-header h2 {
+  color: white;
+}
+
+.panel-content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: auto;
+}
+
+/* Image Upload Styles */
+#image-container {
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.upload-prompt {
+  border: 3px dashed var(--secondary);
+  border-radius: var(--border-radius);
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: rgba(78, 205, 196, 0.05);
+}
+
+.upload-prompt:hover {
+  background: rgba(78, 205, 196, 0.15);
+  transform: scale(1.02);
+}
+
+.upload-icon {
+  font-size: 4rem;
+  display: block;
+  margin-bottom: 15px;
+}
+
+#uploaded-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  cursor: grab;
+}
+#uploaded-image:active {
+  cursor: grabbing;
+}
+
+/* Toolbar Styles */
+.toolbar {
+  padding: 15px 20px;
+  background: #f8f9fa;
+  border-bottom: 2px solid #eee;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+.toolbar-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tool-btn {
+  padding: 10px 15px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  font-family: inherit;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+}
+
+.tool-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0px 0 rgba(0,0,0,0.1);
+}
+
+.note-btn {
+  background: var(--primary);
+  color: white;
+}
+
+.utility-btn {
+  background: var(--accent);
+  color: var(--text-dark);
+}
+
+.action-btn {
+  background: #ff7675;
+  color: white;
+}
+
+/* Editor Styles */
+.editor-content {
+  gap: 20px;
+}
+
+.sheet-music-display {
+  flex: 1;
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  min-height: 200px;
+  overflow-x: auto;
+  border: 2px solid #eee;
+}
+
+.abc-input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.abc-input-container label {
+  font-weight: bold;
+  color: var(--secondary);
+  font-size: 1.1rem;
+}
+
+#abc-code {
+  width: 100%;
+  height: 120px;
+  padding: 15px;
+  border: 3px solid var(--secondary);
+  border-radius: 12px;
+  font-family: monospace;
+  font-size: 1.2rem;
+  resize: vertical;
+  outline: none;
+}
+#abc-code:focus {
+  box-shadow: 0 0 0 4px rgba(78, 205, 196, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .app-container {
+    flex-direction: column;
+  }
+  .left-panel {
+    max-width: 100%;
+  }
+}
