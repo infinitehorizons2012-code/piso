@@ -495,8 +495,8 @@ function updateStudioFromABC() {
         const ctx = canvas.getContext("2d");
 
         window.addEventListener("DOMContentLoaded", () => {
-            loadPreset('devuong');
-            drawSheet();
+            updateStudioFromABC();
+            window.drawSheet();
         });
 
         window.loadPreset = function loadPreset(presetKey) {
