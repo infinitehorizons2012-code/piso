@@ -88,7 +88,13 @@
         <div class="panel-content editor-content">
           <!-- Text area for ABC Notation -->
           <div class="abc-input-container" id="abc-view">
-            <label for="abc-code">Mã ABC Notation (Gõ đến đâu, nhạc cập nhật đến đó!)</label>
+            <label for="abc-code" style="display: flex; justify-content: space-between; align-items: center;">
+              <span>Mã ABC Notation (Gõ đến đâu, nhạc cập nhật đến đó!)</span>
+              <div>
+                 <button onclick="window.zoomText(1)" style="font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #333;">A+</button>
+                 <button onclick="window.zoomText(-1)" style="font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #333;">A-</button>
+              </div>
+            </label>
             <textarea id="abc-code" spellcheck="false" placeholder="Gõ abc vào đây..."></textarea>
           </div>
 

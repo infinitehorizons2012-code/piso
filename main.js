@@ -35,14 +35,21 @@ window.zoomImage = function(delta) {
     document.getElementById('uploaded-image').style.transform = `scale(${window.currentImageScale})`;
 };
 
+window.currentTextSize = 14;
+window.zoomText = function(delta) {
+    window.currentTextSize += delta;
+    if (window.currentTextSize < 8) window.currentTextSize = 8;
+    if (window.currentTextSize > 32) window.currentTextSize = 32;
+    document.getElementById('abc-code').style.fontSize = window.currentTextSize + 'px';
+};
+
 function renderSheetMusic() {
   const abcCode = abcTextarea.value;
   // Render using abcjs for the left panel
   abcjs.renderAbc("paper", abcCode, {
     add_classes: true,
     staffwidth: 700,
-    scale: window.currentSheetScale,
-    responsive: 'resize'
+    scale: window.currentSheetScale
   });
 
   // Render for Karaoke mode (returns visual obj for synth)
@@ -479,7 +486,6 @@ window.renderStudioSheet = function() {
     // Visual ABC: just the melody
     studioVisualObj = abcjs.renderAbc('studio-abc-paper', studioAbc, {
         add_classes: true,
-        responsive: 'resize',
         scale: window.currentSheetScale
     });
     
