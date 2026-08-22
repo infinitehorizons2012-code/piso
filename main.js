@@ -297,13 +297,21 @@ window.fetchLibrary = async function() {
         songs.forEach(song => {
             const div = document.createElement('div');
             div.style = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
-            div.innerHTML = `
-                <div>
-                    <h3 style="margin: 0; font-size: 16px;">${song.title}</h3>
-                    <small style="color: #666;">${new Date(song.createdAt).toLocaleString()}</small>
-                </div>
-                <button class="ctrl-btn play" style="font-size: 13px; padding: 5px 15px;" onclick="loadSong(\`${song.abc.replace(/\n/g, '\\n').replace(/"/g, '\\"')}\`)">Tải vào Editor</button>
+            
+            const infoDiv = document.createElement('div');
+            infoDiv.innerHTML = `
+                <h3 style="margin: 0; font-size: 16px;">${song.title}</h3>
+                <small style="color: #666;">${new Date(song.createdAt).toLocaleString()}</small>
             `;
+            
+            const btn = document.createElement('button');
+            btn.className = 'ctrl-btn play';
+            btn.style = 'font-size: 13px; padding: 5px 15px;';
+            btn.innerText = 'Tải vào Editor';
+            btn.onclick = () => window.loadSong(song.abc);
+            
+            div.appendChild(infoDiv);
+            div.appendChild(btn);
             listEl.appendChild(div);
         });
     } catch (err) {
