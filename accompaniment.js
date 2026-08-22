@@ -52,13 +52,13 @@ window.generateAccompaniment = function(abcCode) {
         
         if (beatsPerMeasure === 4) {
             bassMeasure = `${bassNote} ${bassNote} ${bassNote} ${bassNote}`;
-            drumMeasure = `[C,2] [D,2]`; // Kick Snare
+            drumMeasure = `[C,^F,] D, [C,^F,] D,`; 
         } else if (beatsPerMeasure === 3) {
             bassMeasure = `${bassNote} ${bassNote} ${bassNote}`;
-            drumMeasure = `[C,] [D,] [D,]`; 
+            drumMeasure = `[C,^F,] D, D,`; 
         } else if (beatsPerMeasure === 2) {
-            bassMeasure = `${bassNote}2`;
-            drumMeasure = `[C,D,]`;
+            bassMeasure = `${bassNote} ${bassNote}`;
+            drumMeasure = `[C,^F,] D,`;
         }
         
         bassTrack.push(bassMeasure);
