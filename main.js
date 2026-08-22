@@ -17,6 +17,7 @@ const paperElement = document.getElementById('paper');
 abcTextarea.value = DEFAULT_ABC;
 
 let currentVisualObj = null;
+let currentTempo = 100; // default 100%
 
 function renderSheetMusic() {
   const abcCode = abcTextarea.value;
@@ -82,7 +83,7 @@ toggleBtn.addEventListener('click', () => {
 // --- Karaoke Playback & Cursor Control ---
 let synthControl = null;
 let timingCallbacks = null;
-let currentTempo = 100; // default 100%
+
 
 function CursorControl(rootSelector, playBtnId = 'play-btn', stopBtnId = 'stop-btn') {
     this.onStart = function() {
@@ -362,7 +363,7 @@ window.toggleStudioPlay = function() {
         }
     }).then(() => {
         studioSynthControl.prime().then(() => {
-            // studioSynthControl.start();
+            studioSynthControl.start();
             AccompEngine.startAccompanimentEngine(document.getElementById('studioTempo').value);
             studioTimingCallbacks.start();
         }).catch(function (error) {
