@@ -453,3 +453,51 @@ h1 {
   margin: 20px 0;
   border-radius: 0 8px 8px 0;
 }
+
+/* --- Editor Section Tab Styles --- */
+.editor-tab-bar-container {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 6px 12px;
+}
+
+.editor-tab-btn {
+  background: #ffffff;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 5px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.editor-tab-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.editor-tab-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+  box-shadow: 0 2px 6px rgba(255, 107, 107, 0.3);
+}
+
+.tab-close-icon {
+  font-size: 11px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  opacity: 0.7;
+}
+
+.tab-close-icon:hover {
+  background: rgba(0, 0, 0, 0.15);
+  opacity: 1;
+}

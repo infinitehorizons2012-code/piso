@@ -44,7 +44,8 @@ window.zoomText = function(delta) {
 };
 
 function renderSheetMusic() {
-  const abcCode = abcTextarea.value;
+  const totalSec = (typeof editorSections !== 'undefined') ? editorSections.find(s => s.isTotal) : null;
+  const abcCode = (totalSec && totalSec.content) ? totalSec.content : abcTextarea.value;
   let visualAbc = abcCode;
   try {
       if (abcCode.includes('"')) {
@@ -82,13 +83,15 @@ function renderSheetMusic() {
   });
 }
 
-// Render on startup
+// Render on startup & initialize section tabs
+editorSections = window.parseAbcToSections(abcTextarea.value);
+window.renderEditorTabs();
+window.syncCurrentEditorTab();
 renderSheetMusic();
 
-// Two-way binding (Text -> Sheet)
+// Two-way binding (Text -> Sheet & Section Tabs)
 abcTextarea.addEventListener('input', () => {
-  renderSheetMusic();
-  if (window.renderStudioSheet) window.renderStudioSheet();
+  window.onEditorInput();
 });
 
 // --- View Toggle Logic ---
@@ -390,15 +393,20 @@ window.deleteSong = async function(id) {
 let currentSongId = null;
 
 window.loadSong = function(song) {
-    document.getElementById('abc-code').value = song.abc;
     currentSongId = song.id; // Store ID for overwriting
+    editorSections = window.parseAbcToSections(song.abc);
+    activeTabId = 'total';
+    window.renderEditorTabs();
+    window.syncCurrentEditorTab();
     switchTab('tab-btn-write', 'tab-write');
-    // Trigger input event to re-render sheet
-    document.getElementById('abc-code').dispatchEvent(new Event('input'));
+    renderSheetMusic();
+    if (window.renderStudioSheet) window.renderStudioSheet();
 };
 
 window.saveToCloud = async function() {
-    const abc = document.getElementById('abc-code').value.trim();
+    window.switchEditorTab(activeTabId); // Sync active tab
+    const totalSec = (typeof editorSections !== 'undefined') ? editorSections.find(s => s.isTotal) : null;
+    const abc = (totalSec && totalSec.content) ? totalSec.content.trim() : document.getElementById('abc-code').value.trim();
     if (!abc) return alert("Không có dữ liệu ABC để lưu!");
     
     let title = "Bản nhạc không tên";
@@ -476,7 +484,8 @@ function initAbcjsAudioContext() {
 let studioTimingCallbacks = null;
 
 window.renderStudioSheet = function() {
-    const abcCode = document.getElementById('abc-code').value;
+    const totalSec = (typeof editorSections !== 'undefined') ? editorSections.find(s => s.isTotal) : null;
+    const abcCode = (totalSec && totalSec.content) ? totalSec.content : document.getElementById('abc-code').value;
     let studioAbc = abcCode;
     try {
         if (abcCode.includes('"')) {
@@ -979,16 +988,238 @@ window.createNewSong = function() {
     if (confirm("Bạn có muốn tạo trang viết nhạc mới? Thao tác này sẽ làm sạch vùng soạn thảo và xóa ID cũ để sẵn sàng lưu thành một bản nhạc mới.")) {
         currentSongId = null; // Release old ID
         const defaultAbc = `X:1\nT:Bản Nhạc Mới\nM:4/4\nL:1/8\nQ:1/4=100\nK:C\n\n|: C2 E2 G2 c2 | c2 G2 E2 C2 :|`;
-        const abcEl = document.getElementById('abc-code');
-        if (abcEl) {
-            abcEl.value = defaultAbc;
-            abcEl.dispatchEvent(new Event('input'));
-        }
+        editorSections = window.parseAbcToSections(defaultAbc);
+        activeTabId = 'total';
+        window.renderEditorTabs();
+        window.syncCurrentEditorTab();
+        renderSheetMusic();
+        if (window.renderStudioSheet) window.renderStudioSheet();
+        
         const img = document.getElementById('uploaded-image');
         const prompt = document.getElementById('upload-prompt');
         if (img) img.style.display = 'none';
         if (prompt) prompt.style.display = 'block';
         alert("Đã làm sạch editor! Khi bạn bấm '☁️ Lưu lên Cloud', bản nhạc mới sẽ được tạo độc lập với mã ID mới.");
+    }
+};
+
+/* --- EDITOR SECTION TAB MANAGER --- */
+let editorSections = [
+    { id: 'total', title: '🌐 Tổng thể', isTotal: true },
+    { id: 'sec_header', title: 'HEADER', content: 'X:1\nT:Bản Nhạc Của Bé\nM:4/4\nL:1/4\nK:C' },
+    { id: 'sec_line1', title: 'DÒNG 1', content: 'C D E F | G A B c |' }
+];
+let activeTabId = 'total';
+
+window.parseAbcToSections = function(abcText) {
+    if (!abcText) abcText = '';
+    const lines = abcText.split('\n');
+    const parsedSections = [];
+    let currentTitle = null;
+    let currentLines = [];
+    
+    let i = 0;
+    while (i < lines.length) {
+        const line = lines[i];
+        const trimmed = line.trim();
+        
+        // Match 3-line header pattern: % === ... % TITLE ... % ===
+        if (trimmed.startsWith('% ===') && i + 2 < lines.length && lines[i+1].trim().startsWith('%') && lines[i+2].trim().startsWith('% ===')) {
+            if (currentTitle !== null || currentLines.length > 0) {
+                const titleStr = currentTitle || 'HEADER';
+                parsedSections.push({
+                    id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
+                    title: titleStr.toUpperCase(),
+                    content: currentLines.join('\n').trim()
+                });
+            }
+            currentTitle = lines[i+1].trim().replace(/^%\s*/, '').trim();
+            currentLines = [];
+            i += 3;
+            continue;
+        }
+        
+        // Match single-line marker pattern: % HEADER or % DÒNG 1
+        if (trimmed.match(/^%\s*(HEADER|DÒNG\s*\d+|DOAN\s*\d+|SECTION\s*\d+|ĐOẠN\s*\d+|ĐIỆP\s*KHÚC|LỜI\s*\d+)/i)) {
+            if (currentTitle !== null || currentLines.length > 0) {
+                const titleStr = currentTitle || 'HEADER';
+                parsedSections.push({
+                    id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
+                    title: titleStr.toUpperCase(),
+                    content: currentLines.join('\n').trim()
+                });
+            }
+            currentTitle = trimmed.replace(/^%\s*/, '').trim();
+            currentLines = [];
+            i++;
+            continue;
+        }
+        
+        currentLines.push(line);
+        i++;
+    }
+    
+    if (currentTitle !== null || currentLines.length > 0) {
+        const titleStr = currentTitle || (parsedSections.length === 0 ? 'HEADER' : 'DÒNG 1');
+        parsedSections.push({
+            id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
+            title: titleStr.toUpperCase(),
+            content: currentLines.join('\n').trim()
+        });
+    }
+    
+    // Auto-split header vs body if no markers found
+    if (parsedSections.length <= 1) {
+        const full = abcText.trim();
+        const kIndex = full.search(/^K:.*$/m);
+        if (kIndex !== -1) {
+            const endOfK = full.indexOf('\n', kIndex);
+            const headerPart = endOfK !== -1 ? full.substring(0, endOfK).trim() : full;
+            const bodyPart = endOfK !== -1 ? full.substring(endOfK + 1).trim() : '';
+            return [
+                { id: 'total', title: '🌐 Tổng thể', isTotal: true },
+                { id: 'sec_header', title: 'HEADER', content: headerPart },
+                { id: 'sec_line1', title: 'DÒNG 1', content: bodyPart }
+            ];
+        }
+    }
+    
+    return [
+        { id: 'total', title: '🌐 Tổng thể', isTotal: true },
+        ...parsedSections
+    ];
+};
+
+window.combineSectionsToAbc = function() {
+    let full = '';
+    editorSections.forEach(sec => {
+        if (sec.isTotal) return;
+        full += `% ===============================\n% ${sec.title}\n% ===============================\n${sec.content ? sec.content.trim() : ''}\n\n`;
+    });
+    return full.trim();
+};
+
+window.syncCurrentEditorTab = function() {
+    const abcEl = document.getElementById('abc-code');
+    if (!abcEl) return;
+    
+    const activeSec = editorSections.find(s => s.id === activeTabId);
+    if (!activeSec) return;
+    
+    if (activeSec.isTotal) {
+        activeSec.content = window.combineSectionsToAbc();
+        abcEl.value = activeSec.content;
+    } else {
+        abcEl.value = activeSec.content || '';
+    }
+};
+
+window.onEditorInput = function() {
+    const abcEl = document.getElementById('abc-code');
+    if (!abcEl) return;
+    const val = abcEl.value;
+    
+    const activeSec = editorSections.find(s => s.id === activeTabId);
+    if (!activeSec) return;
+    
+    if (activeSec.isTotal) {
+        activeSec.content = val;
+        if (val.includes('% ===')) {
+            editorSections = window.parseAbcToSections(val);
+            window.renderEditorTabs();
+        }
+    } else {
+        activeSec.content = val;
+        const totalSec = editorSections.find(s => s.isTotal);
+        if (totalSec) totalSec.content = window.combineSectionsToAbc();
+    }
+    
+    renderSheetMusic();
+    if (window.renderStudioSheet) window.renderStudioSheet();
+};
+
+window.switchEditorTab = function(tabId) {
+    const abcEl = document.getElementById('abc-code');
+    if (abcEl) {
+        const currentSec = editorSections.find(s => s.id === activeTabId);
+        if (currentSec) {
+            currentSec.content = abcEl.value;
+            if (!currentSec.isTotal) {
+                const totalSec = editorSections.find(s => s.isTotal);
+                if (totalSec) totalSec.content = window.combineSectionsToAbc();
+            }
+        }
+    }
+    
+    activeTabId = tabId;
+    window.renderEditorTabs();
+    window.syncCurrentEditorTab();
+};
+
+window.renderEditorTabs = function() {
+    const wrapper = document.getElementById('editor-tabs-wrapper');
+    if (!wrapper) return;
+    
+    wrapper.innerHTML = '';
+    editorSections.forEach(sec => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `editor-tab-btn ${sec.id === activeTabId ? 'active' : ''}`;
+        btn.onclick = () => window.switchEditorTab(sec.id);
+        
+        btn.innerHTML = `<span>${sec.title}</span>`;
+        
+        if (!sec.isTotal && sec.title !== 'HEADER' && editorSections.length > 3) {
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'tab-close-icon';
+            closeBtn.innerHTML = ' ✕';
+            closeBtn.title = 'Xóa tab này';
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                window.removeEditorTab(sec.id);
+            };
+            btn.appendChild(closeBtn);
+        }
+        
+        wrapper.appendChild(btn);
+    });
+};
+
+window.addNewEditorTab = function() {
+    let nextNum = editorSections.filter(s => !s.isTotal && s.title !== 'HEADER').length + 1;
+    let name = prompt("Nhập tên tab/dòng mới:", "DÒNG " + nextNum);
+    if (!name || !name.trim()) return;
+    
+    name = name.trim().toUpperCase();
+    window.switchEditorTab(activeTabId);
+    
+    const newSec = {
+        id: 'sec_' + Date.now(),
+        title: name,
+        content: ''
+    };
+    
+    editorSections.push(newSec);
+    activeTabId = newSec.id;
+    window.renderEditorTabs();
+    window.syncCurrentEditorTab();
+    
+    const abcEl = document.getElementById('abc-code');
+    if (abcEl) abcEl.focus();
+};
+
+window.removeEditorTab = function(tabId) {
+    const sec = editorSections.find(s => s.id === tabId);
+    if (!sec) return;
+    if (confirm(`Bạn có chắc muốn xóa tab '${sec.title}'?`)) {
+        editorSections = editorSections.filter(s => s.id !== tabId);
+        if (activeTabId === tabId) {
+            activeTabId = 'total';
+        }
+        window.renderEditorTabs();
+        window.syncCurrentEditorTab();
+        renderSheetMusic();
+        if (window.renderStudioSheet) window.renderStudioSheet();
     }
 };
 

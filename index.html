@@ -94,13 +94,17 @@
         <div class="panel-content editor-content">
           <!-- Text area for ABC Notation -->
           <div class="abc-input-container" id="abc-view">
-            <label for="abc-code" style="display: flex; justify-content: space-between; align-items: center;">
-              <span>Mã ABC Notation (Gõ đến đâu, nhạc cập nhật đến đó!)</span>
-              <div>
-                 <button onclick="window.zoomText(1)" style="font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #333;">A+</button>
-                 <button onclick="window.zoomText(-1)" style="font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #333;">A-</button>
+            <!-- Scrollable Section Tab Bar -->
+            <div class="editor-tab-bar-container" style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 6px 10px; border-radius: 10px; border: 1px solid #cbd5e1; gap: 10px;">
+              <div id="editor-tabs-wrapper" style="display: flex; gap: 6px; overflow-x: auto; flex: 1; scrollbar-width: thin; white-space: nowrap; padding-bottom: 2px;">
+                <!-- Tabs inserted dynamically by JS -->
               </div>
-            </label>
+              <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+                <button onclick="window.addNewEditorTab()" style="font-size: 12px; padding: 4px 10px; border-radius: 6px; border: none; background: #10b981; color: white; cursor: pointer; font-weight: bold; transition: all 0.2s; box-shadow: 0 2px 4px rgba(16,185,129,0.2);">➕ Thêm tab</button>
+                <button onclick="window.zoomText(1)" style="font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #333;">A+</button>
+                <button onclick="window.zoomText(-1)" style="font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid #ccc; background: #fff; cursor: pointer; color: #333;">A-</button>
+              </div>
+            </div>
             <textarea id="abc-code" spellcheck="false" placeholder="Gõ abc vào đây..."></textarea>
           </div>
 
