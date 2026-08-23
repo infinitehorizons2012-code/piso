@@ -19,6 +19,234 @@ abcTextarea.value = DEFAULT_ABC;
 let currentVisualObj = null;
 let currentTempo = 100; // default 100%
 
+/* --- EDITOR SECTION TAB MANAGER --- */
+let editorSections = [
+    { id: 'total', title: '🌐 Tổng thể', isTotal: true },
+    { id: 'sec_header', title: 'HEADER', content: 'X:1\nT:Bản Nhạc Của Bé\nM:4/4\nL:1/4\nK:C' },
+    { id: 'sec_line1', title: 'DÒNG 1', content: 'C D E F | G A B c |' }
+];
+let activeTabId = 'total';
+
+function parseAbcToSections(abcText) {
+    if (!abcText) abcText = '';
+    const lines = abcText.split('\n');
+    const parsedSections = [];
+    let currentTitle = null;
+    let currentLines = [];
+    
+    let i = 0;
+    while (i < lines.length) {
+        const line = lines[i];
+        const trimmed = line.trim();
+        
+        // Match 3-line header pattern: % === ... % TITLE ... % ===
+        if (trimmed.startsWith('% ===') && i + 2 < lines.length && lines[i+1].trim().startsWith('%') && lines[i+2].trim().startsWith('% ===')) {
+            if (currentTitle !== null || currentLines.length > 0) {
+                const titleStr = currentTitle || 'HEADER';
+                parsedSections.push({
+                    id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
+                    title: titleStr.toUpperCase(),
+                    content: currentLines.join('\n').trim()
+                });
+            }
+            currentTitle = lines[i+1].trim().replace(/^%\s*/, '').trim();
+            currentLines = [];
+            i += 3;
+            continue;
+        }
+        
+        // Match single-line marker pattern: % HEADER or % DÒNG 1
+        if (trimmed.match(/^%\s*(HEADER|DÒNG\s*\d+|DOAN\s*\d+|SECTION\s*\d+|ĐOẠN\s*\d+|ĐIỆP\s*KHÚC|LỜI\s*\d+)/i)) {
+            if (currentTitle !== null || currentLines.length > 0) {
+                const titleStr = currentTitle || 'HEADER';
+                parsedSections.push({
+                    id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
+                    title: titleStr.toUpperCase(),
+                    content: currentLines.join('\n').trim()
+                });
+            }
+            currentTitle = trimmed.replace(/^%\s*/, '').trim();
+            currentLines = [];
+            i++;
+            continue;
+        }
+        
+        currentLines.push(line);
+        i++;
+    }
+    
+    if (currentTitle !== null || currentLines.length > 0) {
+        const titleStr = currentTitle || (parsedSections.length === 0 ? 'HEADER' : 'DÒNG 1');
+        parsedSections.push({
+            id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
+            title: titleStr.toUpperCase(),
+            content: currentLines.join('\n').trim()
+        });
+    }
+    
+    // Auto-split header vs body if no markers found
+    if (parsedSections.length <= 1) {
+        const full = abcText.trim();
+        const kIndex = full.search(/^K:.*$/m);
+        if (kIndex !== -1) {
+            const endOfK = full.indexOf('\n', kIndex);
+            const headerPart = endOfK !== -1 ? full.substring(0, endOfK).trim() : full;
+            const bodyPart = endOfK !== -1 ? full.substring(endOfK + 1).trim() : '';
+            return [
+                { id: 'total', title: '🌐 Tổng thể', isTotal: true },
+                { id: 'sec_header', title: 'HEADER', content: headerPart },
+                { id: 'sec_line1', title: 'DÒNG 1', content: bodyPart }
+            ];
+        }
+    }
+    
+    return [
+        { id: 'total', title: '🌐 Tổng thể', isTotal: true },
+        ...parsedSections
+    ];
+}
+window.parseAbcToSections = parseAbcToSections;
+
+function combineSectionsToAbc() {
+    let full = '';
+    editorSections.forEach(sec => {
+        if (sec.isTotal) return;
+        full += `% ===============================\n% ${sec.title}\n% ===============================\n${sec.content ? sec.content.trim() : ''}\n\n`;
+    });
+    return full.trim();
+}
+window.combineSectionsToAbc = combineSectionsToAbc;
+
+function syncCurrentEditorTab() {
+    const abcEl = document.getElementById('abc-code');
+    if (!abcEl) return;
+    
+    const activeSec = editorSections.find(s => s.id === activeTabId);
+    if (!activeSec) return;
+    
+    if (activeSec.isTotal) {
+        activeSec.content = combineSectionsToAbc();
+        abcEl.value = activeSec.content;
+    } else {
+        abcEl.value = activeSec.content || '';
+    }
+}
+window.syncCurrentEditorTab = syncCurrentEditorTab;
+
+function onEditorInput() {
+    const abcEl = document.getElementById('abc-code');
+    if (!abcEl) return;
+    const val = abcEl.value;
+    
+    const activeSec = editorSections.find(s => s.id === activeTabId);
+    if (!activeSec) return;
+    
+    if (activeSec.isTotal) {
+        activeSec.content = val;
+        if (val.includes('% ===')) {
+            editorSections = parseAbcToSections(val);
+            renderEditorTabs();
+        }
+    } else {
+        activeSec.content = val;
+        const totalSec = editorSections.find(s => s.isTotal);
+        if (totalSec) totalSec.content = combineSectionsToAbc();
+    }
+    
+    renderSheetMusic();
+    if (window.renderStudioSheet) window.renderStudioSheet();
+}
+window.onEditorInput = onEditorInput;
+
+function switchEditorTab(tabId) {
+    const abcEl = document.getElementById('abc-code');
+    if (abcEl) {
+        const currentSec = editorSections.find(s => s.id === activeTabId);
+        if (currentSec) {
+            currentSec.content = abcEl.value;
+            if (!currentSec.isTotal) {
+                const totalSec = editorSections.find(s => s.isTotal);
+                if (totalSec) totalSec.content = combineSectionsToAbc();
+            }
+        }
+    }
+    
+    activeTabId = tabId;
+    renderEditorTabs();
+    syncCurrentEditorTab();
+}
+window.switchEditorTab = switchEditorTab;
+
+function renderEditorTabs() {
+    const wrapper = document.getElementById('editor-tabs-wrapper');
+    if (!wrapper) return;
+    
+    wrapper.innerHTML = '';
+    editorSections.forEach(sec => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `editor-tab-btn ${sec.id === activeTabId ? 'active' : ''}`;
+        btn.onclick = () => switchEditorTab(sec.id);
+        
+        btn.innerHTML = `<span>${sec.title}</span>`;
+        
+        if (!sec.isTotal && sec.title !== 'HEADER' && editorSections.length > 3) {
+            const closeBtn = document.createElement('span');
+            closeBtn.className = 'tab-close-icon';
+            closeBtn.innerHTML = ' ✕';
+            closeBtn.title = 'Xóa tab này';
+            closeBtn.onclick = (e) => {
+                e.stopPropagation();
+                removeEditorTab(sec.id);
+            };
+            btn.appendChild(closeBtn);
+        }
+        
+        wrapper.appendChild(btn);
+    });
+}
+window.renderEditorTabs = renderEditorTabs;
+
+function addNewEditorTab() {
+    let nextNum = editorSections.filter(s => !s.isTotal && s.title !== 'HEADER').length + 1;
+    let name = prompt("Nhập tên tab/dòng mới:", "DÒNG " + nextNum);
+    if (!name || !name.trim()) return;
+    
+    name = name.trim().toUpperCase();
+    switchEditorTab(activeTabId);
+    
+    const newSec = {
+        id: 'sec_' + Date.now(),
+        title: name,
+        content: ''
+    };
+    
+    editorSections.push(newSec);
+    activeTabId = newSec.id;
+    renderEditorTabs();
+    syncCurrentEditorTab();
+    
+    const abcEl = document.getElementById('abc-code');
+    if (abcEl) abcEl.focus();
+}
+window.addNewEditorTab = addNewEditorTab;
+
+function removeEditorTab(tabId) {
+    const sec = editorSections.find(s => s.id === tabId);
+    if (!sec) return;
+    if (confirm(`Bạn có chắc muốn xóa tab '${sec.title}'?`)) {
+        editorSections = editorSections.filter(s => s.id !== tabId);
+        if (activeTabId === tabId) {
+            activeTabId = 'total';
+        }
+        renderEditorTabs();
+        syncCurrentEditorTab();
+        renderSheetMusic();
+        if (window.renderStudioSheet) window.renderStudioSheet();
+    }
+}
+window.removeEditorTab = removeEditorTab;
+
 window.currentSheetScale = 1.0;
 window.zoomSheet = function(delta) {
     window.currentSheetScale += delta;
@@ -1000,226 +1228,6 @@ window.createNewSong = function() {
         if (img) img.style.display = 'none';
         if (prompt) prompt.style.display = 'block';
         alert("Đã làm sạch editor! Khi bạn bấm '☁️ Lưu lên Cloud', bản nhạc mới sẽ được tạo độc lập với mã ID mới.");
-    }
-};
-
-/* --- EDITOR SECTION TAB MANAGER --- */
-let editorSections = [
-    { id: 'total', title: '🌐 Tổng thể', isTotal: true },
-    { id: 'sec_header', title: 'HEADER', content: 'X:1\nT:Bản Nhạc Của Bé\nM:4/4\nL:1/4\nK:C' },
-    { id: 'sec_line1', title: 'DÒNG 1', content: 'C D E F | G A B c |' }
-];
-let activeTabId = 'total';
-
-window.parseAbcToSections = function(abcText) {
-    if (!abcText) abcText = '';
-    const lines = abcText.split('\n');
-    const parsedSections = [];
-    let currentTitle = null;
-    let currentLines = [];
-    
-    let i = 0;
-    while (i < lines.length) {
-        const line = lines[i];
-        const trimmed = line.trim();
-        
-        // Match 3-line header pattern: % === ... % TITLE ... % ===
-        if (trimmed.startsWith('% ===') && i + 2 < lines.length && lines[i+1].trim().startsWith('%') && lines[i+2].trim().startsWith('% ===')) {
-            if (currentTitle !== null || currentLines.length > 0) {
-                const titleStr = currentTitle || 'HEADER';
-                parsedSections.push({
-                    id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
-                    title: titleStr.toUpperCase(),
-                    content: currentLines.join('\n').trim()
-                });
-            }
-            currentTitle = lines[i+1].trim().replace(/^%\s*/, '').trim();
-            currentLines = [];
-            i += 3;
-            continue;
-        }
-        
-        // Match single-line marker pattern: % HEADER or % DÒNG 1
-        if (trimmed.match(/^%\s*(HEADER|DÒNG\s*\d+|DOAN\s*\d+|SECTION\s*\d+|ĐOẠN\s*\d+|ĐIỆP\s*KHÚC|LỜI\s*\d+)/i)) {
-            if (currentTitle !== null || currentLines.length > 0) {
-                const titleStr = currentTitle || 'HEADER';
-                parsedSections.push({
-                    id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
-                    title: titleStr.toUpperCase(),
-                    content: currentLines.join('\n').trim()
-                });
-            }
-            currentTitle = trimmed.replace(/^%\s*/, '').trim();
-            currentLines = [];
-            i++;
-            continue;
-        }
-        
-        currentLines.push(line);
-        i++;
-    }
-    
-    if (currentTitle !== null || currentLines.length > 0) {
-        const titleStr = currentTitle || (parsedSections.length === 0 ? 'HEADER' : 'DÒNG 1');
-        parsedSections.push({
-            id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
-            title: titleStr.toUpperCase(),
-            content: currentLines.join('\n').trim()
-        });
-    }
-    
-    // Auto-split header vs body if no markers found
-    if (parsedSections.length <= 1) {
-        const full = abcText.trim();
-        const kIndex = full.search(/^K:.*$/m);
-        if (kIndex !== -1) {
-            const endOfK = full.indexOf('\n', kIndex);
-            const headerPart = endOfK !== -1 ? full.substring(0, endOfK).trim() : full;
-            const bodyPart = endOfK !== -1 ? full.substring(endOfK + 1).trim() : '';
-            return [
-                { id: 'total', title: '🌐 Tổng thể', isTotal: true },
-                { id: 'sec_header', title: 'HEADER', content: headerPart },
-                { id: 'sec_line1', title: 'DÒNG 1', content: bodyPart }
-            ];
-        }
-    }
-    
-    return [
-        { id: 'total', title: '🌐 Tổng thể', isTotal: true },
-        ...parsedSections
-    ];
-};
-
-window.combineSectionsToAbc = function() {
-    let full = '';
-    editorSections.forEach(sec => {
-        if (sec.isTotal) return;
-        full += `% ===============================\n% ${sec.title}\n% ===============================\n${sec.content ? sec.content.trim() : ''}\n\n`;
-    });
-    return full.trim();
-};
-
-window.syncCurrentEditorTab = function() {
-    const abcEl = document.getElementById('abc-code');
-    if (!abcEl) return;
-    
-    const activeSec = editorSections.find(s => s.id === activeTabId);
-    if (!activeSec) return;
-    
-    if (activeSec.isTotal) {
-        activeSec.content = window.combineSectionsToAbc();
-        abcEl.value = activeSec.content;
-    } else {
-        abcEl.value = activeSec.content || '';
-    }
-};
-
-window.onEditorInput = function() {
-    const abcEl = document.getElementById('abc-code');
-    if (!abcEl) return;
-    const val = abcEl.value;
-    
-    const activeSec = editorSections.find(s => s.id === activeTabId);
-    if (!activeSec) return;
-    
-    if (activeSec.isTotal) {
-        activeSec.content = val;
-        if (val.includes('% ===')) {
-            editorSections = window.parseAbcToSections(val);
-            window.renderEditorTabs();
-        }
-    } else {
-        activeSec.content = val;
-        const totalSec = editorSections.find(s => s.isTotal);
-        if (totalSec) totalSec.content = window.combineSectionsToAbc();
-    }
-    
-    renderSheetMusic();
-    if (window.renderStudioSheet) window.renderStudioSheet();
-};
-
-window.switchEditorTab = function(tabId) {
-    const abcEl = document.getElementById('abc-code');
-    if (abcEl) {
-        const currentSec = editorSections.find(s => s.id === activeTabId);
-        if (currentSec) {
-            currentSec.content = abcEl.value;
-            if (!currentSec.isTotal) {
-                const totalSec = editorSections.find(s => s.isTotal);
-                if (totalSec) totalSec.content = window.combineSectionsToAbc();
-            }
-        }
-    }
-    
-    activeTabId = tabId;
-    window.renderEditorTabs();
-    window.syncCurrentEditorTab();
-};
-
-window.renderEditorTabs = function() {
-    const wrapper = document.getElementById('editor-tabs-wrapper');
-    if (!wrapper) return;
-    
-    wrapper.innerHTML = '';
-    editorSections.forEach(sec => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = `editor-tab-btn ${sec.id === activeTabId ? 'active' : ''}`;
-        btn.onclick = () => window.switchEditorTab(sec.id);
-        
-        btn.innerHTML = `<span>${sec.title}</span>`;
-        
-        if (!sec.isTotal && sec.title !== 'HEADER' && editorSections.length > 3) {
-            const closeBtn = document.createElement('span');
-            closeBtn.className = 'tab-close-icon';
-            closeBtn.innerHTML = ' ✕';
-            closeBtn.title = 'Xóa tab này';
-            closeBtn.onclick = (e) => {
-                e.stopPropagation();
-                window.removeEditorTab(sec.id);
-            };
-            btn.appendChild(closeBtn);
-        }
-        
-        wrapper.appendChild(btn);
-    });
-};
-
-window.addNewEditorTab = function() {
-    let nextNum = editorSections.filter(s => !s.isTotal && s.title !== 'HEADER').length + 1;
-    let name = prompt("Nhập tên tab/dòng mới:", "DÒNG " + nextNum);
-    if (!name || !name.trim()) return;
-    
-    name = name.trim().toUpperCase();
-    window.switchEditorTab(activeTabId);
-    
-    const newSec = {
-        id: 'sec_' + Date.now(),
-        title: name,
-        content: ''
-    };
-    
-    editorSections.push(newSec);
-    activeTabId = newSec.id;
-    window.renderEditorTabs();
-    window.syncCurrentEditorTab();
-    
-    const abcEl = document.getElementById('abc-code');
-    if (abcEl) abcEl.focus();
-};
-
-window.removeEditorTab = function(tabId) {
-    const sec = editorSections.find(s => s.id === tabId);
-    if (!sec) return;
-    if (confirm(`Bạn có chắc muốn xóa tab '${sec.title}'?`)) {
-        editorSections = editorSections.filter(s => s.id !== tabId);
-        if (activeTabId === tabId) {
-            activeTabId = 'total';
-        }
-        window.renderEditorTabs();
-        window.syncCurrentEditorTab();
-        renderSheetMusic();
-        if (window.renderStudioSheet) window.renderStudioSheet();
     }
 };
 
