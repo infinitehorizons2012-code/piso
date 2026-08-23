@@ -22,7 +22,7 @@
           </button>
           <div class="dropdown-menu-content">
             <button class="dropdown-item" onclick="window.switchTab('tab-btn-write', 'tab-write')">📝 Soạn Thảo ABC</button>
-            <button class="dropdown-item" onclick="window.switchTab('tab-btn-write', 'tab-write'); if(window.openTransposeModal){window.openTransposeModal()}else{document.getElementById('transpose-modal').style.display='flex';}">🎼 Dịch Giọng (Transpose)</button>
+            <button class="dropdown-item" onclick="window.switchTab('tab-btn-write', 'tab-write'); const m=document.getElementById('transpose-modal'); if(m){m.classList.add('show');m.style.display='flex';} if(window.openTransposeModal)window.openTransposeModal();">🎼 Dịch Giọng (Transpose)</button>
             <button class="dropdown-item" onclick="window.switchTab('tab-btn-library', 'tab-library'); fetchLibrary();">📚 Thư Viện Bản Nhạc</button>
             <button class="dropdown-item" onclick="window.switchTab('tab-btn-listen', 'tab-listen')">🎧 Bàn Trộn Studio</button>
           </div>
@@ -40,8 +40,9 @@
             <button class="dropdown-item" onclick="window.selectGame('scale')">🎹 Scale Match (Cảm Âm Âm Giai)</button>
             <button class="dropdown-item" onclick="window.selectGame('chord')">🎼 Chord Match (Cảm Âm Hợp Âm)</button>
           </div>
+        </div>
         <!-- STANDALONE BUTTON: Dịch Giọng -->
-        <button class="nav-dropdown-btn" onclick="const m=document.getElementById('transpose-modal');if(m)m.style.display='flex';if(window.getCurrentSongKey){const b=document.getElementById('current-key-badge');if(b)b.innerText=window.getCurrentSongKey();}" style="background: linear-gradient(135deg, #ff6b6b, #ff8e53); color: white; border: none; font-weight: 800; box-shadow: 0 4px 12px rgba(255,107,107,0.3); border-radius: 20px; padding: 8px 18px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+        <button class="nav-dropdown-btn" onclick="const m=document.getElementById('transpose-modal'); if(m){m.classList.add('show');m.style.display='flex';} if(window.openTransposeModal)window.openTransposeModal();" style="background: linear-gradient(135deg, #ff6b6b, #ff8e53); color: white; border: none; font-weight: 800; box-shadow: 0 4px 12px rgba(255,107,107,0.3); border-radius: 20px; padding: 8px 18px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
           🎼 Dịch Giọng
         </button>
 
@@ -127,7 +128,7 @@
             <button id="btn-save-transposed" onclick="window.saveTransposedToCloud()" class="toggle-btn" style="background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; padding: 6px 12px;" title="Lưu bài mới với Tone đã dịch">💾 Lưu Giọng Mới</button>
             <button onclick="window.openTheoryModal()" class="toggle-btn" style="background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; padding: 6px 12px;">📖 Lý Thuyết</button>
           </div>
-          <button id="btn-open-transpose" onclick="if(window.openTransposeModal){window.openTransposeModal()}else{const m=document.getElementById('transpose-modal');if(m)m.style.display='flex';}" class="toggle-btn" style="background: #ffffff; color: #ff6b6b; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 14px; padding: 6px 18px; font-weight: 800; border-radius: 20px; border: 2px solid #ff6b6b; cursor: pointer; transition: all 0.2s;">🎼 Dịch Giọng</button>
+          <button id="btn-open-transpose" onclick="const m=document.getElementById('transpose-modal'); if(m){m.classList.add('show');m.style.display='flex';} if(window.openTransposeModal)window.openTransposeModal();" class="toggle-btn" style="background: #ffffff; color: #ff6b6b; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 14px; padding: 6px 18px; font-weight: 800; border-radius: 20px; border: 2px solid #ff6b6b; cursor: pointer; transition: all 0.2s;">🎼 Dịch Giọng</button>
           <div style="display: flex; gap: 8px; align-items: center;">
             <button onclick="window.createNewSong()" class="toggle-btn" style="background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; padding: 6px 12px;">➕ Bản Nhạc Mới</button>
             <button id="toggle-view-btn" class="toggle-btn" style="font-size: 13px; padding: 6px 12px;">📖 Xem Sheet Nhạc</button>
@@ -766,7 +767,7 @@ z2 z2 [Fc]2 z2 |</pre>
       <div class="theory-modal-container" style="max-width: 580px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.25);">
         <div class="modal-header" style="background: linear-gradient(135deg, #ff6b6b, #ff8e53); color: white; padding: 18px 25px; display: flex; justify-content: space-between; align-items: center;">
           <h3 style="margin: 0; font-size: 1.3rem; color: white; font-weight: 800; display: flex; align-items: center; gap: 8px;">🎼 Dịch Giọng Bản Nhạc (Transpose Key)</h3>
-          <button onclick="window.closeTransposeModal()" style="background: white; border: none; color: #ff6b6b; font-size: 0.95rem; cursor: pointer; padding: 6px 14px; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">✕ Đóng</button>
+          <button onclick="const m=document.getElementById('transpose-modal'); if(m){m.classList.remove('show');m.style.display='none';} if(window.closeTransposeModal)window.closeTransposeModal();" style="background: white; border: none; color: #ff6b6b; font-size: 0.95rem; cursor: pointer; padding: 6px 14px; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">✕ Đóng</button>
         </div>
         
         <div class="modal-body" style="padding: 25px; background: #ffffff;">

@@ -1626,21 +1626,23 @@ window.openTransposeModal = function() {
         const modal = document.getElementById('transpose-modal');
         const badge = document.getElementById('current-key-badge');
         if (modal) {
+            modal.classList.add('show');
             modal.style.display = 'flex';
-            modal.style.zIndex = '999999';
-            if (badge) badge.innerText = window.getCurrentSongKey();
-        } else {
-            alert("Lỗi: Không tìm thấy popup dịch giọng");
+            if (badge && window.getCurrentSongKey) {
+                badge.innerText = window.getCurrentSongKey();
+            }
         }
     } catch(err) {
         console.error("Lỗi khi mở popup dịch giọng:", err);
-        alert("Lỗi khi mở popup dịch giọng: " + err.message);
     }
 };
 
 window.closeTransposeModal = function() {
     const modal = document.getElementById('transpose-modal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+    }
 };
 
 window.transposeAbcText = function(abcText, deltaSemitones, targetKeyName = null) {
