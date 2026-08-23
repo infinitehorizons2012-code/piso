@@ -1586,10 +1586,20 @@ const SEMITONE_TO_MAJOR_KEY = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 
 const SEMITONE_TO_MINOR_KEY = ['Cm', 'C#m', 'Dm', 'Ebm', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'Bbm', 'Bm'];
 
 window.getCurrentSongKey = function() {
-    window.switchEditorTab(activeTabId);
-    const totalSec = (typeof editorSections !== 'undefined') ? editorSections.find(s => s.isTotal) : null;
-    const abc = (totalSec && totalSec.content) ? totalSec.content : (document.getElementById('abc-code')?.value || '');
-    const match = abc.match(/^K:\s*(.+)$/m);
+    let fullAbc = '';
+    const abcEl = document.getElementById('abc-code');
+    if (abcEl) {
+        const curSec = (typeof editorSections !== 'undefined') ? editorSections.find(s => s.id === activeTabId) : null;
+        if (curSec) curSec.content = abcEl.value;
+    }
+    if (typeof combineSectionsToAbc === 'function') {
+        fullAbc = combineSectionsToAbc();
+    }
+    if (!fullAbc || !fullAbc.trim()) {
+        const totalSec = (typeof editorSections !== 'undefined') ? editorSections.find(s => s.isTotal) : null;
+        fullAbc = (totalSec && totalSec.content) ? totalSec.content : (abcEl ? abcEl.value : '');
+    }
+    const match = fullAbc.match(/^K:\s*([^\s%]+)/m);
     return match ? match[1].trim() : 'C';
 };
 
@@ -1615,7 +1625,8 @@ window.transposeAbcText = function(abcText, deltaSemitones, targetKeyName = null
     let currentKey = 'C';
     for (let l of lines) {
         if (l.trim().startsWith('K:')) {
-            currentKey = l.trim().substring(2).trim();
+            const kMatch = l.trim().match(/^K:\s*([^\s%]+)/);
+            if (kMatch) currentKey = kMatch[1].trim();
             break;
         }
     }
@@ -1746,37 +1757,56 @@ window.applyTransposeDelta = function(delta) {
 };
 
 window.executeTranspose = function(delta, targetKey) {
-    window.switchEditorTab(activeTabId);
-    
-    const totalSec = editorSections.find(s => s.isTotal);
-    let abc = (totalSec && totalSec.content) ? totalSec.content : document.getElementById('abc-code').value;
-    
-    const transposedAbc = window.transposeAbcText(abc, delta, targetKey);
-    
-    // Parse full transposed ABC back into sections
-    editorSections = window.parseAbcToSections(transposedAbc);
-    
-    const activeSec = editorSections.find(s => s.id === activeTabId);
     const abcEl = document.getElementById('abc-code');
     if (abcEl) {
-        abcEl.value = (activeSec && activeSec.content) ? activeSec.content : transposedAbc;
+        const curSec = editorSections.find(s => s.id === activeTabId);
+        if (curSec) curSec.content = abcEl.value;
     }
     
-    window.renderEditorTabs();
-    window.syncCurrentEditorTab();
+    let fullAbc = (typeof combineSectionsToAbc === 'function') ? combineSectionsToAbc() : '';
+    if (!fullAbc || !fullAbc.trim()) {
+        const totalSec = editorSections.find(s => s.isTotal);
+        fullAbc = (totalSec && totalSec.content) ? totalSec.content : (abcEl ? abcEl.value : '');
+    }
+    
+    if (!fullAbc || !fullAbc.trim()) {
+        return alert("Không có dữ liệu bài hát để dịch giọng!");
+    }
+
+    const transposedFullAbc = window.transposeAbcText(fullAbc, delta, targetKey);
+
+    editorSections = parseAbcToSections(transposedFullAbc);
+
+    const activeSec = editorSections.find(s => s.id === activeTabId) || editorSections.find(s => s.isTotal) || editorSections[0];
+    if (activeSec) activeTabId = activeSec.id;
+
+    if (abcEl) {
+        abcEl.value = (activeSec && activeSec.content) ? activeSec.content : transposedFullAbc;
+    }
+
+    renderEditorTabs();
+    syncCurrentEditorTab();
     renderSheetMusic();
     if (window.renderStudioSheet) window.renderStudioSheet();
-    
+
     window.closeTransposeModal();
-    
+
     const newKey = window.getCurrentSongKey();
-    alert(`✨ Đã dịch giọng toàn bộ bản nhạc sang Tone ${newKey}! Bạn có thể nghe thử và bấm '💾 Lưu Giọng Mới' để lưu vào Thư viện.`);
+    alert(`✨ Đã dịch giọng bản nhạc sang Tone ${newKey}! Bạn có thể nghe thử và bấm '💾 Lưu Giọng Mới' để lưu bài này vào Thư viện.`);
 };
 
 window.saveTransposedToCloud = async function() {
-    window.switchEditorTab(activeTabId);
-    const totalSec = (typeof editorSections !== 'undefined') ? editorSections.find(s => s.isTotal) : null;
-    let abc = (totalSec && totalSec.content) ? totalSec.content.trim() : document.getElementById('abc-code').value.trim();
+    const abcEl = document.getElementById('abc-code');
+    if (abcEl) {
+        const curSec = editorSections.find(s => s.id === activeTabId);
+        if (curSec) curSec.content = abcEl.value;
+    }
+    
+    let abc = (typeof combineSectionsToAbc === 'function') ? combineSectionsToAbc() : '';
+    if (!abc || !abc.trim()) {
+        const totalSec = editorSections.find(s => s.isTotal);
+        abc = (totalSec && totalSec.content) ? totalSec.content.trim() : (abcEl ? abcEl.value.trim() : '');
+    }
     if (!abc) return alert("Không có dữ liệu ABC để lưu!");
     
     const key = window.getCurrentSongKey();
