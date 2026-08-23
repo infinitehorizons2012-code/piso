@@ -117,22 +117,22 @@
 
         // Render Game Header & Game Selector Bar
         let html = `
-            <div class="game-header-bar" style="background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+            <div class="game-header-bar" style="background: linear-gradient(135deg, #ff758c, #ff7eb3, #764ba2); color: white; padding: 22px 25px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(255, 117, 140, 0.35);">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
                     <div>
-                        <h2 style="margin: 0; font-size: 1.5rem; color: #f8fafc; display: flex; align-items: center; gap: 10px;">
+                        <h2 style="margin: 0; font-size: 1.6rem; color: #ffffff; display: flex; align-items: center; gap: 10px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.15);">
                             ${getGameTitle(g.activeGame)}
                         </h2>
-                        <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 0.9rem;">${getGameDesc(g.activeGame)}</p>
+                        <p style="margin: 6px 0 0 0; color: #fce7f3; font-size: 0.95rem; font-weight: 600;">${getGameDesc(g.activeGame)}</p>
                     </div>
-                    <div style="display: flex; gap: 15px; background: rgba(255,255,255,0.1); padding: 8px 18px; border-radius: 30px; font-weight: bold;">
-                        <span style="color: #4ade80;">⭐ Điểm: ${g.score}</span>
-                        <span style="color: #facc15;">🔥 Chuỗi: ${g.streak}</span>
+                    <div style="display: flex; gap: 15px; background: rgba(255,255,255,0.25); backdrop-filter: blur(8px); padding: 10px 22px; border-radius: 30px; font-weight: 800; border: 2px solid rgba(255,255,255,0.4); box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                        <span style="color: #fef08a; font-size: 1.1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">⭐ Điểm: ${g.score}</span>
+                        <span style="color: #ffedd5; font-size: 1.1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.2);">🔥 Chuỗi: ${g.streak}</span>
                     </div>
                 </div>
 
                 <!-- Sub Navigation Tabs for Selected Game -->
-                <div style="display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px;">
+                <div style="display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.25); padding-top: 16px;">
                     ${getGameSubTabs(g.activeGame, g.activeSubTab)}
                 </div>
             </div>
@@ -141,12 +141,12 @@
         // Render Level Selector if in Test mode
         if (g.activeSubTab !== 'theory') {
             html += `
-                <div style="display: flex; justify-content: space-between; align-items: center; background: white; padding: 12px 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.03);">
-                    <span style="font-weight: bold; color: #334155;">🎯 Chọn Độ Khó:</span>
-                    <div style="display: flex; gap: 8px;">
-                        <button onclick="window.setGameLevel(1)" class="level-btn ${g.level === 1 ? 'active' : ''}" style="padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; cursor: pointer; font-weight: bold; ${g.level === 1 ? 'background: #22c55e; color: white; border-color: #22c55e;' : 'background: #f8fafc; color: #475569;'}">Level 1 (Dễ)</button>
-                        <button onclick="window.setGameLevel(2)" class="level-btn ${g.level === 2 ? 'active' : ''}" style="padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; cursor: pointer; font-weight: bold; ${g.level === 2 ? 'background: #eab308; color: white; border-color: #eab308;' : 'background: #f8fafc; color: #475569;'}">Level 2 (Vừa)</button>
-                        <button onclick="window.setGameLevel(3)" class="level-btn ${g.level === 3 ? 'active' : ''}" style="padding: 6px 14px; border-radius: 20px; border: 1px solid #cbd5e1; cursor: pointer; font-weight: bold; ${g.level === 3 ? 'background: #ef4444; color: white; border-color: #ef4444;' : 'background: #f8fafc; color: #475569;'}">Level 3 (Khó)</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #e0f2fe, #f0f9ff); padding: 14px 22px; border-radius: 16px; margin-bottom: 20px; border: 2px solid #7dd3fc; box-shadow: 0 4px 12px rgba(56, 189, 248, 0.15);">
+                    <span style="font-weight: 800; color: #0369a1; font-size: 1.05rem; display: flex; align-items: center; gap: 6px;">🎯 Chọn Độ Khó:</span>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="window.setGameLevel(1)" class="level-btn ${g.level === 1 ? 'active' : ''}" style="padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 800; transition: all 0.2s; ${g.level === 1 ? 'background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);' : 'background: white; color: #334155; border: 2px solid #cbd5e1;'}">Level 1 (Dễ)</button>
+                        <button onclick="window.setGameLevel(2)" class="level-btn ${g.level === 2 ? 'active' : ''}" style="padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 800; transition: all 0.2s; ${g.level === 2 ? 'background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35);' : 'background: white; color: #334155; border: 2px solid #cbd5e1;'}">Level 2 (Vừa)</button>
+                        <button onclick="window.setGameLevel(3)" class="level-btn ${g.level === 3 ? 'active' : ''}" style="padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 800; transition: all 0.2s; ${g.level === 3 ? 'background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.35);' : 'background: white; color: #334155; border: 2px solid #cbd5e1;'}">Level 3 (Khó)</button>
                     </div>
                 </div>
             `;
@@ -187,16 +187,19 @@
     }
 
     function getGameSubTabs(gameId, activeTab) {
+        const activeStyle = 'background: #facc15; color: #431407; font-weight: 800; border-radius: 20px; border: 2px solid #fde047; box-shadow: 0 4px 12px rgba(250, 204, 21, 0.45); padding: 9px 20px; cursor: pointer; transition: all 0.2s;';
+        const inactiveStyle = 'background: rgba(255, 255, 255, 0.2); color: white; font-weight: 700; border-radius: 20px; border: 2px solid rgba(255, 255, 255, 0.35); padding: 9px 20px; cursor: pointer; transition: all 0.2s;';
+
         if (gameId === 'ledger') {
             return `
-                <button onclick="window.switchGameSubTab('sol')" style="padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; ${activeTab === 'sol' ? 'background: #3b82f6; color: white;' : 'background: rgba(255,255,255,0.15); color: white;'}">🎼 Test Khóa Sol</button>
-                <button onclick="window.switchGameSubTab('fa')" style="padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; ${activeTab === 'fa' ? 'background: #3b82f6; color: white;' : 'background: rgba(255,255,255,0.15); color: white;'}">𝄢 Test Khóa Fa</button>
-                <button onclick="window.switchGameSubTab('theory')" style="padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; ${activeTab === 'theory' ? 'background: #3b82f6; color: white;' : 'background: rgba(255,255,255,0.15); color: white;'}">📖 Lý Thuyết</button>
+                <button onclick="window.switchGameSubTab('sol')" style="${activeTab === 'sol' ? activeStyle : inactiveStyle}">🎼 Test Khóa Sol</button>
+                <button onclick="window.switchGameSubTab('fa')" style="${activeTab === 'fa' ? activeStyle : inactiveStyle}">𝄢 Test Khóa Fa</button>
+                <button onclick="window.switchGameSubTab('theory')" style="${activeTab === 'theory' ? activeStyle : inactiveStyle}">📖 Lý Thuyết</button>
             `;
         } else {
             return `
-                <button onclick="window.switchGameSubTab('test')" style="padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; ${activeTab === 'test' ? 'background: #3b82f6; color: white;' : 'background: rgba(255,255,255,0.15); color: white;'}">🎮 Làm Bài Test</button>
-                <button onclick="window.switchGameSubTab('theory')" style="padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; ${activeTab === 'theory' ? 'background: #3b82f6; color: white;' : 'background: rgba(255,255,255,0.15); color: white;'}">📖 Lý Thuyết</button>
+                <button onclick="window.switchGameSubTab('test')" style="${activeTab === 'test' ? activeStyle : inactiveStyle}">🎮 Làm Bài Test</button>
+                <button onclick="window.switchGameSubTab('theory')" style="${activeTab === 'theory' ? activeStyle : inactiveStyle}">📖 Lý Thuyết</button>
             `;
         }
     }
@@ -282,6 +285,16 @@
         { abc: 'c', name: 'Đô (c)', noteOnly: 'C' }
     ];
 
+    const NOTE_COLOR_MAP = {
+        'C': { bg: 'linear-gradient(135deg, #fff1f2, #ffe4e6)', border: '#f43f5e', text: '#be123c', shadow: 'rgba(244, 63, 94, 0.25)' },
+        'D': { bg: 'linear-gradient(135deg, #fff7ed, #ffedd5)', border: '#fb923c', text: '#c2410c', shadow: 'rgba(249, 115, 22, 0.25)' },
+        'E': { bg: 'linear-gradient(135deg, #fefce8, #fef9c3)', border: '#facc15', text: '#a16207', shadow: 'rgba(234, 179, 8, 0.25)' },
+        'F': { bg: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', border: '#4ade80', text: '#15803d', shadow: 'rgba(34, 197, 94, 0.25)' },
+        'G': { bg: 'linear-gradient(135deg, #ecfeff, #cffafe)', border: '#38bdf8', text: '#0369a1', shadow: 'rgba(56, 189, 248, 0.25)' },
+        'A': { bg: 'linear-gradient(135deg, #eff6ff, #dbeafe)', border: '#60a5fa', text: '#1d4ed8', shadow: 'rgba(59, 130, 246, 0.25)' },
+        'B': { bg: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', border: '#c084fc', text: '#6b21a8', shadow: 'rgba(168, 85, 247, 0.25)' }
+    };
+
     function generateLedgerQuestion(cardBody) {
         const isTreble = window.GameState.activeSubTab === 'sol';
         const lvl = window.GameState.level;
@@ -297,19 +310,22 @@
         const abcCode = `X:1\nM:4/4\nL:1/4\nK:C clef=${clefStr}\n${target.abc} |`;
 
         cardBody.innerHTML = `
-            <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <h3 style="margin-top: 0; color: #1e293b;">Hãy chọn tên nốt nhạc đang hiển thị trên khuông nhạc:</h3>
+            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎵 Hãy chọn tên nốt nhạc đang hiển thị trên khuông nhạc:</h3>
                 
-                <div id="game-abc-paper" style="min-height: 140px; display: flex; justify-content: center; align-items: center; margin: 15px 0;"></div>
+                <div id="game-abc-paper" style="min-height: 140px; display: flex; justify-content: center; align-items: center; margin: 15px 0; background: #fafafa; border-radius: 14px; padding: 10px;"></div>
 
-                <div id="game-feedback" style="min-height: 30px; font-weight: bold; font-size: 1.1rem; margin-bottom: 15px;"></div>
+                <div id="game-feedback" style="min-height: 32px; font-weight: 800; font-size: 1.2rem; margin-bottom: 18px;"></div>
 
-                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                    ${['C', 'D', 'E', 'F', 'G', 'A', 'B'].map(note => `
-                        <button onclick="window.checkLedgerAnswer('${note}')" style="font-size: 1.2rem; font-weight: bold; padding: 12px 22px; border-radius: 10px; border: 2px solid #cbd5e1; background: #f8fafc; color: #0f172a; cursor: pointer; transition: all 0.2s; min-width: 65px;">
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    ${['C', 'D', 'E', 'F', 'G', 'A', 'B'].map(note => {
+                        const style = NOTE_COLOR_MAP[note];
+                        return `
+                        <button onclick="window.checkLedgerAnswer('${note}')" style="font-size: 1.25rem; font-weight: 800; padding: 12px 22px; border-radius: 16px; border: 2.5px solid ${style.border}; background: ${style.bg}; color: ${style.text}; cursor: pointer; transition: all 0.2s; min-width: 85px; box-shadow: 0 4px 12px ${style.shadow};" onmouseover="this.style.transform='translateY(-4px) scale(1.06)'" onmouseout="this.style.transform='none'">
                             ${getNoteDisplayName(note)}
                         </button>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
@@ -365,18 +381,18 @@
         window.GameState.currentQuestion = target;
 
         cardBody.innerHTML = `
-            <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <h3 style="margin-top: 0; color: #1e293b;">Bấm nút âm thanh & chọn nhịp điệu chính xác:</h3>
+            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🥁 Bấm nút âm thanh & chọn nhịp điệu chính xác:</h3>
                 
-                <button onclick="window.playRhythmQuestionSound()" style="font-size: 1.1rem; padding: 12px 25px; border-radius: 30px; background: #3b82f6; color: white; border: none; cursor: pointer; font-weight: bold; margin: 15px 0;">
+                <button onclick="window.playRhythmQuestionSound()" style="font-size: 1.15rem; padding: 14px 30px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 15px 0; box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
                     🔊 Phát Âm Thanh Nhịp Điệu
                 </button>
 
-                <div id="game-feedback" style="min-height: 30px; font-weight: bold; font-size: 1.1rem; margin: 15px 0;"></div>
+                <div id="game-feedback" style="min-height: 32px; font-weight: 800; font-size: 1.2rem; margin: 15px 0;"></div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 15px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 15px;">
                     ${RHYTHM_PATTERNS.map((item, idx) => `
-                        <button onclick="window.checkRhythmAnswer(${idx})" style="padding: 15px; border-radius: 10px; border: 2px solid #cbd5e1; background: #f8fafc; font-weight: bold; cursor: pointer; color: #1e293b;">
+                        <button onclick="window.checkRhythmAnswer(${idx})" style="padding: 18px; border-radius: 16px; border: 2.5px solid #a5f3fc; background: linear-gradient(135deg, #f0fdf4, #ecfeff); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #0369a1; box-shadow: 0 4px 12px rgba(6,182,212,0.15); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
                             ${item.name}
                         </button>
                     `).join('')}
@@ -423,18 +439,18 @@
         window.GameState.currentQuestion = { target, rootMidi };
 
         cardBody.innerHTML = `
-            <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <h3 style="margin-top: 0; color: #1e293b;">Nghe 2 nốt nhạc & xác định Quãng Âm (Interval):</h3>
+            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎵 Nghe 2 nốt nhạc & xác định Quãng Âm (Interval):</h3>
                 
-                <button onclick="window.playIntervalQuestionSound()" style="font-size: 1.1rem; padding: 12px 25px; border-radius: 30px; background: #3b82f6; color: white; border: none; cursor: pointer; font-weight: bold; margin: 15px 0;">
+                <button onclick="window.playIntervalQuestionSound()" style="font-size: 1.15rem; padding: 14px 30px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 15px 0; box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
                     🔊 Nghe Lại Quãng Âm
                 </button>
 
-                <div id="game-feedback" style="min-height: 30px; font-weight: bold; font-size: 1.1rem; margin: 15px 0;"></div>
+                <div id="game-feedback" style="min-height: 32px; font-weight: 800; font-size: 1.2rem; margin: 15px 0;"></div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 15px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 15px;">
                     ${INTERVALS.map((item, idx) => `
-                        <button onclick="window.checkIntervalAnswer(${idx})" style="padding: 15px; border-radius: 10px; border: 2px solid #cbd5e1; background: #f8fafc; font-weight: bold; cursor: pointer; color: #1e293b;">
+                        <button onclick="window.checkIntervalAnswer(${idx})" style="padding: 18px; border-radius: 16px; border: 2.5px solid #bfdbfe; background: linear-gradient(135deg, #eff6ff, #dbeafe); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #1d4ed8; box-shadow: 0 4px 12px rgba(59,130,246,0.15); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
                             ${item.name}
                         </button>
                     `).join('')}
@@ -481,18 +497,18 @@
         window.GameState.currentQuestion = { target, rootMidi };
 
         cardBody.innerHTML = `
-            <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <h3 style="margin-top: 0; color: #1e293b;">Nghe chuỗi nốt & nhận biết loại Âm Giai (Scale):</h3>
+            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎹 Nghe chuỗi nốt & nhận biết loại Âm Giai (Scale):</h3>
                 
-                <button onclick="window.playScaleQuestionSound()" style="font-size: 1.1rem; padding: 12px 25px; border-radius: 30px; background: #3b82f6; color: white; border: none; cursor: pointer; font-weight: bold; margin: 15px 0;">
+                <button onclick="window.playScaleQuestionSound()" style="font-size: 1.15rem; padding: 14px 30px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 15px 0; box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
                     🔊 Nghe Lại Âm Giai
                 </button>
 
-                <div id="game-feedback" style="min-height: 30px; font-weight: bold; font-size: 1.1rem; margin: 15px 0;"></div>
+                <div id="game-feedback" style="min-height: 32px; font-weight: 800; font-size: 1.2rem; margin: 15px 0;"></div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 15px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 15px;">
                     ${SCALES.map((item, idx) => `
-                        <button onclick="window.checkScaleAnswer(${idx})" style="padding: 15px; border-radius: 10px; border: 2px solid #cbd5e1; background: #f8fafc; font-weight: bold; cursor: pointer; color: #1e293b;">
+                        <button onclick="window.checkScaleAnswer(${idx})" style="padding: 18px; border-radius: 16px; border: 2.5px solid #fde047; background: linear-gradient(135deg, #fefce8, #fef9c3); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #854d0e; box-shadow: 0 4px 12px rgba(234,179,8,0.2); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
                             ${item.name}
                         </button>
                     `).join('')}
@@ -540,18 +556,18 @@
         window.GameState.currentQuestion = { target, rootMidi };
 
         cardBody.innerHTML = `
-            <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-                <h3 style="margin-top: 0; color: #1e293b;">Nghe hòa âm & xác định loại Hợp Âm (Chord):</h3>
+            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎼 Nghe hòa âm & xác định loại Hợp Âm (Chord):</h3>
                 
-                <button onclick="window.playChordQuestionSound()" style="font-size: 1.1rem; padding: 12px 25px; border-radius: 30px; background: #3b82f6; color: white; border: none; cursor: pointer; font-weight: bold; margin: 15px 0;">
+                <button onclick="window.playChordQuestionSound()" style="font-size: 1.15rem; padding: 14px 30px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 15px 0; box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
                     🔊 Nghe Lại Hợp Âm
                 </button>
 
-                <div id="game-feedback" style="min-height: 30px; font-weight: bold; font-size: 1.1rem; margin: 15px 0;"></div>
+                <div id="game-feedback" style="min-height: 32px; font-weight: 800; font-size: 1.2rem; margin: 15px 0;"></div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-top: 15px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 15px;">
                     ${CHORDS.map((item, idx) => `
-                        <button onclick="window.checkChordAnswer(${idx})" style="padding: 15px; border-radius: 10px; border: 2px solid #cbd5e1; background: #f8fafc; font-weight: bold; cursor: pointer; color: #1e293b;">
+                        <button onclick="window.checkChordAnswer(${idx})" style="padding: 18px; border-radius: 16px; border: 2.5px solid #e9d5ff; background: linear-gradient(135deg, #faf5ff, #f3e8ff); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #6b21a8; box-shadow: 0 4px 12px rgba(168,85,247,0.2); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
                             ${item.name}
                         </button>
                     `).join('')}
