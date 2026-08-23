@@ -22,6 +22,7 @@
           </button>
           <div class="dropdown-menu-content">
             <button class="dropdown-item" onclick="window.switchTab('tab-btn-write', 'tab-write')">📝 Soạn Thảo ABC</button>
+            <button class="dropdown-item" onclick="window.switchTab('tab-btn-write', 'tab-write'); if(window.openTransposeModal){window.openTransposeModal()}else{document.getElementById('transpose-modal').style.display='flex';}">🎼 Dịch Giọng (Transpose)</button>
             <button class="dropdown-item" onclick="window.switchTab('tab-btn-library', 'tab-library'); fetchLibrary();">📚 Thư Viện Bản Nhạc</button>
             <button class="dropdown-item" onclick="window.switchTab('tab-btn-listen', 'tab-listen')">🎧 Bàn Trộn Studio</button>
           </div>
@@ -123,7 +124,7 @@
             <button id="btn-save-transposed" onclick="window.saveTransposedToCloud()" class="toggle-btn" style="background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; padding: 6px 12px;" title="Lưu bài mới với Tone đã dịch">💾 Lưu Giọng Mới</button>
             <button onclick="window.openTheoryModal()" class="toggle-btn" style="background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; padding: 6px 12px;">📖 Lý Thuyết</button>
           </div>
-          <button id="btn-open-transpose" onclick="window.openTransposeModal()" class="toggle-btn" style="background: #ffffff; color: #ff6b6b; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 14px; padding: 6px 18px; font-weight: 800; border-radius: 20px; border: 2px solid #ff6b6b; cursor: pointer; transition: all 0.2s;">🎼 Dịch Giọng</button>
+          <button id="btn-open-transpose" onclick="if(window.openTransposeModal){window.openTransposeModal()}else{const m=document.getElementById('transpose-modal');if(m)m.style.display='flex';}" class="toggle-btn" style="background: #ffffff; color: #ff6b6b; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 14px; padding: 6px 18px; font-weight: 800; border-radius: 20px; border: 2px solid #ff6b6b; cursor: pointer; transition: all 0.2s;">🎼 Dịch Giọng</button>
           <div style="display: flex; gap: 8px; align-items: center;">
             <button onclick="window.createNewSong()" class="toggle-btn" style="background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; padding: 6px 12px;">➕ Bản Nhạc Mới</button>
             <button id="toggle-view-btn" class="toggle-btn" style="font-size: 13px; padding: 6px 12px;">📖 Xem Sheet Nhạc</button>
