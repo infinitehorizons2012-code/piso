@@ -343,3 +343,113 @@ h1 {
   fill: #f1c40f !important; /* Yellow */
   stroke: #f1c40f !important;
 }
+
+/* --- Theory Modal Overlay Styles --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(6px);
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.theory-modal-container {
+  background: white;
+  width: 95%;
+  max-width: 1100px;
+  max-height: 90vh;
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.theory-tab-btn {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  background: rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+}
+
+.theory-tab-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+.theory-tab-btn.active {
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.theory-tab-content pre {
+  background-color: #1e293b;
+  color: #f8fafc;
+  padding: 15px 20px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 15px 0;
+}
+
+.theory-tab-content code {
+  background-color: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #e11d48;
+  font-family: monospace;
+  font-size: 0.95em;
+  border: 1px solid #cbd5e1;
+}
+
+.theory-tab-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.theory-tab-content th, .theory-tab-content td {
+  border: 1px solid #e2e8f0;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.theory-tab-content th {
+  background-color: #334155;
+  color: white;
+  font-weight: bold;
+}
+
+.theory-tab-content tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.theory-tab-content .alert {
+  background-color: #fef3c7;
+  border-left: 5px solid #f59e0b;
+  padding: 15px 20px;
+  margin: 20px 0;
+  border-radius: 0 8px 8px 0;
+}

@@ -973,3 +973,73 @@ window.downloadMidi = function() {
         alert("Có lỗi xảy ra khi tạo file MIDI.");
     }
 };
+
+/* --- New Song & Theory Modal Functions --- */
+window.createNewSong = function() {
+    if (confirm("Bạn có muốn tạo trang viết nhạc mới? Thao tác này sẽ làm sạch vùng soạn thảo và xóa ID cũ để sẵn sàng lưu thành một bản nhạc mới.")) {
+        currentSongId = null; // Release old ID
+        const defaultAbc = `X:1\nT:Bản Nhạc Mới\nM:4/4\nL:1/8\nQ:1/4=100\nK:C\n\n|: C2 E2 G2 c2 | c2 G2 E2 C2 :|`;
+        const abcEl = document.getElementById('abc-code');
+        if (abcEl) {
+            abcEl.value = defaultAbc;
+            abcEl.dispatchEvent(new Event('input'));
+        }
+        const img = document.getElementById('uploaded-image');
+        const prompt = document.getElementById('upload-prompt');
+        if (img) img.style.display = 'none';
+        if (prompt) prompt.style.display = 'block';
+        alert("Đã làm sạch editor! Khi bạn bấm '☁️ Lưu lên Cloud', bản nhạc mới sẽ được tạo độc lập với mã ID mới.");
+    }
+};
+
+window.openTheoryModal = function() {
+    const modal = document.getElementById('theory-modal');
+    if (modal) {
+        modal.style.display = 'flex';
+        renderModalAbcBlocks();
+    }
+};
+
+window.closeTheoryModal = function() {
+    const modal = document.getElementById('theory-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
+
+window.switchTheoryTab = function(tabName) {
+    const pianoTab = document.getElementById('theory-tab-piano');
+    const drumTab = document.getElementById('theory-tab-drum');
+    const pianoContent = document.getElementById('theory-content-piano');
+    const drumContent = document.getElementById('theory-content-drum');
+
+    if (tabName === 'piano') {
+        if (pianoTab) pianoTab.classList.add('active');
+        if (drumTab) drumTab.classList.remove('active');
+        if (pianoContent) pianoContent.style.display = 'block';
+        if (drumContent) drumContent.style.display = 'none';
+    } else {
+        if (drumTab) drumTab.classList.add('active');
+        if (pianoTab) pianoTab.classList.remove('active');
+        if (drumContent) drumContent.style.display = 'block';
+        if (pianoContent) pianoContent.style.display = 'none';
+    }
+    renderModalAbcBlocks();
+};
+
+function renderModalAbcBlocks() {
+    if (typeof abcjs === 'undefined') return;
+    const demos = document.querySelectorAll('.theory-abc-demo');
+    demos.forEach((block, index) => {
+        const sourceEl = block.querySelector('.theory-abc-source');
+        const paperEl = block.querySelector('.theory-abc-paper');
+        if (sourceEl && paperEl && !paperEl.dataset.rendered) {
+            const source = sourceEl.innerText.trim();
+            abcjs.renderAbc(paperEl, source, {
+                responsive: 'resize',
+                staffwidth: 800
+            });
+            paperEl.dataset.rendered = 'true';
+        }
+    });
+}
