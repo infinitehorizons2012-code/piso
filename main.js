@@ -576,6 +576,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const btnTranspose = document.getElementById('btn-open-transpose');
+    if (btnTranspose) {
+        btnTranspose.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.openTransposeModal();
+        });
+    }
+
+    const btnSaveTransposed = document.getElementById('btn-save-transposed');
+    if (btnSaveTransposed) {
+        btnSaveTransposed.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.saveTransposedToCloud();
+        });
+    }
+
     document.addEventListener('click', (e) => {
         if (writeWrapper && !writeWrapper.contains(e.target)) {
             writeWrapper.classList.remove('open');
@@ -1604,11 +1622,19 @@ window.getCurrentSongKey = function() {
 };
 
 window.openTransposeModal = function() {
-    const modal = document.getElementById('transpose-modal');
-    const badge = document.getElementById('current-key-badge');
-    if (modal) {
-        modal.style.display = 'flex';
-        if (badge) badge.innerText = window.getCurrentSongKey();
+    try {
+        const modal = document.getElementById('transpose-modal');
+        const badge = document.getElementById('current-key-badge');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.style.zIndex = '999999';
+            if (badge) badge.innerText = window.getCurrentSongKey();
+        } else {
+            alert("Lỗi: Không tìm thấy popup dịch giọng");
+        }
+    } catch(err) {
+        console.error("Lỗi khi mở popup dịch giọng:", err);
+        alert("Lỗi khi mở popup dịch giọng: " + err.message);
     }
 };
 
