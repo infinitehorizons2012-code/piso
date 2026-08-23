@@ -40,7 +40,10 @@
             <button class="dropdown-item" onclick="window.selectGame('scale')">🎹 Scale Match (Cảm Âm Âm Giai)</button>
             <button class="dropdown-item" onclick="window.selectGame('chord')">🎼 Chord Match (Cảm Âm Hợp Âm)</button>
           </div>
-        </div>
+        <!-- STANDALONE BUTTON: Dịch Giọng -->
+        <button class="nav-dropdown-btn" onclick="const m=document.getElementById('transpose-modal');if(m)m.style.display='flex';if(window.getCurrentSongKey){const b=document.getElementById('current-key-badge');if(b)b.innerText=window.getCurrentSongKey();}" style="background: linear-gradient(135deg, #ff6b6b, #ff8e53); color: white; border: none; font-weight: 800; box-shadow: 0 4px 12px rgba(255,107,107,0.3); border-radius: 20px; padding: 8px 18px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          🎼 Dịch Giọng
+        </button>
 
       </nav>
     </header>
