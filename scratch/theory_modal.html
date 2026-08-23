@@ -48,7 +48,47 @@ K: C                % Khóa Đô trưởng</pre>
             <tr><td><code>c''</code></td><td>Cực kỳ cao (2 dấu nháy phẩy)</td><td>Các nốt lấp lánh chói tai</td></tr>
         </table>
 
-        <h2>3. Đánh Hợp Âm & Rải Ngón (Chords & Arpeggios)</h2>
+        <h2>3. Quy Tắc Trường Độ Nốt & Dấu Lặng (Note Lengths & Rests)</h2>
+        <p>Trường độ nốt nhạc được ghi bằng <strong>số nguyên hoặc phân số ngay sau tên nốt</strong> (dựa trên đơn vị chuẩn <code>L: 1/8</code> - nốt móc đơn):</p>
+        <ul>
+            <li><code>c'</code> = Nốt Đô móc đơn (1 đơn vị).</li>
+            <li><code>c'2</code> = Nốt Đô đen (dài gấp 2 nốt móc đơn).</li>
+            <li><code>c'3</code> = Nốt Đô đen chấm dôi (dài gấp 3 nốt móc đơn).</li>
+            <li><code>c4</code> = Nốt Đô trắng (dài gấp 4 nốt móc đơn).</li>
+            <li><code>c8</code> = Nốt Đô tròn (dài gấp 8 nốt móc đơn).</li>
+            <li><code>z</code> = Dấu lặng đơn, <code>z2</code> = Dấu lặng đen, <code>z4</code> = Dấu lặng trắng.</li>
+        </ul>
+
+        <h2>4. Nối Đuôi Nốt (Beaming) & Dấu Luyến / Dấu Nối (Slurs & Ties)</h2>
+        <p><strong>Nối đuôi nốt (Beaming):</strong> Để các nốt móc đơn dính chùm (nối đuôi) với nhau trong cùng một phách, bạn chỉ cần viết các nốt liền nhau không có khoảng trắng. Ví dụ: viết <code>(ge)</code> thay vì <code>(g e)</code>, hoặc <code>cdef</code> thay vì <code>c d e f</code>.</p>
+        <ul>
+            <li><strong>Dấu luyến (Slur):</strong> Đánh liền tiếng (Legato) một cụm nốt KHÁC NHAU. Bọc cụm nốt trong ngoặc đơn <code>()</code>.<br>
+                Ví dụ: <code>(ge)</code> hoặc <code>(C D E F)</code> (Đánh lướt mềm mại 4 nốt).
+            </li>
+            <li><strong>Dấu nối (Tie):</strong> Nối 2 nốt CÙNG CAO ĐỘ để ngân dài ra. Dùng dấu gạch ngang <code>-</code>.<br>
+                Ví dụ: <code>C4- | C4</code> (Ngân nốt Đô từ ô nhịp này vắt qua ô nhịp sau).
+            </li>
+        </ul>
+
+        <h2>5. Ký Hiệu Hợp Âm Trên Đầu Bản Nhạc (Chords Placement)</h2>
+        <p>Hợp âm hòa âm (Lead sheet chords) được đặt trong <strong>dấu ngoặc kép <code>" "</code></strong> và viết ngay trước nốt nhạc mà nó rơi vào.</p>
+        <p>Ví dụ: <code>"C"G3 A</code> hoặc <code>"Am"E2 "G"D2</code>. Trình duyệt sẽ tự động hiển thị tên hợp âm <strong>C</strong>, <strong>Am</strong>, <strong>G</strong> nằm ngay ngắn phía trên nốt nhạc đó.</p>
+
+        <h2>6. Ghép 2 Lời Bài Hát (Lyrics) & Quy Tắc Luyến Âm (Dấu `*`)</h2>
+        <p>Lệnh <code>w:</code> dùng để chèn lời bài hát ngay bên dưới các nốt nhạc.</p>
+        <ul>
+            <li><strong>Ghép nhiều lời (Verse 1 & 2):</strong> Vì bản nhạc có thể có 2 lời (Verse 1 & 2), ta viết <strong>hai dòng <code>w:</code> liên tiếp</strong> ngay bên dưới dòng nốt nhạc tương ứng:<br>
+                <pre>
+c2 d2 e2 f2 | g4 g4 |
+w: Lời 1: Chú heo con ngoan, bé xíu xiu
+w: Lời 2: Mắt tròn long lanh, xinh thật xinh</pre>
+            </li>
+            <li><strong>Quy tắc luyến âm (Dấu hoa thị <code>*</code>):</strong> Mặc định, mỗi nốt nhạc sẽ khớp với một chữ. Đối với các chỗ luyến (nhiều nốt hát một chữ), ta dùng dấu hoa thị <code>*</code> để yêu cầu ABC bỏ qua nốt đó không gán chữ mới vào.<br>
+                Ví dụ: <code>c d (e f) | g4</code> đi kèm <code>w: Mẹ * yêu * ơi</code> (Dấu <code>*</code> giúp chữ "yêu" giữ nguyên trên cụm nốt luyến <code>e f</code>).
+            </li>
+        </ul>
+
+        <h2>7. Đánh Hợp Âm Khóa Fa & Rải Ngón (Chords & Arpeggios)</h2>
         <div class="alert">
             <strong>Hợp âm (Đánh cùng lúc):</strong> Bọc các nốt lại bằng dấu ngoặc vuông <code>[]</code>.<br>
             Ví dụ: <code>[CEG]</code> (Đánh 3 nốt Đô-Mi-Son cùng một lúc).<br><br>
@@ -56,18 +96,7 @@ K: C                % Khóa Đô trưởng</pre>
             Ví dụ: <code>!arpeggio![C,E,G,C]</code>.
         </div>
 
-        <h2>4. Dấu Luyến & Dấu Nối (Slurs & Ties)</h2>
-        <p>Rất nhiều người nhầm lẫn hai loại dấu này trong Piano:</p>
-        <ul>
-            <li><strong>Dấu nối (Tie):</strong> Nối 2 nốt CÙNG CAO ĐỘ để ngân dài ra. Dùng dấu gạch ngang <code>-</code>.<br>
-                Ví dụ: <code>C4- | C4</code> (Ngân nốt Đô từ ô nhịp này vắt qua ô nhịp sau).
-            </li>
-            <li><strong>Dấu luyến (Slur):</strong> Đánh liền tiếng (Legato) một cụm nốt KHÁC NHAU. Bọc cụm nốt trong ngoặc đơn <code>()</code>.<br>
-                Ví dụ: <code>(C D E F)</code> (Đánh lướt mềm mại 4 nốt).
-            </li>
-        </ul>
-
-        <h2>5. Sắc Thái & Kỹ Thuật (Dynamics & Articulations)</h2>
+        <h2>8. Sắc Thái & Kỹ Thuật (Dynamics & Articulations)</h2>
         <p>Piano là nhạc cụ của "sắc thái". Đặt các thẻ <code>! !</code> ngay sát trước nốt nhạc để điều khiển cảm xúc:</p>
         <ul>
             <li><strong>Độ mạnh nhẹ:</strong> <code>!pp!</code>, <code>!p!</code>, <code>!mp!</code>, <code>!mf!</code>, <code>!f!</code>, <code>!ff!</code>.</li>
