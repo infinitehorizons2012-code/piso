@@ -235,6 +235,7 @@
     }
 
     // --- GAME 1: LEDGER LINES ---
+    // Level 1 (Dễ): Nốt hoa ABCDEFG
     const TREBLE_NOTES_LVL1 = [
         { abc: 'C', name: 'Đô (C)', noteOnly: 'C' },
         { abc: 'D', name: 'Rê (D)', noteOnly: 'D' },
@@ -242,7 +243,48 @@
         { abc: 'F', name: 'Pha (F)', noteOnly: 'F' },
         { abc: 'G', name: 'Son (G)', noteOnly: 'G' },
         { abc: 'A', name: 'La (A)', noteOnly: 'A' },
-        { abc: 'B', name: 'Si (B)', noteOnly: 'B' },
+        { abc: 'B', name: 'Si (B)', noteOnly: 'B' }
+    ];
+
+    // Level 2 (Vừa / Trung bình): Nốt thường abcdefg
+    const TREBLE_NOTES_LVL2 = [
+        { abc: 'c', name: 'Đô (c)', noteOnly: 'C' },
+        { abc: 'd', name: 'Rê (d)', noteOnly: 'D' },
+        { abc: 'e', name: 'Mi (e)', noteOnly: 'E' },
+        { abc: 'f', name: 'Pha (f)', noteOnly: 'F' },
+        { abc: 'g', name: 'Son (g)', noteOnly: 'G' },
+        { abc: 'a', name: 'La (a)', noteOnly: 'A' },
+        { abc: 'b', name: 'Si (b)', noteOnly: 'B' }
+    ];
+
+    // Level 3 (Khó): Nốt trầm (G,, A,, B,) hoặc nốt rất cao (c', d', e', f', g', a', b', c'')
+    const TREBLE_NOTES_LVL3 = [
+        { abc: 'G,', name: 'Son (G,)', noteOnly: 'G' },
+        { abc: 'A,', name: 'La (A,)', noteOnly: 'A' },
+        { abc: 'B,', name: 'Si (B,)', noteOnly: 'B' },
+        { abc: "c'", name: 'Đô (c\')', noteOnly: 'C' },
+        { abc: "d'", name: 'Rê (d\')', noteOnly: 'D' },
+        { abc: "e'", name: 'Mi (e\')', noteOnly: 'E' },
+        { abc: "f'", name: 'Pha (f\')', noteOnly: 'F' },
+        { abc: "g'", name: 'Son (g\')', noteOnly: 'G' },
+        { abc: "a'", name: 'La (a\')', noteOnly: 'A' },
+        { abc: "b'", name: 'Si (b\')', noteOnly: 'B' },
+        { abc: "c''", name: 'Đô (c\'\')', noteOnly: 'C' }
+    ];
+
+    // Khóa Fa Level 1 (Dễ): Nốt hoa ABCDEFG
+    const BASS_NOTES_LVL1 = [
+        { abc: 'C', name: 'Đô (C)', noteOnly: 'C' },
+        { abc: 'D', name: 'Rê (D)', noteOnly: 'D' },
+        { abc: 'E', name: 'Mi (E)', noteOnly: 'E' },
+        { abc: 'F', name: 'Pha (F)', noteOnly: 'F' },
+        { abc: 'G', name: 'Son (G)', noteOnly: 'G' },
+        { abc: 'A', name: 'La (A)', noteOnly: 'A' },
+        { abc: 'B', name: 'Si (B)', noteOnly: 'B' }
+    ];
+
+    // Khóa Fa Level 2 (Vừa / Trung bình): Nốt thường abcdefg
+    const BASS_NOTES_LVL2 = [
         { abc: 'c', name: 'Đô (c)', noteOnly: 'C' },
         { abc: 'd', name: 'Rê (d)', noteOnly: 'D' },
         { abc: 'e', name: 'Mi (e)', noteOnly: 'E' },
@@ -250,17 +292,8 @@
         { abc: 'g', name: 'Son (g)', noteOnly: 'G' }
     ];
 
-    const TREBLE_NOTES_LVL2 = [
-        ...TREBLE_NOTES_LVL1,
-        { abc: 'G,', name: 'Son (G,)', noteOnly: 'G' },
-        { abc: 'A,', name: 'La (A,)', noteOnly: 'A' },
-        { abc: 'B,', name: 'Si (B,)', noteOnly: 'B' },
-        { abc: "a'", name: 'La (a\')', noteOnly: 'A' },
-        { abc: "b'", name: 'Si (b\')', noteOnly: 'B' },
-        { abc: "c''", name: 'Đô (c\'\')', noteOnly: 'C' }
-    ];
-
-    const BASS_NOTES_LVL1 = [
+    // Khóa Fa Level 3 (Khó): Nốt trầm có phẩy (C,, D,, E,, F,, G,, A,, B,, E,, F,, G,)
+    const BASS_NOTES_LVL3 = [
         { abc: 'C,', name: 'Đô (C,)', noteOnly: 'C' },
         { abc: 'D,', name: 'Rê (D,)', noteOnly: 'D' },
         { abc: 'E,', name: 'Mi (E,)', noteOnly: 'E' },
@@ -268,21 +301,9 @@
         { abc: 'G,', name: 'Son (G,)', noteOnly: 'G' },
         { abc: 'A,', name: 'La (A,)', noteOnly: 'A' },
         { abc: 'B,', name: 'Si (B,)', noteOnly: 'B' },
-        { abc: 'C', name: 'Đô (C)', noteOnly: 'C' },
-        { abc: 'D', name: 'Rê (D)', noteOnly: 'D' },
-        { abc: 'E', name: 'Mi (E)', noteOnly: 'E' }
-    ];
-
-    const BASS_NOTES_LVL2 = [
-        ...BASS_NOTES_LVL1,
         { abc: 'E,,', name: 'Mi (E,,)', noteOnly: 'E' },
         { abc: 'F,,', name: 'Pha (F,,)', noteOnly: 'F' },
-        { abc: 'G,,', name: 'Son (G,,)', noteOnly: 'G' },
-        { abc: 'F', name: 'Pha (F)', noteOnly: 'F' },
-        { abc: 'G', name: 'Son (G)', noteOnly: 'G' },
-        { abc: 'A', name: 'La (A)', noteOnly: 'A' },
-        { abc: 'B', name: 'Si (B)', noteOnly: 'B' },
-        { abc: 'c', name: 'Đô (c)', noteOnly: 'C' }
+        { abc: 'G,,', name: 'Son (G,,)', noteOnly: 'G' }
     ];
 
     const NOTE_COLOR_MAP = {
@@ -290,7 +311,7 @@
         'D': { bg: 'linear-gradient(135deg, #fff7ed, #ffedd5)', border: '#fb923c', text: '#c2410c', shadow: 'rgba(249, 115, 22, 0.25)' },
         'E': { bg: 'linear-gradient(135deg, #fefce8, #fef9c3)', border: '#facc15', text: '#a16207', shadow: 'rgba(234, 179, 8, 0.25)' },
         'F': { bg: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', border: '#4ade80', text: '#15803d', shadow: 'rgba(34, 197, 94, 0.25)' },
-        'G': { bg: 'linear-gradient(135deg, #ecfeff, #cffafe)', border: '#38bdf8', text: '#0369a1', shadow: 'rgba(56, 189, 248, 0.25)' },
+        'G': { bg: 'linear-gradient(135deg, #ecfeff, #cffafe)', border: '#38bdf8', text: '#0891b2', shadow: 'rgba(56, 189, 248, 0.25)' },
         'A': { bg: 'linear-gradient(135deg, #eff6ff, #dbeafe)', border: '#60a5fa', text: '#1d4ed8', shadow: 'rgba(59, 130, 246, 0.25)' },
         'B': { bg: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', border: '#c084fc', text: '#6b21a8', shadow: 'rgba(168, 85, 247, 0.25)' }
     };
@@ -300,8 +321,8 @@
         const lvl = window.GameState.level;
 
         let pool = isTreble 
-            ? (lvl === 1 ? TREBLE_NOTES_LVL1 : TREBLE_NOTES_LVL2)
-            : (lvl === 1 ? BASS_NOTES_LVL1 : BASS_NOTES_LVL2);
+            ? (lvl === 1 ? TREBLE_NOTES_LVL1 : (lvl === 2 ? TREBLE_NOTES_LVL2 : TREBLE_NOTES_LVL3))
+            : (lvl === 1 ? BASS_NOTES_LVL1 : (lvl === 2 ? BASS_NOTES_LVL2 : BASS_NOTES_LVL3));
 
         const target = pool[Math.floor(Math.random() * pool.length)];
         window.GameState.currentQuestion = target;
