@@ -43,10 +43,11 @@ function parseAbcToSections(abcText) {
         if (trimmed.startsWith('% ===') && i + 2 < lines.length && lines[i+1].trim().startsWith('%') && lines[i+2].trim().startsWith('% ===')) {
             if (currentTitle !== null || currentLines.length > 0) {
                 const titleStr = currentTitle || 'HEADER';
+                const cleanText = currentLines.filter(l => l.trim().length > 0).join('\n').trim();
                 parsedSections.push({
                     id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
                     title: titleStr.toUpperCase(),
-                    content: currentLines.join('\n').trim()
+                    content: cleanText
                 });
             }
             currentTitle = lines[i+1].trim().replace(/^%\s*/, '').trim();
@@ -59,10 +60,11 @@ function parseAbcToSections(abcText) {
         if (trimmed.match(/^%\s*(HEADER|DÒNG\s*\d+|DOAN\s*\d+|SECTION\s*\d+|ĐOẠN\s*\d+|ĐIỆP\s*KHÚC|LỜI\s*\d+)/i)) {
             if (currentTitle !== null || currentLines.length > 0) {
                 const titleStr = currentTitle || 'HEADER';
+                const cleanText = currentLines.filter(l => l.trim().length > 0).join('\n').trim();
                 parsedSections.push({
                     id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
                     title: titleStr.toUpperCase(),
-                    content: currentLines.join('\n').trim()
+                    content: cleanText
                 });
             }
             currentTitle = trimmed.replace(/^%\s*/, '').trim();
@@ -77,10 +79,11 @@ function parseAbcToSections(abcText) {
     
     if (currentTitle !== null || currentLines.length > 0) {
         const titleStr = currentTitle || (parsedSections.length === 0 ? 'HEADER' : 'DÒNG 1');
+        const cleanText = currentLines.filter(l => l.trim().length > 0).join('\n').trim();
         parsedSections.push({
             id: 'sec_' + Date.now() + '_' + Math.floor(Math.random()*10000),
             title: titleStr.toUpperCase(),
-            content: currentLines.join('\n').trim()
+            content: cleanText
         });
     }
     
@@ -94,8 +97,8 @@ function parseAbcToSections(abcText) {
             const bodyPart = endOfK !== -1 ? full.substring(endOfK + 1).trim() : '';
             return [
                 { id: 'total', title: '🌐 Tổng thể', isTotal: true },
-                { id: 'sec_header', title: 'HEADER', content: headerPart },
-                { id: 'sec_line1', title: 'DÒNG 1', content: bodyPart }
+                { id: 'sec_header', title: 'HEADER', content: headerPart.split('\n').filter(l => l.trim().length > 0).join('\n') },
+                { id: 'sec_line1', title: 'DÒNG 1', content: bodyPart.split('\n').filter(l => l.trim().length > 0).join('\n') }
             ];
         }
     }
@@ -108,12 +111,23 @@ function parseAbcToSections(abcText) {
 window.parseAbcToSections = parseAbcToSections;
 
 function combineSectionsToAbc() {
-    let full = '';
+    let lines = [];
     editorSections.forEach(sec => {
         if (sec.isTotal) return;
-        full += `% ===============================\n% ${sec.title}\n% ===============================\n${sec.content ? sec.content.trim() : ''}\n\n`;
+        lines.push(`% ===============================`);
+        lines.push(`% ${sec.title}`);
+        lines.push(`% ===============================`);
+        if (sec.content) {
+            const cleanContentLines = sec.content
+                .split('\n')
+                .map(l => l.trimEnd())
+                .filter(l => l.trim().length > 0);
+            if (cleanContentLines.length > 0) {
+                lines.push(...cleanContentLines);
+            }
+        }
     });
-    return full.trim();
+    return lines.join('\n');
 }
 window.combineSectionsToAbc = combineSectionsToAbc;
 
