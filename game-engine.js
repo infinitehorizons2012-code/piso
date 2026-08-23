@@ -159,6 +159,8 @@
         // Populate Game View Body
         if (g.activeSubTab === 'theory') {
             renderGameTheory(g.activeGame);
+        } else if (g.activeSubTab === 'flashcard') {
+            renderFlashcardView();
         } else {
             generateNextQuestion();
         }
@@ -195,11 +197,13 @@
                 <button onclick="window.switchGameSubTab('sol')" style="${activeTab === 'sol' ? activeStyle : inactiveStyle}">🎼 Test Khóa Sol</button>
                 <button onclick="window.switchGameSubTab('fa')" style="${activeTab === 'fa' ? activeStyle : inactiveStyle}">𝄢 Test Khóa Fa</button>
                 <button onclick="window.switchGameSubTab('theory')" style="${activeTab === 'theory' ? activeStyle : inactiveStyle}">📖 Lý Thuyết</button>
+                <button onclick="window.switchGameSubTab('flashcard')" style="${activeTab === 'flashcard' ? activeStyle : inactiveStyle}">🎴 Flashcard Nốt Nhạc</button>
             `;
         } else {
             return `
                 <button onclick="window.switchGameSubTab('test')" style="${activeTab === 'test' ? activeStyle : inactiveStyle}">🎮 Làm Bài Test</button>
                 <button onclick="window.switchGameSubTab('theory')" style="${activeTab === 'theory' ? activeStyle : inactiveStyle}">📖 Lý Thuyết</button>
+                <button onclick="window.switchGameSubTab('flashcard')" style="${activeTab === 'flashcard' ? activeStyle : inactiveStyle}">🎴 Flashcard Nốt Nhạc</button>
             `;
         }
     }
@@ -764,5 +768,160 @@
             }
         }, 60);
     }
+
+    // --- 6. FLASHCARD LEARNING MODULE ---
+    window.GameState.flashcardClef = 'sol'; // 'sol' or 'fa'
+    window.GameState.flashcardIndex = 0;
+    window.GameState.flashcardFlipped = false;
+
+    window.toggleFlashcardFlip = function() {
+        window.GameState.flashcardFlipped = !window.GameState.flashcardFlipped;
+        const cardInner = document.getElementById('flashcard-inner');
+        if (cardInner) {
+            if (window.GameState.flashcardFlipped) {
+                cardInner.style.transform = 'rotateY(180deg)';
+            } else {
+                cardInner.style.transform = 'rotateY(0deg)';
+            }
+        }
+    };
+
+    window.switchFlashcardClef = function(clef) {
+        window.GameState.flashcardClef = clef;
+        window.GameState.flashcardIndex = 0;
+        window.GameState.flashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.nextFlashcard = function() {
+        const pool = getFlashcardPool();
+        window.GameState.flashcardIndex = (window.GameState.flashcardIndex + 1) % pool.length;
+        window.GameState.flashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.prevFlashcard = function() {
+        const pool = getFlashcardPool();
+        window.GameState.flashcardIndex = (window.GameState.flashcardIndex - 1 + pool.length) % pool.length;
+        window.GameState.flashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.shuffleFlashcards = function() {
+        const pool = getFlashcardPool();
+        window.GameState.flashcardIndex = Math.floor(Math.random() * pool.length);
+        window.GameState.flashcardFlipped = false;
+        renderGameUI();
+    };
+
+    function getFlashcardPool() {
+        const isSol = window.GameState.flashcardClef === 'sol';
+        const lvl = window.GameState.level;
+        if (isSol) {
+            return lvl === 1 ? TREBLE_NOTES_LVL1 : (lvl === 2 ? TREBLE_NOTES_LVL2 : TREBLE_NOTES_LVL3);
+        } else {
+            return lvl === 1 ? BASS_NOTES_LVL1 : (lvl === 2 ? BASS_NOTES_LVL2 : BASS_NOTES_LVL3);
+        }
+    }
+
+    function renderFlashcardView() {
+        const cardBody = document.getElementById('game-card-body');
+        if (!cardBody) return;
+
+        const pool = getFlashcardPool();
+        if (window.GameState.flashcardIndex >= pool.length) {
+            window.GameState.flashcardIndex = 0;
+        }
+
+        const currentNote = pool[window.GameState.flashcardIndex];
+        const isSol = window.GameState.flashcardClef === 'sol';
+        const clefStr = isSol ? 'treble' : 'bass';
+        const clefTitle = isSol ? 'Khóa Sol' : 'Khóa Fa';
+        const lvlTitle = window.GameState.level === 1 ? 'Level 1 (Dễ)' : (window.GameState.level === 2 ? 'Level 2 (Vừa)' : 'Level 3 (Khó)');
+        const colorStyle = NOTE_COLOR_MAP[currentNote.noteOnly] || { bg: 'linear-gradient(135deg, #eff6ff, #dbeafe)', border: '#3b82f6', text: '#1d4ed8', shadow: 'rgba(59,130,246,0.2)' };
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">🎴 Thẻ Học Nốt Nhạc (Flashcard Learning)</h3>
+                <p style="margin: 0 0 18px 0; color: #64748b; font-size: 0.95rem;">Chọn Khóa & Độ khó ở trên để xem thẻ. Đây chính là nguyên liệu cho các bài Test!</p>
+
+                <!-- Clef Toggle Filter -->
+                <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 22px;">
+                    <button onclick="window.switchFlashcardClef('sol')" style="padding: 10px 22px; border-radius: 20px; font-weight: 800; cursor: pointer; transition: all 0.2s; ${isSol ? 'background: linear-gradient(135deg, #ff758c, #ff7eb3); color: white; border: none; box-shadow: 0 4px 12px rgba(255,117,140,0.4);' : 'background: #f1f5f9; color: #475569; border: 2px solid #cbd5e1;'}">🎼 Khóa Sol (Treble)</button>
+                    <button onclick="window.switchFlashcardClef('fa')" style="padding: 10px 22px; border-radius: 20px; font-weight: 800; cursor: pointer; transition: all 0.2s; ${!isSol ? 'background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border: none; box-shadow: 0 4px 12px rgba(59,130,246,0.4);' : 'background: #f1f5f9; color: #475569; border: 2px solid #cbd5e1;'}">𝄢 Khóa Fa (Bass)</button>
+                </div>
+
+                <!-- 3D Flip Card Container -->
+                <div onclick="window.toggleFlashcardFlip()" style="perspective: 1000px; width: 100%; max-width: 480px; margin: 0 auto 22px auto; height: 300px; cursor: pointer;">
+                    <div id="flashcard-inner" style="position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; ${window.GameState.flashcardFlipped ? 'transform: rotateY(180deg);' : ''}">
+                        
+                        <!-- CARD FRONT: Staff Note -->
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #ffffff, #f8fafc); border-radius: 24px; border: 3.5px solid #cbd5e1; box-shadow: 0 12px 32px rgba(0,0,0,0.08); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #e2e8f0; padding-bottom: 10px;">
+                                <span style="font-weight: 800; color: #475569; font-size: 0.95rem;">📌 ${clefTitle} — ${lvlTitle}</span>
+                                <span style="font-weight: 800; color: #0284c7; background: #e0f2fe; padding: 4px 14px; border-radius: 14px; font-size: 0.9rem;">Nốt ${window.GameState.flashcardIndex + 1} / ${pool.length}</span>
+                            </div>
+                            
+                            <div id="flashcard-abc-paper" style="min-height: 150px; display: flex; justify-content: center; align-items: center;"></div>
+                            
+                            <div style="font-weight: 800; color: #d97706; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 6px; background: #fef3c7; padding: 6px; border-radius: 12px;">
+                                👆 Bấm vào thẻ để lật xem tên nốt!
+                            </div>
+                        </div>
+
+                        <!-- CARD BACK: Note Name & Info -->
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); background: ${colorStyle.bg}; border-radius: 24px; border: 3.5px solid ${colorStyle.border}; box-shadow: 0 12px 32px ${colorStyle.shadow}; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; box-sizing: border-box;">
+                            <span style="font-weight: 800; color: ${colorStyle.text}; font-size: 1rem; letter-spacing: 0.5px;">🎉 ĐÁP ÁN NỐT NHẠC</span>
+                            
+                            <div>
+                                <h1 style="margin: 4px 0; font-size: 3.4rem; color: ${colorStyle.text}; font-weight: 800; text-shadow: 0 2px 8px rgba(0,0,0,0.1);">${currentNote.name}</h1>
+                                <p style="margin: 4px 0 0 0; font-weight: 800; color: #475569; font-size: 1.1rem;">Ký hiệu ABC: <code style="background: white; padding: 4px 12px; border-radius: 10px; border: 1.5px solid ${colorStyle.border}; font-weight: 800;">${currentNote.abc}</code></p>
+                            </div>
+
+                            <button onclick="event.stopPropagation(); window.playFlashcardNoteSound();" style="background: white; border: 2.5px solid ${colorStyle.border}; color: ${colorStyle.text}; font-weight: 800; padding: 10px 22px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+                                🔊 Nghe Nốt Nhạc
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Bar -->
+                <div style="display: flex; gap: 12px; justify-content: center; align-items: center; max-width: 480px; margin: 0 auto; flex-wrap: wrap;">
+                    <button onclick="window.prevFlashcard()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #334155; border: 2px solid #cbd5e1; cursor: pointer; transition: all 0.2s; flex: 1; min-width: 100px;">⬅️ Nốt Trước</button>
+                    <button onclick="window.toggleFlashcardFlip()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #facc15, #eab308); color: #431407; border: 2px solid #fde047; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(250,204,21,0.3); flex: 1; min-width: 100px;">🔄 Lật Thẻ</button>
+                    <button onclick="window.shuffleFlashcards()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #a855f7, #9333ea); color: white; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(168,85,247,0.3); flex: 1; min-width: 100px;">🔀 Ngẫu Nhiên</button>
+                    <button onclick="window.nextFlashcard()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(59,130,246,0.3); flex: 1; min-width: 100px;">➡️ Nốt Tiếp</button>
+                </div>
+            </div>
+        `;
+
+        // Render staff note on card front
+        const abcCode = `X:1\nM:4/4\nL:1/4\nK:C clef=${clefStr}\n${currentNote.abc} |`;
+        setTimeout(() => {
+            const paperEl = document.getElementById('flashcard-abc-paper');
+            const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+            if (paperEl && abcRenderer) {
+                paperEl.innerHTML = '';
+                abcRenderer.renderAbc('flashcard-abc-paper', abcCode, {
+                    responsive: 'resize',
+                    scale: 1.4,
+                    staffwidth: 320,
+                    paddingtop: 10,
+                    paddingbottom: 10,
+                    add_classes: true
+                });
+            }
+        }, 60);
+
+        playNoteByName(currentNote.abc, 0.4);
+    }
+
+    window.playFlashcardNoteSound = function() {
+        const pool = getFlashcardPool();
+        const currentNote = pool[window.GameState.flashcardIndex];
+        if (currentNote) {
+            playNoteByName(currentNote.abc, 0.6);
+        }
+    };
 
 })();
