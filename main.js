@@ -3,6 +3,9 @@ import 'abcjs/abcjs-audio.css';
 import './style.css';
 import abcjs from 'abcjs';
 
+window.abcjs = abcjs;
+window.ABCJS = abcjs;
+
 // --- Default ABC Notation ---
 const DEFAULT_ABC = `X:1
 T:Bản Nhạc Của Bé

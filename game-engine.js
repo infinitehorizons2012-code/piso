@@ -370,14 +370,16 @@
 
         setTimeout(() => {
             const paperEl = document.getElementById('game-abc-paper');
-            if (paperEl && typeof abcjs !== 'undefined') {
+            const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+            if (paperEl && abcRenderer) {
                 paperEl.innerHTML = '';
-                abcjs.renderAbc('game-abc-paper', abcCode, {
+                abcRenderer.renderAbc('game-abc-paper', abcCode, {
                     responsive: 'resize',
-                    scale: 1.3,
-                    staffwidth: 320,
+                    scale: 1.4,
+                    staffwidth: 360,
                     paddingtop: 15,
-                    paddingbottom: 15
+                    paddingbottom: 15,
+                    add_classes: true
                 });
             }
         }, 50);
