@@ -200,6 +200,15 @@ h1 {
   border: 2px solid #eee;
 }
 
+/* Studio Tab (Nghe Nhạc) Sheet Music Display Override */
+#studio-abc-paper {
+  height: auto !important;
+  min-height: 500px;
+  overflow-y: visible !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
 /* Editor Styles */
 .editor-content {
   display: flex;
