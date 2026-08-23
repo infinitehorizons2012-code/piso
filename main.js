@@ -1656,12 +1656,12 @@ window.transposeAbcText = function(abcText, deltaSemitones, targetKeyName = null
     for (let line of lines) {
         let trimmed = line.trim();
 
-        if (trimmed.startsWith('K:')) {
+        if (trimmed.match(/^K:\s*/i)) {
             transposedLines.push(`K:${calcTargetKey}`);
             continue;
         }
 
-        if (trimmed.startsWith('%') || trimmed.match(/^[A-JLN-Z]:/)) {
+        if (trimmed.startsWith('%') || trimmed.match(/^[A-Za-z]:/) || trimmed.startsWith('%%')) {
             transposedLines.push(line);
             continue;
         }
@@ -1676,6 +1676,12 @@ window.transposeAbcText = function(abcText, deltaSemitones, targetKeyName = null
                 return noteMap[newSemi];
             });
             return `"${transposedChord}"`;
+        });
+
+        const voiceTags = [];
+        newLine = newLine.replace(/(\[V:[^\]]+\])/gi, (match) => {
+            voiceTags.push(match);
+            return `___VOICETAG_${voiceTags.length - 1}___`;
         });
 
         const noteRegex = /([\^_=+]*)([A-Ga-g])([,']*)/g;
@@ -1732,6 +1738,10 @@ window.transposeAbcText = function(abcText, deltaSemitones, targetKeyName = null
             }
 
             return newAcc + finalNote + finalOctave;
+        });
+
+        newLine = newLine.replace(/___VOICETAG_(\d+)___/g, (match, idx) => {
+            return voiceTags[parseInt(idx, 10)] || match;
         });
 
         transposedLines.push(newLine);
