@@ -517,27 +517,32 @@ imageContainer.addEventListener('drop', (e) => {
 
 
 
-// --- Tab Switching Logic ---
 // --- TAB SWITCHING LOGIC ---
-const tabs = ['tab-btn-library', 'tab-btn-write', 'tab-btn-listen'];
-const panels = ['tab-library', 'tab-write', 'tab-listen'];
+const panels = ['tab-library', 'tab-write', 'tab-listen', 'tab-game'];
 
-function switchTab(activeTabId, activePanelId) {
-    tabs.forEach(tabId => {
-        const el = document.getElementById(tabId);
-        if (el) {
-            if (tabId === activeTabId) el.classList.add('active');
-            else el.classList.remove('active');
-        }
-    });
+window.switchTab = function(activeTabId, activePanelId) {
     panels.forEach(panelId => {
         const el = document.getElementById(panelId);
         if (el) {
-            if (panelId === activePanelId) el.style.display = panelId === 'tab-library' ? 'block' : 'flex';
-            else el.style.display = 'none';
+            if (panelId === activePanelId) {
+                el.style.display = (panelId === 'tab-library' || panelId === 'tab-game') ? 'block' : 'flex';
+            } else {
+                el.style.display = 'none';
+            }
         }
     });
-}
+
+    const writeWrapper = document.getElementById('dropdown-write-wrapper');
+    const gameWrapper = document.getElementById('dropdown-game-wrapper');
+
+    if (activePanelId === 'tab-game') {
+        if (gameWrapper) gameWrapper.classList.add('active');
+        if (writeWrapper) writeWrapper.classList.remove('active');
+    } else {
+        if (writeWrapper) writeWrapper.classList.add('active');
+        if (gameWrapper) gameWrapper.classList.remove('active');
+    }
+};
 
 document.getElementById('tab-btn-library')?.addEventListener('click', () => {
     switchTab('tab-btn-library', 'tab-library');

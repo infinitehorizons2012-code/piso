@@ -16,12 +16,43 @@
         <span class="logo-icon">🎵</span>
         <h1 style="margin: 0;">Piso Music</h1>
       </div>
-      <nav class="app-tabs" style="margin: 0;">
-        <button class="tab-btn" id="tab-btn-library">📚 Thư Viện</button>
-        <button class="tab-btn active" id="tab-btn-write">📝 Viết Nhạc</button>
-        <button class="tab-btn" id="tab-btn-listen">🎧 Nghe Nhạc (Studio)</button>
+      <nav class="app-tabs" style="margin: 0; display: flex; gap: 15px; align-items: center;">
+        
+        <!-- DROPDOWN 1: Viết Nhạc -->
+        <div class="nav-dropdown-wrapper" id="dropdown-write-wrapper">
+          <button class="nav-dropdown-btn" id="dropdown-write-btn">
+            ✍️ Viết Nhạc <span style="font-size: 0.7rem; margin-left: 2px;">▼</span>
+          </button>
+          <div class="dropdown-menu-content">
+            <button class="dropdown-item" onclick="window.switchTab('tab-btn-write', 'tab-write')">📝 Soạn Thảo ABC</button>
+            <button class="dropdown-item" onclick="window.switchTab('tab-btn-library', 'tab-library'); fetchLibrary();">📚 Thư Viện Bản Nhạc</button>
+            <button class="dropdown-item" onclick="window.switchTab('tab-btn-listen', 'tab-listen')">🎧 Bàn Trộn Studio</button>
+          </div>
+        </div>
+
+        <!-- DROPDOWN 2: Game -->
+        <div class="nav-dropdown-wrapper" id="dropdown-game-wrapper">
+          <button class="nav-dropdown-btn" id="dropdown-game-btn" style="border-color: #3b82f6;">
+            🎮 Game <span style="font-size: 0.7rem; margin-left: 2px;">▼</span>
+          </button>
+          <div class="dropdown-menu-content">
+            <button class="dropdown-item" onclick="window.selectGame('ledger')">🎼 Ledger Lines (Đọc Nốt Nhanh)</button>
+            <button class="dropdown-item" onclick="window.selectGame('rhythm')">🥁 Rhythm Match (Cảm Âm Nhịp)</button>
+            <button class="dropdown-item" onclick="window.selectGame('interval')">🎵 Interval Match (Cảm Âm Quãng)</button>
+            <button class="dropdown-item" onclick="window.selectGame('scale')">🎹 Scale Match (Cảm Âm Âm Giai)</button>
+            <button class="dropdown-item" onclick="window.selectGame('chord')">🎼 Chord Match (Cảm Âm Hợp Âm)</button>
+          </div>
+        </div>
+
       </nav>
     </header>
+
+    <!-- NEW GAME TAB CONTAINER -->
+    <main class="app-container tab-content" id="tab-game" style="display: none;">
+      <section class="panel" style="width: 100%; max-width: 950px; margin: 0 auto; padding: 20px;">
+        <div id="game-main-content"></div>
+      </section>
+    </main>
 
     <!-- NEW LIBRARY TAB (Thư Viện) -->
     <main class="app-container tab-content" id="tab-library" style="display: none;">
@@ -717,6 +748,8 @@ z2 z2 [Fc]2 z2 |</pre>
     <script>
        // We will attach global handlers in main.js
     </script>
+  <!-- Game Engine Script -->
+  <script type="module" src="./game-engine.js"></script>
   <!-- Main Script -->
   <script type="module" src="/main.js"></script>
   </body>
