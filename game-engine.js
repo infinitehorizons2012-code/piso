@@ -272,8 +272,19 @@
         { abc: "c''", name: 'Đô (c\'\')', noteOnly: 'C' }
     ];
 
-    // Khóa Fa Level 1 (Dễ): Nốt hoa ABCDEFG
+    // Khóa Fa Level 1 (Dễ): Nốt có phẩy C, D, E, F, G, A, B, (Nằm chính giữa 5 dòng kẻ của Khóa Fa - C3 đến B3)
     const BASS_NOTES_LVL1 = [
+        { abc: 'C,', name: 'Đô (C,)', noteOnly: 'C' },
+        { abc: 'D,', name: 'Rê (D,)', noteOnly: 'D' },
+        { abc: 'E,', name: 'Mi (E,)', noteOnly: 'E' },
+        { abc: 'F,', name: 'Pha (F,)', noteOnly: 'F' },
+        { abc: 'G,', name: 'Son (G,)', noteOnly: 'G' },
+        { abc: 'A,', name: 'La (A,)', noteOnly: 'A' },
+        { abc: 'B,', name: 'Si (B,)', noteOnly: 'B' }
+    ];
+
+    // Khóa Fa Level 2 (Vừa / Trung bình): Nốt hoa C D E F G A B (Nằm ở các dòng kẻ phụ phía trên Khóa Fa - C4 đến B4)
+    const BASS_NOTES_LVL2 = [
         { abc: 'C', name: 'Đô (C)', noteOnly: 'C' },
         { abc: 'D', name: 'Rê (D)', noteOnly: 'D' },
         { abc: 'E', name: 'Mi (E)', noteOnly: 'E' },
@@ -283,24 +294,13 @@
         { abc: 'B', name: 'Si (B)', noteOnly: 'B' }
     ];
 
-    // Khóa Fa Level 2 (Vừa / Trung bình): Nốt thường abcdefg
-    const BASS_NOTES_LVL2 = [
+    // Khóa Fa Level 3 (Khó): Nốt thường c d e f g (Rất cao trên dòng phụ) & Nốt phẩy đôi E,, F,, G,, (Rất trầm dưới dòng phụ)
+    const BASS_NOTES_LVL3 = [
         { abc: 'c', name: 'Đô (c)', noteOnly: 'C' },
         { abc: 'd', name: 'Rê (d)', noteOnly: 'D' },
         { abc: 'e', name: 'Mi (e)', noteOnly: 'E' },
         { abc: 'f', name: 'Pha (f)', noteOnly: 'F' },
-        { abc: 'g', name: 'Son (g)', noteOnly: 'G' }
-    ];
-
-    // Khóa Fa Level 3 (Khó): Nốt trầm có phẩy (C,, D,, E,, F,, G,, A,, B,, E,, F,, G,)
-    const BASS_NOTES_LVL3 = [
-        { abc: 'C,', name: 'Đô (C,)', noteOnly: 'C' },
-        { abc: 'D,', name: 'Rê (D,)', noteOnly: 'D' },
-        { abc: 'E,', name: 'Mi (E,)', noteOnly: 'E' },
-        { abc: 'F,', name: 'Pha (F,)', noteOnly: 'F' },
-        { abc: 'G,', name: 'Son (G,)', noteOnly: 'G' },
-        { abc: 'A,', name: 'La (A,)', noteOnly: 'A' },
-        { abc: 'B,', name: 'Si (B,)', noteOnly: 'B' },
+        { abc: 'g', name: 'Son (g)', noteOnly: 'G' },
         { abc: 'E,,', name: 'Mi (E,,)', noteOnly: 'E' },
         { abc: 'F,,', name: 'Pha (F,,)', noteOnly: 'F' },
         { abc: 'G,,', name: 'Son (G,,)', noteOnly: 'G' }
