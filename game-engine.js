@@ -95,6 +95,8 @@
         if (gameId === 'ledger') window.GameState.activeSubTab = 'sol';
         else window.GameState.activeSubTab = 'test';
 
+        if (window.closeAllDropdowns) window.closeAllDropdowns();
+
         // Show game main tab view
         if (window.switchTab) {
             window.switchTab('', 'tab-game');

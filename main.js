@@ -521,6 +521,13 @@ imageContainer.addEventListener('drop', (e) => {
 // --- TAB SWITCHING LOGIC ---
 const panels = ['tab-library', 'tab-write', 'tab-listen', 'tab-game'];
 
+window.closeAllDropdowns = function() {
+    const writeWrapper = document.getElementById('dropdown-write-wrapper');
+    const gameWrapper = document.getElementById('dropdown-game-wrapper');
+    if (writeWrapper) writeWrapper.classList.remove('open');
+    if (gameWrapper) gameWrapper.classList.remove('open');
+};
+
 window.switchTab = function(activeTabId, activePanelId) {
     panels.forEach(panelId => {
         const el = document.getElementById(panelId);
@@ -543,7 +550,41 @@ window.switchTab = function(activeTabId, activePanelId) {
         if (writeWrapper) writeWrapper.classList.add('active');
         if (gameWrapper) gameWrapper.classList.remove('active');
     }
+
+    window.closeAllDropdowns();
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    const writeWrapper = document.getElementById('dropdown-write-wrapper');
+    const gameWrapper = document.getElementById('dropdown-game-wrapper');
+    const writeBtn = document.getElementById('dropdown-write-btn');
+    const gameBtn = document.getElementById('dropdown-game-btn');
+
+    if (writeBtn && writeWrapper) {
+        writeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            writeWrapper.classList.toggle('open');
+            if (gameWrapper) gameWrapper.classList.remove('open');
+        });
+    }
+
+    if (gameBtn && gameWrapper) {
+        gameBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            gameWrapper.classList.toggle('open');
+            if (writeWrapper) writeWrapper.classList.remove('open');
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (writeWrapper && !writeWrapper.contains(e.target)) {
+            writeWrapper.classList.remove('open');
+        }
+        if (gameWrapper && !gameWrapper.contains(e.target)) {
+            gameWrapper.classList.remove('open');
+        }
+    });
+});
 
 document.getElementById('tab-btn-library')?.addEventListener('click', () => {
     switchTab('tab-btn-library', 'tab-library');
