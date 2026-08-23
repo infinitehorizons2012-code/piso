@@ -1532,3 +1532,241 @@ function renderModalAbcBlocks() {
         }
     });
 }
+
+/* --- TRANSPOSE KEY SYSTEM --- */
+
+const KEY_SEMITONES = {
+    'C': 0, 'C#': 1, 'DB': 1, 'D': 2, 'D#': 3, 'EB': 3, 'E': 4, 'F': 5,
+    'F#': 6, 'GB': 6, 'G': 7, 'G#': 8, 'AB': 8, 'A': 9, 'A#': 10, 'BB': 10, 'B': 11,
+    'AM': 9, 'A#M': 10, 'BBM': 10, 'BM': 11, 'CM': 0, 'C#M': 1, 'DM': 2, 'EBM': 3, 'EM': 4, 'FM': 5, 'F#M': 6, 'GM': 7, 'G#M': 8
+};
+
+const SEMITONE_TO_MAJOR_KEY = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+const SEMITONE_TO_MINOR_KEY = ['Cm', 'C#m', 'Dm', 'Ebm', 'Em', 'Fm', 'F#m', 'Gm', 'G#m', 'Am', 'Bbm', 'Bm'];
+
+window.getCurrentSongKey = function() {
+    window.switchEditorTab(activeTabId);
+    const totalSec = (typeof editorSections !== 'undefined') ? editorSections.find(s => s.isTotal) : null;
+    const abc = (totalSec && totalSec.content) ? totalSec.content : (document.getElementById('abc-code')?.value || '');
+    const match = abc.match(/^K:\s*(.+)$/m);
+    return match ? match[1].trim() : 'C';
+};
+
+window.openTransposeModal = function() {
+    const modal = document.getElementById('transpose-modal');
+    const badge = document.getElementById('current-key-badge');
+    if (modal) {
+        modal.style.display = 'flex';
+        if (badge) badge.innerText = window.getCurrentSongKey();
+    }
+};
+
+window.closeTransposeModal = function() {
+    const modal = document.getElementById('transpose-modal');
+    if (modal) modal.style.display = 'none';
+};
+
+window.transposeAbcText = function(abcText, deltaSemitones, targetKeyName = null) {
+    if (!abcText) return '';
+    const lines = abcText.split('\n');
+    const transposedLines = [];
+
+    let currentKey = 'C';
+    for (let l of lines) {
+        if (l.trim().startsWith('K:')) {
+            currentKey = l.trim().substring(2).trim();
+            break;
+        }
+    }
+
+    const isMinor = currentKey.toLowerCase().endsWith('m');
+    const curKeyUpper = currentKey.toUpperCase();
+    const curSemi = KEY_SEMITONES[curKeyUpper] !== undefined ? KEY_SEMITONES[curKeyUpper] : 0;
+
+    let calcTargetKey = targetKeyName;
+    if (!calcTargetKey) {
+        let targetSemi = (curSemi + deltaSemitones) % 12;
+        if (targetSemi < 0) targetSemi += 12;
+        calcTargetKey = isMinor ? SEMITONE_TO_MINOR_KEY[targetSemi] : SEMITONE_TO_MAJOR_KEY[targetSemi];
+    } else {
+        const targetUpper = targetKeyName.toUpperCase();
+        const targetSemi = KEY_SEMITONES[targetUpper] !== undefined ? KEY_SEMITONES[targetUpper] : 0;
+        deltaSemitones = targetSemi - curSemi;
+    }
+
+    const NOTE_TO_VAL = { 'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11 };
+    const VAL_TO_NOTE_FLAT  = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+    const VAL_TO_NOTE_SHARP = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+    const useSharps = (calcTargetKey.includes('#') || ['G', 'D', 'A', 'E', 'B', 'F#', 'Em', 'Bm', 'F#m', 'C#m'].includes(calcTargetKey));
+    const noteMap = useSharps ? VAL_TO_NOTE_SHARP : VAL_TO_NOTE_FLAT;
+
+    for (let line of lines) {
+        let trimmed = line.trim();
+
+        if (trimmed.startsWith('K:')) {
+            transposedLines.push(`K:${calcTargetKey}`);
+            continue;
+        }
+
+        if (trimmed.startsWith('%') || trimmed.match(/^[A-JLN-Z]:/)) {
+            transposedLines.push(line);
+            continue;
+        }
+
+        let newLine = line;
+
+        newLine = newLine.replace(/"([^"]+)"/g, (match, chord) => {
+            const transposedChord = chord.replace(/([A-G][#b]?)/g, (m, root) => {
+                let rootSemi = KEY_SEMITONES[root.toUpperCase()] !== undefined ? KEY_SEMITONES[root.toUpperCase()] : 0;
+                let newSemi = (rootSemi + deltaSemitones) % 12;
+                if (newSemi < 0) newSemi += 12;
+                return noteMap[newSemi];
+            });
+            return `"${transposedChord}"`;
+        });
+
+        const noteRegex = /([\^_=+]*)([A-Ga-g])([,']*)/g;
+        newLine = newLine.replace(noteRegex, (match, acc, baseNote, octaves) => {
+            let isLower = baseNote === baseNote.toLowerCase();
+            let upperNote = baseNote.toUpperCase();
+
+            let baseVal = NOTE_TO_VAL[upperNote];
+            if (baseVal === undefined) return match;
+
+            if (acc === '^') baseVal += 1;
+            else if (acc === '^^') baseVal += 2;
+            else if (acc === '_') baseVal -= 1;
+            else if (acc === '__') baseVal -= 2;
+
+            let octaveOffset = 0;
+            if (isLower) octaveOffset += 12;
+            for (let ch of octaves) {
+                if (ch === "'") octaveOffset += 12;
+                if (ch === ",") octaveOffset -= 12;
+            }
+
+            let totalPitch = baseVal + octaveOffset + deltaSemitones;
+
+            let newBaseVal = totalPitch % 12;
+            if (newBaseVal < 0) newBaseVal += 12;
+            let newOctaveVal = Math.floor(totalPitch / 12);
+
+            let newNoteName = noteMap[newBaseVal];
+            let newAcc = '';
+            if (newNoteName.includes('#')) {
+                newAcc = '^';
+                newNoteName = newNoteName.replace('#', '');
+            } else if (newNoteName.includes('b')) {
+                newAcc = '_';
+                newNoteName = newNoteName.replace('b', '');
+            }
+
+            let finalNote = newNoteName;
+            let finalOctave = '';
+
+            if (newOctaveVal >= 1) {
+                finalNote = finalNote.toLowerCase();
+                for (let k = 1; k < newOctaveVal; k++) {
+                    finalOctave += "'";
+                }
+            } else if (newOctaveVal < 0) {
+                finalNote = finalNote.toUpperCase();
+                for (let k = 0; k > newOctaveVal; k--) {
+                    finalOctave += ",";
+                }
+            } else {
+                finalNote = finalNote.toUpperCase();
+            }
+
+            return newAcc + finalNote + finalOctave;
+        });
+
+        transposedLines.push(newLine);
+    }
+
+    return transposedLines.join('\n');
+};
+
+window.applyTransposeToKey = function(targetKey) {
+    const curKey = window.getCurrentSongKey();
+    const curUpper = curKey.toUpperCase();
+    const targetUpper = targetKey.toUpperCase();
+    
+    const curSemi = KEY_SEMITONES[curUpper] !== undefined ? KEY_SEMITONES[curUpper] : 0;
+    const targetSemi = KEY_SEMITONES[targetUpper] !== undefined ? KEY_SEMITONES[targetUpper] : 0;
+    const delta = targetSemi - curSemi;
+
+    window.executeTranspose(delta, targetKey);
+};
+
+window.applyTransposeDelta = function(delta) {
+    window.executeTranspose(delta, null);
+};
+
+window.executeTranspose = function(delta, targetKey) {
+    window.switchEditorTab(activeTabId);
+    
+    const totalSec = editorSections.find(s => s.isTotal);
+    let abc = (totalSec && totalSec.content) ? totalSec.content : document.getElementById('abc-code').value;
+    
+    const transposedAbc = window.transposeAbcText(abc, delta, targetKey);
+    
+    // Parse full transposed ABC back into sections
+    editorSections = window.parseAbcToSections(transposedAbc);
+    
+    const activeSec = editorSections.find(s => s.id === activeTabId);
+    const abcEl = document.getElementById('abc-code');
+    if (abcEl) {
+        abcEl.value = (activeSec && activeSec.content) ? activeSec.content : transposedAbc;
+    }
+    
+    window.renderEditorTabs();
+    window.syncCurrentEditorTab();
+    renderSheetMusic();
+    if (window.renderStudioSheet) window.renderStudioSheet();
+    
+    window.closeTransposeModal();
+    
+    const newKey = window.getCurrentSongKey();
+    alert(`✨ Đã dịch giọng toàn bộ bản nhạc sang Tone ${newKey}! Bạn có thể nghe thử và bấm '💾 Lưu Giọng Mới' để lưu vào Thư viện.`);
+};
+
+window.saveTransposedToCloud = async function() {
+    window.switchEditorTab(activeTabId);
+    const totalSec = (typeof editorSections !== 'undefined') ? editorSections.find(s => s.isTotal) : null;
+    let abc = (totalSec && totalSec.content) ? totalSec.content.trim() : document.getElementById('abc-code').value.trim();
+    if (!abc) return alert("Không có dữ liệu ABC để lưu!");
+    
+    const key = window.getCurrentSongKey();
+    let title = "Bản nhạc mới";
+    const titleMatch = abc.match(/^T:\s*(.+)$/m);
+    if (titleMatch) title = titleMatch[1];
+    
+    let baseTitle = title.replace(/\s*\(Tone\s+[^\)]+\)/gi, '').trim();
+    let newTitle = prompt("Nhập tên lưu bài với giọng mới:", `${baseTitle} (Tone ${key})`);
+    if (!newTitle) return;
+    
+    abc = abc.replace(/^T:\s*.+$/m, `T:${newTitle}`);
+    
+    currentSongId = null; // Create distinct new song entry in cloud
+    
+    try {
+        const payload = { title: newTitle, abc, folderPath: currentFolderPath || '/' };
+        const res = await fetch(CF_WORKER_URL + '/api/songs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+            currentSongId = data.id;
+            alert(`🎉 Đã lưu bản nhạc mới '${newTitle}' vào Thư viện Cloud!`);
+            window.fetchLibrary(true);
+        } else {
+            alert("Lỗi khi lưu: " + data.error);
+        }
+    } catch(err) {
+        alert("Lỗi kết nối máy chủ: " + err.message);
+    }
+};

@@ -120,9 +120,10 @@
         <div class="panel-header" style="background: var(--primary); display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
           <div style="display: flex; gap: 8px; align-items: center;">
             <button onclick="saveToCloud()" class="toggle-btn" style="background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; padding: 6px 12px;">☁️ Lưu lên Cloud</button>
+            <button onclick="window.saveTransposedToCloud()" class="toggle-btn" style="background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; padding: 6px 12px;" title="Lưu bài mới với Tone đã dịch">💾 Lưu Giọng Mới</button>
             <button onclick="window.openTheoryModal()" class="toggle-btn" style="background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; padding: 6px 12px;">📖 Lý Thuyết</button>
           </div>
-          <h2 style="color: white; margin: 0; font-size: 1.3rem;">📝 Viết Mã ABC</h2>
+          <button onclick="window.openTransposeModal()" class="toggle-btn" style="background: #ffffff; color: #ff6b6b; box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-size: 14px; padding: 6px 18px; font-weight: 800; border-radius: 20px; border: 2px solid #ff6b6b; cursor: pointer; transition: all 0.2s;">🎼 Dịch Giọng</button>
           <div style="display: flex; gap: 8px; align-items: center;">
             <button onclick="window.createNewSong()" class="toggle-btn" style="background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 13px; padding: 6px 12px;">➕ Bản Nhạc Mới</button>
             <button id="toggle-view-btn" class="toggle-btn" style="font-size: 13px; padding: 6px 12px;">📖 Xem Sheet Nhạc</button>
@@ -756,8 +757,67 @@ z2 z2 [Fc]2 z2 |</pre>
           </div>
         </div>
       </div>
+    <!-- TRANSPOSE KEY MODAL -->
+    <div id="transpose-modal" class="modal-overlay" style="display: none;">
+      <div class="theory-modal-container" style="max-width: 580px; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.25);">
+        <div class="modal-header" style="background: linear-gradient(135deg, #ff6b6b, #ff8e53); color: white; padding: 18px 25px; display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0; font-size: 1.3rem; color: white; font-weight: 800; display: flex; align-items: center; gap: 8px;">🎼 Dịch Giọng Bản Nhạc (Transpose Key)</h3>
+          <button onclick="window.closeTransposeModal()" style="background: white; border: none; color: #ff6b6b; font-size: 0.95rem; cursor: pointer; padding: 6px 14px; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">✕ Đóng</button>
+        </div>
+        
+        <div class="modal-body" style="padding: 25px; background: #ffffff;">
+          <p style="margin-top: 0; color: #475569; font-size: 0.95rem; line-height: 1.5;">
+            Chọn giọng (Tone) mục tiêu bạn muốn dịch sang. Toàn bộ mã ABC, hợp âm và nốt nhạc sẽ tự động chuyển đổi chuẩn xác!
+          </p>
+
+          <div style="background: #f8fafc; padding: 12px 18px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: bold; color: #334155;">Giọng Hiện Tại:</span>
+            <span id="current-key-badge" style="background: #ff6b6b; color: white; padding: 4px 16px; border-radius: 20px; font-weight: bold; font-size: 1.05rem;">C</span>
+          </div>
+
+          <h4 style="margin: 15px 0 10px 0; color: #1e293b; font-size: 1rem;">1. Chọn Giọng Trưởng (Major Keys):</h4>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px;">
+            <button onclick="window.applyTransposeToKey('C')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">C (Đô)</button>
+            <button onclick="window.applyTransposeToKey('Db')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Db (Rê ♭)</button>
+            <button onclick="window.applyTransposeToKey('D')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">D (Rê)</button>
+            <button onclick="window.applyTransposeToKey('Eb')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Eb (Mi ♭)</button>
+            <button onclick="window.applyTransposeToKey('E')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">E (Mi)</button>
+            <button onclick="window.applyTransposeToKey('F')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">F (Fa)</button>
+            <button onclick="window.applyTransposeToKey('F#')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">F# (Fa ♯)</button>
+            <button onclick="window.applyTransposeToKey('G')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">G (Son)</button>
+            <button onclick="window.applyTransposeToKey('Ab')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Ab (La ♭)</button>
+            <button onclick="window.applyTransposeToKey('A')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">A (La)</button>
+            <button onclick="window.applyTransposeToKey('Bb')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Bb (Si ♭)</button>
+            <button onclick="window.applyTransposeToKey('B')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">B (Si)</button>
+          </div>
+
+          <h4 style="margin: 15px 0 10px 0; color: #1e293b; font-size: 1rem;">2. Chọn Giọng Thứ (Minor Keys):</h4>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px;">
+            <button onclick="window.applyTransposeToKey('Am')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Am</button>
+            <button onclick="window.applyTransposeToKey('Bbm')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Bbm</button>
+            <button onclick="window.applyTransposeToKey('Bm')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Bm</button>
+            <button onclick="window.applyTransposeToKey('Cm')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Cm</button>
+            <button onclick="window.applyTransposeToKey('C#m')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">C#m</button>
+            <button onclick="window.applyTransposeToKey('Dm')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Dm</button>
+            <button onclick="window.applyTransposeToKey('Ebm')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Ebm</button>
+            <button onclick="window.applyTransposeToKey('Em')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Em</button>
+            <button onclick="window.applyTransposeToKey('Fm')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Fm</button>
+            <button onclick="window.applyTransposeToKey('F#m')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">F#m</button>
+            <button onclick="window.applyTransposeToKey('Gm')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">Gm</button>
+            <button onclick="window.applyTransposeToKey('G#m')" class="key-btn" style="padding: 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: white; font-weight: bold; color: #0f172a; cursor: pointer;">G#m</button>
+          </div>
+
+          <h4 style="margin: 15px 0 10px 0; color: #1e293b; font-size: 1rem;">3. Nâng / Hạ Nửa Cung (Semitones):</h4>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button onclick="window.applyTransposeDelta(-2)" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; background: #f1f5f9; font-weight: bold; cursor: pointer;">-2 (Hạ 1 cung)</button>
+            <button onclick="window.applyTransposeDelta(-1)" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; background: #f1f5f9; font-weight: bold; cursor: pointer;">-1 (Hạ 1/2 cung)</button>
+            <button onclick="window.applyTransposeDelta(1)" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; background: #f1f5f9; font-weight: bold; cursor: pointer;">+1 (Tăng 1/2 cung)</button>
+            <button onclick="window.applyTransposeDelta(2)" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid #cbd5e1; background: #f1f5f9; font-weight: bold; cursor: pointer;">+2 (Tăng 1 cung)</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <!-- END THEORY MODAL -->
+    <!-- END TRANSPOSE KEY MODAL -->
 
     <!-- Global functions export for onclick handlers -->
     <script>
