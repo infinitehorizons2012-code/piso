@@ -242,16 +242,16 @@
 
     <!-- THEORY MODAL -->
     <div id="theory-modal" class="modal-overlay" style="display: none;">
-      <div class="theory-modal-container">
-        <div class="modal-header" style="background: linear-gradient(135deg, #1e293b, #334155); color: white; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-radius: 16px 16px 0 0;">
+      <div class="theory-modal-container" style="border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+        <div class="modal-header" style="background: linear-gradient(135deg, #ff6b6b, #ff8e53); color: white; padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; border-radius: 20px 20px 0 0;">
           <div style="display: flex; align-items: center; gap: 20px;">
-            <h3 style="margin: 0; font-size: 1.3rem; color: white; display: flex; align-items: center; gap: 8px;">📚 Thư Viện Lý Thuyết ABC Notation</h3>
+            <h3 style="margin: 0; font-size: 1.4rem; color: white; display: flex; align-items: center; gap: 8px; font-weight: 800;">📚 Thư Viện Lý Thuyết ABC Notation</h3>
             <div class="theory-tab-nav" style="display: flex; gap: 10px;">
-              <button id="theory-tab-piano" onclick="window.switchTheoryTab('piano')" class="theory-tab-btn active">🎹 Lý Thuyết Piano</button>
-              <button id="theory-tab-drum" onclick="window.switchTheoryTab('drum')" class="theory-tab-btn">🥁 Lý Thuyết Trống</button>
+              <button id="theory-tab-piano" onclick="window.switchTheoryTab('piano')" class="theory-tab-btn active" style="padding: 8px 16px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; background: white; color: #ff6b6b; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">🎹 Lý Thuyết Piano</button>
+              <button id="theory-tab-drum" onclick="window.switchTheoryTab('drum')" class="theory-tab-btn" style="padding: 8px 16px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; background: rgba(255,255,255,0.25); color: white;">🥁 Lý Thuyết Trống</button>
             </div>
           </div>
-          <button onclick="window.closeTheoryModal()" style="background: rgba(255,255,255,0.15); border: none; color: white; font-size: 1.2rem; cursor: pointer; padding: 5px 12px; border-radius: 8px; transition: all 0.2s;">✕ Đóng</button>
+          <button onclick="window.closeTheoryModal()" style="background: white; border: none; color: #ff6b6b; font-size: 1rem; cursor: pointer; padding: 6px 14px; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">✕ Đóng</button>
         </div>
         
         <div class="modal-body" style="padding: 30px; overflow-y: auto; max-height: 80vh; background: #ffffff;">
@@ -262,7 +262,7 @@
 
         <h2>1. Khung Xương Bản Nhạc Piano (Đại Khuông Nhạc)</h2>
         <p>Khác với sáo hay guitar chỉ có 1 dòng nhạc, Piano cần 2 dòng kết nối bằng dấu ngoặc nhọn <code>{}</code>. Cấu trúc Header chuẩn mực của Piano như sau:</p>
-        <pre>
+        <pre style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">
 X: 1
 T: Tên Bản Nhạc Piano
 C: Tên Nhạc Sĩ
@@ -319,7 +319,7 @@ K: C                % Khóa Đô trưởng</pre>
         <p>Lệnh <code>w:</code> dùng để chèn lời bài hát ngay bên dưới các nốt nhạc.</p>
         <ul>
             <li><strong>Ghép nhiều lời (Verse 1 & 2):</strong> Vì bản nhạc có thể có 2 lời (Verse 1 & 2), ta viết <strong>hai dòng <code>w:</code> liên tiếp</strong> ngay bên dưới dòng nốt nhạc tương ứng:<br>
-                <pre>
+                <pre style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">
 c2 d2 e2 f2 | g4 g4 |
 w: Lời 1: Chú heo con ngoan, bé xíu xiu
 w: Lời 2: Mắt tròn long lanh, xinh thật xinh</pre>
@@ -347,12 +347,30 @@ w: Lời 2: Mắt tròn long lanh, xinh thật xinh</pre>
             <li><strong>Fermata (Dấu mắt ngỗng - Ngân tự do):</strong> Dùng lệnh: <code>!fermata!C</code> hoặc chữ <code>H</code> trước nốt (<code>HC</code>).</li>
         </ul>
 
+        <h2>9. Cách Viết Dấu Hóa Bất Thường (Accidentals: Thăng, Giáng, Bình)</h2>
+        <p>Dấu hóa bất thường được đặt <strong>ngay sát trước nốt nhạc</strong> tương ứng:</p>
+        <ul>
+            <li><code>^</code> (Dấu Thăng - Sharp): Tăng nốt nhạc lên nửa cung. Ví dụ: <code>^C</code> (Đô thăng), <code>^f</code> (Pha thăng).</li>
+            <li><code>_</code> (Dấu Giáng - Flat): Giảm nốt nhạc xuống nửa cung. Ví dụ: <code>_B</code> (Si giáng), <code>_e</code> (Mi giáng).</li>
+            <li><code>=</code> (Dấu Bình - Natural): Trở về nốt tự nhiên (hủy dấu thăng/giáng). Ví dụ: <code>=C</code> (Đô bình), <code>=f</code> (Pha bình).</li>
+            <li><code>^^</code> (Dấu Thăng Kép - Double Sharp): Tăng nốt nhạc lên 1 cung nguyên. Ví dụ: <code>^^C</code> (Đô thăng kép).</li>
+            <li><code>__</code> (Dấu Giáng Kép - Double Flat): Giảm nốt nhạc xuống 1 cung nguyên. Ví dụ: <code>__B</code> (Si giáng kép).</li>
+        </ul>
+
+        <h2>10. Cách Viết Chùm Nốt Liên Ba (Triplets & Tuplets)</h2>
+        <p>Để tạo chùm nốt liên ba (3 nốt hòa vào 1 phách), ta dùng cú pháp <code>(3</code> ngay sát trước 3 nốt nhạc đó:</p>
+        <ul>
+            <li><b>Chùm liên ba (Triplet):</b> Viết <code>(3</code> trước 3 nốt. Ví dụ: <code>(3cde</code> (3 nốt Đô-Rê-Mi dính chùm liên ba) hoặc <code>(3CDE</code>.</li>
+            <li><b>Chùm liên hai (Duplet):</b> Viết <code>(2</code> trước 2 nốt. Ví dụ: <code>(2cd</code>.</li>
+            <li><b>Chùm liên bốn (Quadruplet):</b> Viết <code>(4</code> trước 4 nốt. Ví dụ: <code>(4cdef</code>.</li>
+        </ul>
+
         <hr style="margin: 50px 0; border: 1px solid #ddd;">
 
         <h2>6. Cách Viết Bản Nhạc Dài (Interleaved Voices)</h2>
         <p>Một thắc mắc cực kỳ phổ biến: <em>"Nếu bản nhạc dài 100 ô nhịp, tôi có phải viết một lèo 100 nhịp khóa Sol rồi mới viết 100 nhịp khóa Fa không?"</em>. Câu trả lời là <strong>KHÔNG BẮT BUỘC!</strong></p>
         <p>Thực tế, để dễ đọc và dễ dò lỗi, các lập trình viên âm nhạc luôn viết theo <strong>từng cặp dòng nhạc (System by system)</strong>. Bạn chỉ cần gọi lại tên Bè (<code>V: 1</code> và <code>V: 2</code>) mỗi khi chuyển khuông nhạc mới:</p>
-        <pre>
+        <pre style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">
 % ----- KHUÔNG NHẠC 1 (Nhịp 1-4) -----
 V: 1 
 (Nốt tay phải nhịp 1 đến 4...)
@@ -374,7 +392,7 @@ V: 2
         <p>Chú ý cách sử dụng <strong>Ký hiệu Quãng tám</strong> (Tay phải bay lên cao với <code>e'</code>, Tay trái lặn xuống trầm với <code>A,,</code>) và <strong>Dấu thăng bất thường</strong> (<code>^d</code>).</p>
 
         <div class="theory-abc-demo">
-            <pre class="theory-abc-source">X: 1
+            <pre class="theory-abc-source" style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">X: 1
 T: Für Elise (Trích đoạn)
 C: Ludwig van Beethoven
 M: 3/8
@@ -396,7 +414,7 @@ z2 | z6 | A,,E,A, z3 | E,,E,^G, z3 | A,,E,A, z3 |</pre>
         <p>Bản nhạc kết hợp đầy đủ: Hợp âm rải (Arpeggio) ở tay trái, Dấu to dần/nhỏ dần và nốt luyến mềm mại ở tay phải.</p>
 
         <div class="theory-abc-demo">
-            <pre class="theory-abc-source">X: 2
+            <pre class="theory-abc-source" style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">X: 2
 T: Bản Nhạc Khúc Tình
 M: 4/4
 L: 1/8
@@ -421,7 +439,7 @@ V: 2 clef=bass
         <h4>Cách 1: Viết theo Khối (Cả bài Tay phải, rồi mới đến cả bài Tay trái)</h4>
         <p>Cách này dễ bị rối mắt nếu bản nhạc dài hàng chục ô nhịp.</p>
         <div class="theory-abc-demo">
-            <pre class="theory-abc-source">X: 3
+            <pre class="theory-abc-source" style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">X: 3
 T: THẰNG CUỘI (Cách 1: Viết Khối)
 C: Lê Thương
 M: 2/4
@@ -454,7 +472,7 @@ z4 | [C,E,G,]4 | [C,E,G,]4 | [A,,C,E,]4 |
         <h4>Cách 2: Viết Xen kẽ (Interleaved / System-by-System)</h4>
         <p>Cách viết "chuẩn lập trình viên": Viết tay phải và tay trái song song cho từng câu hát.</p>
         <div class="theory-abc-demo">
-            <pre class="theory-abc-source">X: 4
+            <pre class="theory-abc-source" style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">X: 4
 T: THẰNG CUỘI (Cách 2: Dòng song song)
 C: Lê Thương
 M: 2/4
@@ -501,7 +519,7 @@ V: 2
 
         <h2>1. Cấu hình Header (Khai báo chung)</h2>
         <p>Mỗi bản nhạc trống bắt buộc phải có phần khung xương này ở trên cùng:</p>
-        <pre>
+        <pre style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">
 M: 4/4                   % Nhịp (vd: 4/4 nghĩa là 4 phách trong 1 ô nhịp)
 L: 1/8                   % Đơn vị nốt mặc định (Quan trọng! Sẽ giải thích ở phần 2)
 %%score (1 2)            % Bắt buộc: Ép bè tay (1) và chân (2) dính chung vào 1 khuông nhạc
@@ -580,7 +598,7 @@ K: none clef=perc        % Xóa dấu hóa, đổi khóa son/pha thành khóa 2 
         <p>Ở ví dụ này, L mặc định là 1/8. Bạn sẽ thấy <code>F2</code> (nốt đen) ở Kick, và <code>!style=x!!plus!g</code> (nốt đơn hihat đóng). Xem cách chúng kết hợp với nhau!</p>
 
         <div class="theory-abc-demo">
-            <pre class="theory-abc-source">X: 1
+            <pre class="theory-abc-source" style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">X: 1
 T: Disco Beat (Đọc hiểu trường độ và trang trí)
 M: 4/4
 L: 1/8
@@ -607,7 +625,7 @@ F2 c2 F2 c2 | F2 c2 F2 c2 |</pre>
         <p>Lần này <code>L: 1/16</code>. Do đó <code>c</code> là nốt móc kép đánh rất nhanh. <code>z16</code> ở Bè 1 nghĩa là bè tay Hi-hat sẽ nghỉ hoàn toàn trong cả ô nhịp đầu tiên (16 nốt móc kép = 4 phách).</p>
 
         <div class="theory-abc-demo">
-            <pre class="theory-abc-source">X: 2
+            <pre class="theory-abc-source" style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">X: 2
 T: Drum Fill (Đọc hiểu dấu lặng z và móc kép)
 M: 4/4
 L: 1/16
@@ -636,7 +654,7 @@ cccc eeee dddd AAAA | F16 |</pre>
         <p>Ở ví dụ này, 1 nhịp đầu gõ điệu cơ bản, ô nhịp sau sử dụng nốt gạch chéo (Slash Notation) để ra hiệu cho người đánh trống tự "phiêu" (Solo) theo tiết tấu móc đơn và nốt trắng.</p>
 
         <div class="theory-abc-demo">
-            <pre class="theory-abc-source">X: 3
+            <pre class="theory-abc-source" style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">X: 3
 T: Drum Solo (Rhythmic Slashes)
 M: 4/4
 L: 1/8
@@ -666,7 +684,7 @@ F2 c2 F2 c2 | z8 |</pre>
         <h3>Ví dụ 4: Funk Groove (Đảo Phách Sôi Động)</h3>
         <p>Điệu Funk đặc trưng bởi việc đánh trống Kick đảo phách (rơi vào những nhịp lẻ) tạo cảm giác cực kỳ nhún nhảy. Chú ý tốc độ L: 1/16.</p>
         <div class="theory-abc-demo">
-            <pre class="theory-abc-source">X: 4
+            <pre class="theory-abc-source" style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">X: 4
 T: Funk Groove
 M: 4/4
 L: 1/16
@@ -691,7 +709,7 @@ F2zF z2c2 zFz2 F2c2 |</pre>
         <h3>Ví dụ 5: Bossa Nova (Âm hưởng Mỹ Latin)</h3>
         <p>Điệu Bossa Nova của Brazil nổi tiếng với tiếng gõ cộc cộc vào vành trống Snare (Cross-stick / Rim click) kết hợp tiếng Kick dập dìu. Mình sẽ mượn nốt <code>^c</code> để gán cho tiếng gõ vành trống (Mã MIDI 37).</p>
         <div class="theory-abc-demo">
-            <pre class="theory-abc-source">X: 5
+            <pre class="theory-abc-source" style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">X: 5
 T: Bossa Nova
 M: 4/4
 L: 1/8
@@ -715,7 +733,7 @@ V: 2 stem=down
         <h3>Ví dụ 6: Reggae (Điệu nhảy Jamaica - One Drop)</h3>
         <p>Điệu Reggae có đặc điểm vô cùng kỳ lạ: Phách số 1 (phách mạnh nhất theo tư duy bình thường) lại hoàn toàn bị bỏ trống! Cả Kick và Snare đều dồn lực giáng thẳng vào phách số 3.</p>
         <div class="theory-abc-demo">
-            <pre class="theory-abc-source">X: 6
+            <pre class="theory-abc-source" style="background: #f0f9ff; color: #0f172a; border: 2px solid #bae6fd; border-radius: 12px; padding: 15px; font-family: monospace; font-size: 0.95rem; overflow-x: auto;">X: 6
 T: Reggae (One Drop)
 M: 4/4
 L: 1/8
