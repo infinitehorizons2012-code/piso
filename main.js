@@ -552,83 +552,312 @@ document.getElementById('tab-btn-listen')?.addEventListener('click', () => {
     switchTab('tab-btn-listen', 'tab-listen');
 });
 
-// --- CLOUDFLARE LIBRARY API ---
-const CF_WORKER_URL = 'https://piano-library.infinite-horizons-2012.workers.dev'; // User needs to update this
+// --- CLOUDFLARE LIBRARY API WITH NESTED FOLDERS & INSTANT CACHE ---
+const CF_WORKER_URL = 'https://piano-library.infinite-horizons-2012.workers.dev';
 
-window.fetchLibrary = async function() {
+let libraryItemsCache = [];
+let currentFolderPath = '/';
+
+window.fetchLibrary = async function(forceRefresh = false) {
     const listEl = document.getElementById('library-list');
     if (!listEl) return;
-    listEl.innerHTML = '<p style="text-align: center; color: #888;">Đang tải danh sách...</p>';
     
+    // 1. Instant Render from LocalStorage Cache (0ms Latency)
+    const cachedData = localStorage.getItem('piso_library_cache');
+    if (cachedData && !forceRefresh) {
+        try {
+            libraryItemsCache = JSON.parse(cachedData);
+            window.renderLibraryCurrentView();
+        } catch(e) {}
+    } else if (!libraryItemsCache || libraryItemsCache.length === 0) {
+        listEl.innerHTML = '<p style="text-align: center; color: #888; padding: 20px;">⚡ Đang tải danh sách từ Cloud...</p>';
+    }
+    
+    // 2. Background Parallel Fetch from Cloud Worker
     try {
-        // In real app, fetch from CF_WORKER_URL + '/api/songs'
-        // For now, if URL is dummy, simulate error/mock
         if (CF_WORKER_URL.includes('YOU.workers.dev')) {
             throw new Error("Vui lòng thay thế CF_WORKER_URL trong main.js bằng URL của Worker bạn đã deploy.");
         }
         const res = await fetch(CF_WORKER_URL + '/api/songs');
-        const songs = await res.json();
+        const items = await res.json();
         
-        listEl.innerHTML = '';
-        if (songs.length === 0) {
-            listEl.innerHTML = '<p style="text-align: center; color: #888;">Thư viện trống.</p>';
-            return;
+        if (Array.isArray(items)) {
+            libraryItemsCache = items;
+            localStorage.setItem('piso_library_cache', JSON.stringify(items));
+            window.renderLibraryCurrentView();
         }
-        
-        songs.forEach(song => {
-            const div = document.createElement('div');
-            div.style = 'display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
-            
-            const infoDiv = document.createElement('div');
-            infoDiv.innerHTML = `
-                <h3 style="margin: 0; font-size: 16px;">${song.title}</h3>
-                <small style="color: #666;">${new Date(song.createdAt).toLocaleString()}</small>
-            `;
-            
-            const btnGroup = document.createElement('div');
-            btnGroup.style = 'display: flex; gap: 10px;';
-            
-            const delBtn = document.createElement('button');
-            delBtn.className = 'ctrl-btn stop';
-            delBtn.style = 'font-size: 13px; padding: 5px 15px; background: #ef4444;';
-            delBtn.innerText = 'Xóa';
-            delBtn.onclick = () => window.deleteSong(song.id);
-            
-            const btn = document.createElement('button');
-            btn.className = 'ctrl-btn play';
-            btn.style = 'font-size: 13px; padding: 5px 15px;';
-            btn.innerText = 'Tải vào Editor';
-            btn.onclick = () => window.loadSong(song);
-            
-            btnGroup.appendChild(delBtn);
-            btnGroup.appendChild(btn);
-            
-            div.appendChild(infoDiv);
-            div.appendChild(btnGroup);
-            listEl.appendChild(div);
-        });
     } catch (err) {
-        listEl.innerHTML = `<p style="text-align: center; color: red;">Lỗi tải dữ liệu: ${err.message}</p>`;
+        if (!cachedData) {
+            listEl.innerHTML = `<p style="text-align: center; color: red; padding: 20px;">Lỗi tải dữ liệu: ${err.message}</p>`;
+        }
     }
 };
 
-window.deleteSong = async function(id) {
-    if (!confirm("Bạn có chắc chắn muốn xóa bản nhạc này không?")) return;
+window.renderLibraryCurrentView = function() {
+    const listEl = document.getElementById('library-list');
+    const breadcrumbEl = document.getElementById('library-breadcrumb');
+    const searchVal = (document.getElementById('search-library')?.value || '').trim().toLowerCase();
+    
+    if (!listEl) return;
+    
+    // Render Breadcrumb Bar
+    if (breadcrumbEl) {
+        breadcrumbEl.innerHTML = '';
+        const parts = currentFolderPath.split('/').filter(Boolean);
+        
+        const homeBtn = document.createElement('span');
+        homeBtn.style = 'cursor: pointer; color: #2563eb; transition: all 0.2s;';
+        homeBtn.innerHTML = '🏠 Gốc';
+        homeBtn.onclick = () => window.navigateToFolder('/');
+        breadcrumbEl.appendChild(homeBtn);
+        
+        let pathAccumulator = '';
+        parts.forEach((part, index) => {
+            pathAccumulator += '/' + part;
+            const sep = document.createElement('span');
+            sep.innerHTML = ' ❯ ';
+            sep.style.color = '#94a3b8';
+            breadcrumbEl.appendChild(sep);
+            
+            const partBtn = document.createElement('span');
+            const targetPath = pathAccumulator;
+            partBtn.style = `cursor: pointer; color: ${index === parts.length - 1 ? '#0f172a' : '#2563eb'}; font-weight: bold;`;
+            partBtn.innerHTML = `📁 ${part}`;
+            partBtn.onclick = () => window.navigateToFolder(targetPath);
+            breadcrumbEl.appendChild(partBtn);
+        });
+    }
+    
+    listEl.innerHTML = '';
+    
+    // Filter items
+    let displayItems = [];
+    if (searchVal) {
+        displayItems = libraryItemsCache.filter(item => 
+            (item.title || item.name || '').toLowerCase().includes(searchVal)
+        );
+    } else {
+        displayItems = libraryItemsCache.filter(item => {
+            const itemFolder = item.folderPath || '/';
+            return itemFolder === currentFolderPath;
+        });
+    }
+    
+    // Show "Go Back" button if not in root
+    if (currentFolderPath !== '/' && !searchVal) {
+        const backDiv = document.createElement('div');
+        backDiv.style = 'display: flex; align-items: center; padding: 10px 15px; background: #f1f5f9; border-radius: 8px; cursor: pointer; font-weight: bold; color: #475569; border: 1px dashed #cbd5e1; transition: all 0.2s;';
+        backDiv.innerHTML = '<span>⬆ Quay lại thư mục cha</span>';
+        backDiv.onclick = () => {
+            const parts = currentFolderPath.split('/').filter(Boolean);
+            parts.pop();
+            const parentPath = parts.length > 0 ? '/' + parts.join('/') : '/';
+            window.navigateToFolder(parentPath);
+        };
+        listEl.appendChild(backDiv);
+    }
+    
+    if (displayItems.length === 0) {
+        listEl.innerHTML += searchVal 
+            ? '<p style="text-align: center; color: #888; padding: 20px;">Không tìm thấy bản nhạc hoặc thư mục nào khớp với từ khóa.</p>'
+            : '<p style="text-align: center; color: #888; padding: 20px;">Thư mục này hiện đang trống. Bấm <b>"📁 Tạo Thư Mục Mới"</b> hoặc chọn <b>"☁️ Lưu lên Cloud"</b> để thêm bản nhạc vào đây!</p>';
+        return;
+    }
+    
+    // Sort: Folders first, then Songs
+    displayItems.sort((a, b) => {
+        if (a.type === 'folder' && b.type !== 'folder') return -1;
+        if (a.type !== 'folder' && b.type === 'folder') return 1;
+        return (a.title || '').localeCompare(b.title || '');
+    });
+    
+    displayItems.forEach(item => {
+        const div = document.createElement('div');
+        div.style = 'display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: white; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); transition: all 0.2s;';
+        
+        const isFolder = item.type === 'folder';
+        const icon = isFolder ? '📁' : '🎵';
+        
+        const infoDiv = document.createElement('div');
+        infoDiv.style = 'display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;';
+        infoDiv.onclick = () => {
+            if (isFolder) {
+                const newPath = (item.folderPath === '/' ? '' : item.folderPath) + '/' + item.title;
+                window.navigateToFolder(newPath);
+            } else {
+                window.loadSong(item);
+            }
+        };
+        
+        infoDiv.innerHTML = `
+            <span style="font-size: 1.5rem;">${icon}</span>
+            <div>
+                <h3 style="margin: 0; font-size: 15px; color: ${isFolder ? '#1e293b' : '#0f172a'}; font-weight: bold;">${item.title}</h3>
+                <small style="color: #64748b;">${isFolder ? 'Thư mục' : new Date(item.createdAt).toLocaleString()}</small>
+            </div>
+        `;
+        
+        const btnGroup = document.createElement('div');
+        btnGroup.style = 'display: flex; gap: 8px; align-items: center;';
+        
+        if (!isFolder) {
+            const moveBtn = document.createElement('button');
+            moveBtn.className = 'toggle-btn';
+            moveBtn.style = 'font-size: 12px; padding: 5px 10px; background: #f8fafc; color: #475569; border: 1px solid #cbd5e1;';
+            moveBtn.innerText = '🚚 Chuyển';
+            moveBtn.onclick = (e) => {
+                e.stopPropagation();
+                window.moveItemToFolder(item);
+            };
+            btnGroup.appendChild(moveBtn);
+
+            const loadBtn = document.createElement('button');
+            loadBtn.className = 'ctrl-btn play';
+            loadBtn.style = 'font-size: 12px; padding: 5px 12px;';
+            loadBtn.innerText = 'Tải vào Editor';
+            loadBtn.onclick = (e) => {
+                e.stopPropagation();
+                window.loadSong(item);
+            };
+            btnGroup.appendChild(loadBtn);
+        } else {
+            const openBtn = document.createElement('button');
+            openBtn.className = 'ctrl-btn play';
+            openBtn.style = 'font-size: 12px; padding: 5px 12px; background: #3b82f6;';
+            openBtn.innerText = 'Mở Thư Mục';
+            openBtn.onclick = (e) => {
+                e.stopPropagation();
+                const newPath = (item.folderPath === '/' ? '' : item.folderPath) + '/' + item.title;
+                window.navigateToFolder(newPath);
+            };
+            btnGroup.appendChild(openBtn);
+        }
+        
+        const delBtn = document.createElement('button');
+        delBtn.className = 'ctrl-btn stop';
+        delBtn.style = 'font-size: 12px; padding: 5px 12px; background: #ef4444;';
+        delBtn.innerText = 'Xóa';
+        delBtn.onclick = (e) => {
+            e.stopPropagation();
+            window.deleteLibraryItem(item);
+        };
+        btnGroup.appendChild(delBtn);
+        
+        div.appendChild(infoDiv);
+        div.appendChild(btnGroup);
+        listEl.appendChild(div);
+    });
+};
+
+window.navigateToFolder = function(folderPath) {
+    currentFolderPath = folderPath;
+    window.renderLibraryCurrentView();
+};
+
+window.createFolderInCurrentPath = async function() {
+    const name = prompt("Nhập tên thư mục mới:", "Thư Mục Mới");
+    if (!name || !name.trim()) return;
+    
+    const folderName = name.trim();
+    const exists = libraryItemsCache.some(item => 
+        item.type === 'folder' && 
+        (item.folderPath || '/') === currentFolderPath && 
+        item.title.toLowerCase() === folderName.toLowerCase()
+    );
+    if (exists) {
+        return alert("Thư mục này đã tồn tại trong đường dẫn hiện tại!");
+    }
+    
+    const folderData = {
+        title: folderName,
+        type: 'folder',
+        folderPath: currentFolderPath
+    };
+    
+    try {
+        const res = await fetch(CF_WORKER_URL + '/api/songs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(folderData)
+        });
+        const data = await res.json();
+        if (data.success) {
+            window.fetchLibrary(true);
+        } else {
+            alert("Lỗi khi tạo thư mục: " + data.error);
+        }
+    } catch(err) {
+        alert("Không thể kết nối đến máy chủ: " + err.message);
+    }
+};
+
+window.moveItemToFolder = async function(item) {
+    const availableFolders = ['/'];
+    libraryItemsCache.forEach(i => {
+        if (i.type === 'folder') {
+            const fPath = (i.folderPath === '/' ? '' : i.folderPath) + '/' + i.title;
+            if (!availableFolders.includes(fPath)) availableFolders.push(fPath);
+        }
+    });
+    
+    const folderListStr = availableFolders.map((f, idx) => `${idx + 1}. ${f}`).join('\n');
+    const choice = prompt(`Chọn số thứ tự thư mục muốn chuyển bài '${item.title}' tới:\n\n${folderListStr}`, "1");
+    if (!choice) return;
+    
+    const idx = parseInt(choice) - 1;
+    if (isNaN(idx) || idx < 0 || idx >= availableFolders.length) {
+        return alert("Lựa chọn không hợp lệ!");
+    }
+    
+    const targetFolder = availableFolders[idx];
+    item.folderPath = targetFolder;
+    
+    try {
+        const res = await fetch(CF_WORKER_URL + '/api/songs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item)
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert(`Đã chuyển bài '${item.title}' sang thư mục '${targetFolder}'!`);
+            window.fetchLibrary(true);
+        }
+    } catch(err) {
+        alert("Lỗi khi chuyển thư mục: " + err.message);
+    }
+};
+
+window.deleteLibraryItem = async function(item) {
+    const isFolder = item.type === 'folder';
+    const msg = isFolder 
+        ? `Bạn có chắc chắn muốn xóa thư mục '${item.title}'?`
+        : `Bạn có chắc chắn muốn xóa bản nhạc '${item.title}'?`;
+        
+    if (!confirm(msg)) return;
+    
     try {
         const res = await fetch(CF_WORKER_URL + '/api/songs', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id })
+            body: JSON.stringify({ id: item.id })
         });
         if (res.ok) {
-            alert("Đã xóa bản nhạc!");
-            window.loadLibrary(); // Reload list
-        } else {
-            const err = await res.json();
-            alert("Lỗi khi xóa: " + err.error);
+            if (isFolder) {
+                const subPath = (item.folderPath === '/' ? '' : item.folderPath) + '/' + item.title;
+                const childItems = libraryItemsCache.filter(i => (i.folderPath || '').startsWith(subPath));
+                for (const child of childItems) {
+                    await fetch(CF_WORKER_URL + '/api/songs', {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: child.id })
+                    });
+                }
+            }
+            window.fetchLibrary(true);
         }
-    } catch (err) {
-        alert("Không thể kết nối đến máy chủ: " + err.message);
+    } catch(err) {
+        alert("Lỗi khi xóa: " + err.message);
     }
 };
 
@@ -664,7 +893,7 @@ window.saveToCloud = async function() {
             return alert("Vui lòng thay thế CF_WORKER_URL trong main.js bằng URL của Worker bạn đã deploy.");
         }
         
-        const payload = { title, abc };
+        const payload = { title, abc, folderPath: currentFolderPath || '/' };
         if (currentSongId) payload.id = currentSongId; // Attach ID if updating
         
         const res = await fetch(CF_WORKER_URL + '/api/songs', {
@@ -677,6 +906,7 @@ window.saveToCloud = async function() {
         if (data.success) {
             currentSongId = data.id; // Update current ID (either new or existing)
             alert("Đã lưu thành công!");
+            window.fetchLibrary(true);
         } else {
             alert("Lỗi khi lưu: " + data.error);
         }

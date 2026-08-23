@@ -25,17 +25,27 @@
 
     <!-- NEW LIBRARY TAB (Thư Viện) -->
     <main class="app-container tab-content" id="tab-library" style="display: none;">
-      <section class="panel" style="width: 100%; max-width: 800px; margin: 0 auto; padding: 20px;">
-        <div class="panel-header" style="background: var(--primary);">
-          <h2 style="color: white; margin: 0 auto;">📚 Thư Viện Bản Nhạc</h2>
+      <section class="panel" style="width: 100%; max-width: 900px; margin: 0 auto; padding: 20px;">
+        <div class="panel-header" style="background: var(--primary); display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="color: white; margin: 0;">📚 Thư Viện Bản Nhạc</h2>
+          <button onclick="window.createFolderInCurrentPath()" class="toggle-btn" style="background: white; color: var(--primary); font-size: 13px; padding: 6px 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">📁 Tạo Thư Mục Mới</button>
         </div>
+        
         <div class="panel-content" style="display: flex; flex-direction: column; gap: 15px;">
-          <div style="display: flex; gap: 10px;">
-            <input type="text" id="search-library" placeholder="Tìm kiếm bản nhạc..." style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ddd;" />
-            <button class="ctrl-btn play" onclick="fetchLibrary()" style="font-size: 14px;">🔄 Làm Mới</button>
+          <!-- Search & Refresh Controls -->
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <input type="text" id="search-library" oninput="window.renderLibraryCurrentView()" placeholder="🔍 Tìm kiếm bản nhạc hoặc thư mục..." style="flex: 1; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; outline: none; font-size: 14px;" />
+            <button class="ctrl-btn play" onclick="window.fetchLibrary(true)" style="font-size: 13px; padding: 10px 16px; white-space: nowrap;">🔄 Làm Mới</button>
           </div>
-          <div id="library-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px; padding: 10px; background: #fafafa;">
-             <p style="text-align: center; color: #888;">Đang tải danh sách...</p>
+
+          <!-- Breadcrumb Navigation Bar -->
+          <div id="library-breadcrumb" style="display: flex; align-items: center; gap: 6px; background: #f1f5f9; padding: 10px 15px; border-radius: 8px; font-weight: bold; font-size: 14px; color: #334155; border: 1px solid #cbd5e1; flex-wrap: wrap;">
+            <!-- Rendered dynamically by JS: 🏠 Gốc > 📁 Nhạc Piano > 📁 Nhạc Trẻ -->
+          </div>
+
+          <!-- Library Items List -->
+          <div id="library-list" style="display: flex; flex-direction: column; gap: 8px; min-height: 380px; max-height: 550px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px; padding: 12px; background: #fafafa;">
+             <p style="text-align: center; color: #888;">⚡ Đang tải danh sách...</p>
           </div>
         </div>
       </section>
