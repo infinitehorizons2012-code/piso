@@ -1,6 +1,7 @@
 import * as AccompEngine from './accompaniment-engine.js';
-import './style.css'
-import abcjs from 'abcjs'
+import 'abcjs/abcjs-audio.css';
+import './style.css';
+import abcjs from 'abcjs';
 
 // --- Default ABC Notation ---
 const DEFAULT_ABC = `X:1

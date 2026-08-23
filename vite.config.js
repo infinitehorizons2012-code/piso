@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  base: '/piso/', // For GitHub Pages deployment under repository 'piso'
+  base: './', // Relative base path works universally on Cloudflare Pages, GitHub Pages, etc.
 })
