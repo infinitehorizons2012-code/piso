@@ -316,6 +316,21 @@
         'B': { bg: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', border: '#c084fc', text: '#6b21a8', shadow: 'rgba(168, 85, 247, 0.25)' }
     };
 
+    function generate3Options(correctNoteOnly) {
+        const ALL_NOTES = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+        const distractors = ALL_NOTES.filter(n => n !== correctNoteOnly);
+        for (let i = distractors.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [distractors[i], distractors[j]] = [distractors[j], distractors[i]];
+        }
+        const selected = [correctNoteOnly, distractors[0], distractors[1]];
+        for (let i = selected.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [selected[i], selected[j]] = [selected[j], selected[i]];
+        }
+        return selected;
+    }
+
     function generateLedgerQuestion(cardBody) {
         const isTreble = window.GameState.activeSubTab === 'sol';
         const lvl = window.GameState.level;
@@ -327,22 +342,24 @@
         const target = pool[Math.floor(Math.random() * pool.length)];
         window.GameState.currentQuestion = target;
 
+        const options3 = generate3Options(target.noteOnly);
         const clefStr = isTreble ? 'treble' : 'bass';
+        const clefTitle = isTreble ? 'Khóa Sol' : 'Khóa Fa';
         const abcCode = `X:1\nM:4/4\nL:1/4\nK:C clef=${clefStr}\n${target.abc} |`;
 
         cardBody.innerHTML = `
             <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎵 Hãy chọn tên nốt nhạc đang hiển thị trên khuông nhạc:</h3>
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎼 [${clefTitle}] Hãy nhìn khuông nhạc & chọn 1 đáp án đúng trong 3 phương án:</h3>
                 
-                <div id="game-abc-paper" style="min-height: 140px; display: flex; justify-content: center; align-items: center; margin: 15px 0; background: #fafafa; border-radius: 14px; padding: 10px;"></div>
+                <div id="game-abc-paper" style="min-height: 160px; display: flex; justify-content: center; align-items: center; margin: 18px 0; background: linear-gradient(135deg, #f8fafc, #f1f5f9); border-radius: 16px; padding: 15px; border: 2px dashed #cbd5e1;"></div>
 
                 <div id="game-feedback" style="min-height: 32px; font-weight: 800; font-size: 1.2rem; margin-bottom: 18px;"></div>
 
-                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                    ${['C', 'D', 'E', 'F', 'G', 'A', 'B'].map(note => {
+                <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; max-width: 600px; margin: 0 auto;">
+                    ${options3.map(note => {
                         const style = NOTE_COLOR_MAP[note];
                         return `
-                        <button onclick="window.checkLedgerAnswer('${note}')" style="font-size: 1.25rem; font-weight: 800; padding: 12px 22px; border-radius: 16px; border: 2.5px solid ${style.border}; background: ${style.bg}; color: ${style.text}; cursor: pointer; transition: all 0.2s; min-width: 85px; box-shadow: 0 4px 12px ${style.shadow};" onmouseover="this.style.transform='translateY(-4px) scale(1.06)'" onmouseout="this.style.transform='none'">
+                        <button onclick="window.checkLedgerAnswer('${note}')" style="font-size: 1.35rem; font-weight: 800; padding: 16px 28px; border-radius: 20px; border: 3px solid ${style.border}; background: ${style.bg}; color: ${style.text}; cursor: pointer; transition: all 0.2s; min-width: 130px; box-shadow: 0 6px 18px ${style.shadow}; flex: 1;" onmouseover="this.style.transform='translateY(-4px) scale(1.08)'" onmouseout="this.style.transform='none'">
                             ${getNoteDisplayName(note)}
                         </button>
                         `;
@@ -351,9 +368,20 @@
             </div>
         `;
 
-        if (typeof abcjs !== 'undefined') {
-            abcjs.renderAbc('game-abc-paper', abcCode, { responsive: 'resize', staffwidth: 300 });
-        }
+        setTimeout(() => {
+            const paperEl = document.getElementById('game-abc-paper');
+            if (paperEl && typeof abcjs !== 'undefined') {
+                paperEl.innerHTML = '';
+                abcjs.renderAbc('game-abc-paper', abcCode, {
+                    responsive: 'resize',
+                    scale: 1.3,
+                    staffwidth: 320,
+                    paddingtop: 15,
+                    paddingbottom: 15
+                });
+            }
+        }, 50);
+
         playNoteByName(target.abc, 0.4);
     }
 
