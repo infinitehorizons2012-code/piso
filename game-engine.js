@@ -652,68 +652,117 @@
         }
     };
 
-    // --- GAME THEORY RENDERER ---
+    // --- GAME THEORY RENDERER WITH SHEET MUSIC DEMOS ---
     function renderGameTheory(gameId) {
         const cardBody = document.getElementById('game-card-body');
         if (!cardBody) return;
 
-        let content = '';
+        let htmlContent = '';
+
         if (gameId === 'ledger') {
-            content = `
-                <h3>📖 Lý Thuyết Dòng Kẻ Phụ (Ledger Lines)</h3>
-                <p>Khung nhạc tiêu chuẩn gồm 5 dòng kẻ chính. Những nốt nhạc nằm ngoài 5 dòng kẻ này sẽ cần <b>Dòng Kẻ Phụ (Ledger Lines)</b> để xác định cao độ.</p>
-                <ul>
-                    <li><b>Khóa Sol (Treble Clef):</b> Dòng kẻ thứ 1 từ dưới lên là nốt E4 (Mi). Nốt Đô giữa (Middle C - C4) nằm ở 1 dòng kẻ phụ phía dưới khuông nhạc.</li>
-                    <li><b>Khóa Fa (Bass Clef):</b> Dòng kẻ trên cùng là nốt F3 (Pha). Nốt Đô giữa (Middle C - C4) nằm ở 1 dòng kẻ phụ phía trên khuông nhạc.</li>
-                </ul>
+            htmlContent = `
+                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">📖 Lý Thuyết Dòng Kẻ Phụ & Tên Nốt Nhạc</h3>
+                    <p style="font-size: 1rem; color: #475569;">Khuông nhạc gồm 5 dòng kẻ chính. Dưới đây là vị trí và tên gọi từng nốt nhạc trên <b>Khóa Sol</b> và <b>Khóa Fa</b>:</p>
+                    
+                    <!-- DEMO 1: KHÓA SOL -->
+                    <div style="margin: 22px 0; background: linear-gradient(135deg, #fff1f2, #fff7ed); padding: 20px; border-radius: 16px; border: 2px solid #fecdd3;">
+                        <h4 style="margin: 0 0 10px 0; color: #e11d48; font-size: 1.15rem; font-weight: 800;">🎼 1. Vị Trí Các Nốt Trên Khóa Sol (Treble Clef):</h4>
+                        <div id="theory-treble-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #fda4af;"></div>
+                    </div>
+
+                    <!-- DEMO 2: KHÓA FA -->
+                    <div style="margin: 22px 0; background: linear-gradient(135deg, #eff6ff, #f0fdf4); padding: 20px; border-radius: 16px; border: 2px solid #bfdbfe;">
+                        <h4 style="margin: 0 0 10px 0; color: #1d4ed8; font-size: 1.15rem; font-weight: 800;">𝄢 2. Vị Trí Các Nốt Trên Khóa Fa (Bass Clef):</h4>
+                        <div id="theory-bass-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #93c5fd;"></div>
+                    </div>
+                </div>
             `;
         } else if (gameId === 'rhythm') {
-            content = `
-                <h3>📖 Lý Thuyết Tiết Tấu & Nhịp Điệu (Rhythm)</h3>
-                <p>Tiết tấu là sự phân bổ thời gian của các nốt nhạc theo trường độ:</p>
-                <ul>
-                    <li><b>Nốt Đen (Quarter Note):</b> 1 phách tròn.</li>
-                    <li><b>Nốt Trắng (Half Note):</b> Ngân dài 2 phách.</li>
-                    <li><b>Nốt Móc Đơn (Eighth Note):</b> 1/2 phách. Hai nốt móc đơn dính chùm tạo nên 1 phách tròn.</li>
-                </ul>
+            htmlContent = `
+                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Tiết Tấu & Trường Độ Nốt Nhạc</h3>
+                    <p style="font-size: 1rem; color: #475569;">Mỗi loại nốt nhạc đại diện cho một độ dài thời gian (trường độ) khác nhau:</p>
+                    
+                    <div style="margin: 20px 0; background: linear-gradient(135deg, #ecfeff, #eff6ff); padding: 20px; border-radius: 16px; border: 2px solid #a5f3fc;">
+                        <div id="theory-rhythm-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #38bdf8;"></div>
+                    </div>
+                </div>
             `;
         } else if (gameId === 'interval') {
-            content = `
-                <h3>📖 Lý Thuyết Quãng Âm (Music Intervals)</h3>
-                <p>Quãng âm là khoảng cách độ cao giữa hai nốt nhạc:</p>
-                <ul>
-                    <li><b>Quãng 1 (Unison):</b> Hai nốt cùng độ cao.</li>
-                    <li><b>Quãng 3 Trưởng (Major 3rd):</b> Khoảng cách 4 nửa cung (C - E). Mang sắc thái vui tươi.</li>
-                    <li><b>Quãng 5 Đúng (Perfect 5th):</b> Khoảng cách 7 nửa cung (C - G). Âm thanh trong trẻo, vững chãi.</li>
-                    <li><b>Quãng 8 (Octave):</b> Khoảng cách 12 nửa cung (C4 - C5).</li>
-                </ul>
+            htmlContent = `
+                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Quãng Âm (Music Intervals)</h3>
+                    <p style="font-size: 1rem; color: #475569;">Quãng âm là khoảng cách giữa 2 nốt nhạc vang lên nối tiếp hoặc cùng lúc:</p>
+                    
+                    <div style="margin: 20px 0; background: linear-gradient(135deg, #faf5ff, #eff6ff); padding: 20px; border-radius: 16px; border: 2px solid #e9d5ff;">
+                        <div id="theory-interval-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #c084fc;"></div>
+                    </div>
+                </div>
             `;
         } else if (gameId === 'scale') {
-            content = `
-                <h3>📖 Lý Thuyết Âm Giai (Scales)</h3>
-                <p>Âm giai là dãy các nốt nhạc được xếp theo thứ tự độ cao tăng dần:</p>
-                <ul>
-                    <li><b>Major Scale (Trưởng):</b> Cấu trúc (1 - 1 - 1/2 - 1 - 1 - 1 - 1/2). Sáng sủa, vui vẻ.</li>
-                    <li><b>Minor Scale (Thứ):</b> Sắc thái u buồn, trầm lắng.</li>
-                    <li><b>Pentatonic (Ngũ âm):</b> Gồm 5 nốt mang âm hưởng dân ca Đông Á.</li>
-                </ul>
+            htmlContent = `
+                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Âm Giai (Scales)</h3>
+                    <p style="font-size: 1rem; color: #475569;">Âm giai là dãy nốt sắp xếp theo thứ tự cao độ tăng dần:</p>
+                    
+                    <div style="margin: 20px 0; background: linear-gradient(135deg, #fefce8, #f0fdf4); padding: 20px; border-radius: 16px; border: 2px solid #fde047;">
+                        <div id="theory-scale-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #facc15;"></div>
+                    </div>
+                </div>
             `;
         } else if (gameId === 'chord') {
-            content = `
-                <h3>📖 Lý Thuyết Hợp Âm (Chords)</h3>
-                <p>Hợp âm được tạo thành khi vang lên cùng lúc từ 3 nốt nhạc trở lên:</p>
-                <ul>
-                    <li><b>Major Chord (Trưởng):</b> Nốt gốc + Quãng 3 Trưởng + Quãng 5 Đúng (Nghe vang, sáng).</li>
-                    <li><b>Minor Chord (Thứ):</b> Nốt gốc + Quãng 3 Thứ + Quãng 5 Đúng (Nghe u buồn, tâm trạng).</li>
-                </ul>
+            htmlContent = `
+                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Hợp Âm (Chords)</h3>
+                    <p style="font-size: 1rem; color: #475569;">Hợp âm được tạo thành khi vang lên cùng lúc 3 nốt nhạc trở lên:</p>
+                    
+                    <div style="margin: 20px 0; background: linear-gradient(135deg, #fff7ed, #faf5ff); padding: 20px; border-radius: 16px; border: 2px solid #fed7aa;">
+                        <div id="theory-chord-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #fb923c;"></div>
+                    </div>
+                </div>
             `;
         }
 
-        cardBody.innerHTML = `
-            <div style="background: white; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0; line-height: 1.7; color: #334155;">
-                ${content}
-            </div>
-        `;
+        cardBody.innerHTML = htmlContent;
+
+        // Render Sheet Music Demos
+        if (gameId === 'ledger') {
+            const trebleAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nC D E F | G A B c |\nw: "Đô(C)" "Rê(D)" "Mi(E)" "Pha(F)" "Son(G)" "La(A)" "Si(B)" "Đô(c)"`;
+            const bassAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=bass\nC, D, E, F, | G, A, B, C |\nw: "Đô(C,)" "Rê(D,)" "Mi(E,)" "Pha(F,)" "Son(G,)" "La(A,)" "Si(B,)" "Đô(C)"`;
+            renderTheoryAbcHelper('theory-treble-paper', trebleAbc);
+            renderTheoryAbcHelper('theory-bass-paper', bassAbc);
+        } else if (gameId === 'rhythm') {
+            const rhythmAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nc c2 c/2 c/2 c4 |\nw: "Nốt_Đen(1phách)" "Trắng(2phách)" "Móc_đơn(1/2)" "Móc_đơn(1/2)" "Tròn(4phách)"`;
+            renderTheoryAbcHelper('theory-rhythm-paper', rhythmAbc);
+        } else if (gameId === 'interval') {
+            const intervalAbc = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n[CE] [CG] [Cc] |\nw: "Quãng_3_Trưởng" "Quãng_5_Đúng" "Quãng_8_(Octave)"`;
+            renderTheoryAbcHelper('theory-interval-paper', intervalAbc);
+        } else if (gameId === 'scale') {
+            const scaleAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nC D E F | G A B c |\nw: C D E F G A B c`;
+            renderTheoryAbcHelper('theory-scale-paper', scaleAbc);
+        } else if (gameId === 'chord') {
+            const chordAbc = `X:1\nM:4/4\nL:1/1\nK:C clef=treble\n[CEG] [A,CE] [G,B,DF] |\nw: "Đô_Trưởng_(C)" "La_Thứ_(Am)" "Son_Bảy_(G7)"`;
+            renderTheoryAbcHelper('theory-chord-paper', chordAbc);
+        }
+    }
+
+    function renderTheoryAbcHelper(elementId, abcCode) {
+        setTimeout(() => {
+            const el = document.getElementById(elementId);
+            const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+            if (el && abcRenderer) {
+                el.innerHTML = '';
+                abcRenderer.renderAbc(elementId, abcCode, {
+                    responsive: 'resize',
+                    scale: 1.3,
+                    staffwidth: 520,
+                    paddingtop: 15,
+                    paddingbottom: 15,
+                    add_classes: true
+                });
+            }
+        }, 60);
     }
 
 })();
