@@ -27,24 +27,86 @@
         return 440 * Math.pow(2, (midi - 69) / 12);
     }
 
-    function playTone(freq, duration = 0.5, type = 'triangle', delay = 0) {
+    // Realistic Acoustic Grand Piano Synthesizer (Physical Modeling)
+    function playTone(freq, duration = 0.6, type = 'piano', delay = 0) {
         const ctx = getAudioContext();
         const now = ctx.currentTime + delay;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
 
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, now);
+        // 1. Dual String Oscillators (Detuned ±1.5 cents for acoustic chorusing & warmth)
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const osc3 = ctx.createOscillator(); // 2nd octave harmonic overtone
 
-        gain.gain.setValueAtTime(0.01, now);
-        gain.gain.exponentialRampToValueAtTime(0.4, now + 0.03);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc1.type = 'triangle';
+        osc2.type = 'sine';
+        osc3.type = 'sine';
 
-        osc.connect(gain);
-        gain.connect(ctx.destination);
+        osc1.frequency.setValueAtTime(freq, now);
+        osc2.frequency.setValueAtTime(freq * 1.0012, now); // +2 cents detune
+        osc3.frequency.setValueAtTime(freq * 2.0, now);    // 2nd harmonic
 
-        osc.start(now);
-        osc.stop(now + duration);
+        // 2. Wooden Piano Body Lowpass Filter
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        const startCutoff = Math.min(4800, freq * 6);
+        const endCutoff = Math.min(1000, freq * 2);
+        filter.frequency.setValueAtTime(startCutoff, now);
+        filter.frequency.exponentialRampToValueAtTime(endCutoff, now + Math.max(0.1, duration * 0.7));
+
+        // 3. Felt Hammer Strike Transient Noise (Percussive click)
+        const hammerGain = ctx.createGain();
+        const hammerLen = Math.floor(ctx.sampleRate * 0.012);
+        const hammerBuffer = ctx.createBuffer(1, hammerLen, ctx.sampleRate);
+        const data = hammerBuffer.getChannelData(0);
+        for (let i = 0; i < hammerLen; i++) {
+            data[i] = (Math.random() * 2 - 1) * 0.12;
+        }
+        const hammerSource = ctx.createBufferSource();
+        hammerSource.buffer = hammerBuffer;
+        hammerGain.gain.setValueAtTime(0.25, now);
+        hammerGain.gain.exponentialRampToValueAtTime(0.001, now + 0.012);
+        hammerSource.connect(hammerGain);
+        hammerGain.connect(filter);
+
+        // 4. Acoustic Piano Envelopes
+        const gain1 = ctx.createGain();
+        const gain2 = ctx.createGain();
+        const gain3 = ctx.createGain();
+
+        // Fundamental string
+        gain1.gain.setValueAtTime(0.001, now);
+        gain1.gain.linearRampToValueAtTime(0.5, now + 0.008);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + duration + 0.1);
+
+        // Detuned string (chorusing)
+        gain2.gain.setValueAtTime(0.001, now);
+        gain2.gain.linearRampToValueAtTime(0.35, now + 0.008);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + duration + 0.1);
+
+        // Harmonic overtone
+        gain3.gain.setValueAtTime(0.001, now);
+        gain3.gain.linearRampToValueAtTime(0.18, now + 0.006);
+        gain3.gain.exponentialRampToValueAtTime(0.001, now + Math.max(0.08, duration * 0.4));
+
+        osc1.connect(gain1);
+        osc2.connect(gain2);
+        osc3.connect(gain3);
+
+        gain1.connect(filter);
+        gain2.connect(filter);
+        gain3.connect(filter);
+
+        filter.connect(ctx.destination);
+
+        osc1.start(now);
+        osc2.start(now);
+        osc3.start(now);
+        hammerSource.start(now);
+
+        osc1.stop(now + duration + 0.15);
+        osc2.stop(now + duration + 0.15);
+        osc3.stop(now + duration + 0.15);
+        hammerSource.stop(now + 0.02);
     }
 
     function playNoteByName(noteStr, duration = 0.5, delay = 0) {
