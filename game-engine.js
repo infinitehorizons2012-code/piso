@@ -665,33 +665,88 @@
         }
     };
 
-    // --- GAME 4: SCALE MATCH ---
-    const SCALES = [
-        { name: 'Âm Giai Trưởng (Major Scale)', intervals: [0, 2, 4, 5, 7, 9, 11, 12] },
-        { name: 'Âm Giai Thứ Tự Nhiên (Minor Scale)', intervals: [0, 2, 3, 5, 7, 8, 10, 12] },
-        { name: 'Âm Giai Pentatonic (Ngũ Âm Trưởng)', intervals: [0, 2, 4, 7, 9, 12] },
-        { name: 'Âm Giai Blues (Blues Scale)', intervals: [0, 3, 5, 6, 7, 10, 12] }
-    ];
+    // --- GAME 4: SCALE MATCH (3 LEVELS + 2 PLAYBACK MODES: SCALE RUN & MELODY/LICK + 3 MULTIPLE CHOICE) ---
+    const SCALE_LEVELS = {
+        lvl1: [
+            { id: 'major', icon: '☀️', name: 'Âm Giai Trưởng (Major Scale)', desc: 'Vui vẻ, sáng sủa, hào hùng, trọn vẹn', intervals: [0, 2, 4, 5, 7, 9, 11, 12] },
+            { id: 'natural_minor', icon: '🌧️', name: 'Âm Giai Thứ Tự Nhiên (Natural Minor)', desc: 'Buồn bã, da diết, tối tăm', intervals: [0, 2, 3, 5, 7, 8, 10, 12] },
+            { id: 'major_pentatonic', icon: '🎋', name: 'Ngũ Cung Trưởng (Major Pentatonic)', desc: 'Đậm chất Dân ca, Á Đông, thoáng vãng', intervals: [0, 2, 4, 7, 9, 12] }
+        ],
+        lvl2: [
+            { id: 'harmonic_minor', icon: '🏜️', name: 'Thứ Hòa Âm (Harmonic Minor)', desc: 'Ma mị, sa mạc Ai Cập, Trung Đông', intervals: [0, 2, 3, 5, 7, 8, 11, 12] },
+            { id: 'melodic_minor', icon: '🎻', name: 'Thứ Giai Điệu (Melodic Minor)', desc: 'Đầu buồn (Thứ), kết vút sáng (Trưởng)', intervals: [0, 2, 3, 5, 7, 9, 11, 12] },
+            { id: 'minor_pentatonic', icon: '🎸', name: 'Ngũ Cung Thứ (Minor Pentatonic)', desc: 'Gai góc, mạnh mẽ, Solo Rock/Pop', intervals: [0, 3, 5, 7, 10, 12] }
+        ],
+        lvl3: [
+            { id: 'blues', icon: '🎷', name: 'Âm Giai Blues (Blues Scale)', desc: 'Lả lướt, bụi bặm (Có nốt Blue chói)', intervals: [0, 3, 5, 6, 7, 10, 12] },
+            { id: 'dorian', icon: '✨', name: 'Điệu Thức Dorian (Dorian Mode)', desc: 'Âm giai Thứ sáng sủa, bồng bềnh, Celtic', intervals: [0, 2, 3, 5, 7, 9, 10, 12] },
+            { id: 'mixolydian', icon: '🕶️', name: 'Điệu Thức Mixolydian (Mixolydian)', desc: 'Âm giai Trưởng lười biếng, bụi bặm', intervals: [0, 2, 4, 5, 7, 9, 10, 12] }
+        ]
+    };
+
+    function getScalePool(level) {
+        if (level === 1) return SCALE_LEVELS.lvl1;
+        if (level === 2) return SCALE_LEVELS.lvl2;
+        return SCALE_LEVELS.lvl3;
+    }
+
+    window.setScalePlaybackMode = function(mode) {
+        window.GameState.scalePlaybackMode = mode;
+        renderGameUI();
+    };
 
     function generateScaleQuestion(cardBody) {
-        const target = SCALES[Math.floor(Math.random() * SCALES.length)];
-        const rootMidi = 60;
-        window.GameState.currentQuestion = { target, rootMidi };
+        const lvl = window.GameState.level || 1;
+        const pool = getScalePool(lvl);
+        const allPool = [...SCALE_LEVELS.lvl1, ...SCALE_LEVELS.lvl2, ...SCALE_LEVELS.lvl3];
+
+        const target = pool[Math.floor(Math.random() * pool.length)];
+
+        // Select 2 wrong distractors to form exactly 3 multiple choice options
+        let otherScales = pool.filter(x => x.id !== target.id);
+        if (otherScales.length < 2) {
+            otherScales = allPool.filter(x => x.id !== target.id);
+        }
+        otherScales.sort(() => Math.random() - 0.5);
+        const options = [target, otherScales[0], otherScales[1]];
+        options.sort(() => Math.random() - 0.5);
+
+        const NATURAL_ROOTS = [60, 62, 64, 65, 67, 69, 71];
+        const rootMidi = NATURAL_ROOTS[Math.floor(Math.random() * NATURAL_ROOTS.length)];
+        const mode = window.GameState.scalePlaybackMode || 'run'; // 'run' (Scale Run) or 'lick' (Melody/Lick)
+
+        window.GameState.currentQuestion = { target, rootMidi, mode, options };
+
+        const modeBtnStyle = (m) => mode === m
+            ? 'background: linear-gradient(135deg, #eab308, #ca8a04); color: white; border: none; font-weight: 800; padding: 8px 18px; border-radius: 20px; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.35); cursor: pointer;'
+            : 'background: white; color: #475569; border: 2px solid #cbd5e1; font-weight: 700; padding: 8px 18px; border-radius: 20px; cursor: pointer;';
 
         cardBody.innerHTML = `
             <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎹 Nghe chuỗi nốt & nhận biết loại Âm Giai (Scale):</h3>
+                <!-- Playback Mode Switcher -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #fefce8; padding: 12px; border-radius: 16px; border: 1px solid #fef08a;">
+                    <span style="font-weight: 800; color: #713f12; font-size: 0.95rem;">🎧 Chế Độ Luyện Âm Giai:</span>
+                    <button onclick="window.setScalePlaybackMode('run')" style="${modeBtnStyle('run')}">📖 Chế Độ Học (Scale Run)</button>
+                    <button onclick="window.setScalePlaybackMode('lick')" style="${modeBtnStyle('lick')}">🎸 Chế Độ Thực Chiến (Melody/Lick)</button>
+                </div>
+
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎹 Luyện Tai Âm Giai (Scale Match) — Level ${lvl}:</h3>
+                <p style="color: #64748b; font-size: 0.95rem; margin-top: -5px;">
+                    ${mode === 'run' ? 'Nghe chuỗi nốt chạy lần lượt và đoán loại Âm Giai:' : 'Nghe câu giai điệu thực chiến (Melody / Lick) 3 giây & chọn loại Âm Giai phù hợp:'}
+                </p>
                 
-                <button onclick="window.playScaleQuestionSound()" style="font-size: 1.15rem; padding: 14px 30px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 15px 0; box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
-                    🔊 Nghe Lại Âm Giai
+                <button onclick="window.playScaleQuestionSound()" style="font-size: 1.2rem; padding: 16px 36px; border-radius: 30px; background: linear-gradient(135deg, #eab308, #d97706); color: white; border: none; cursor: pointer; font-weight: 800; margin: 10px 0 20px 0; box-shadow: 0 8px 20px rgba(234, 179, 8, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px) scale(1.03)'" onmouseout="this.style.transform='none'">
+                    🔊 Nghe Âm Giai ${mode === 'run' ? '(Scale Run)' : '(Câu Giai Điệu Lick)'}
                 </button>
 
-                <div id="game-feedback" style="min-height: 32px; font-weight: 800; font-size: 1.2rem; margin: 15px 0;"></div>
+                <div id="game-feedback" style="min-height: 36px; font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;"></div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 15px;">
-                    ${SCALES.map((item, idx) => `
-                        <button onclick="window.checkScaleAnswer(${idx})" style="padding: 18px; border-radius: 16px; border: 2.5px solid #fde047; background: linear-gradient(135deg, #fefce8, #fef9c3); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #854d0e; box-shadow: 0 4px 12px rgba(234,179,8,0.2); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
-                            ${item.name}
+                <!-- Exactly 3 Multiple Choice Options -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; max-width: 780px; margin: 10px auto 0 auto;">
+                    ${options.map((item) => `
+                        <button onclick="window.checkScaleAnswer('${item.id}')" style="padding: 20px 16px; border-radius: 20px; border: 3px solid #fef08a; background: linear-gradient(135deg, #ffffff, #fefce8); font-weight: 800; font-size: 1.08rem; cursor: pointer; color: #854d0e; box-shadow: 0 6px 16px rgba(234,179,8,0.15); transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px;" onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='#eab308';" onmouseout="this.style.transform='none'; this.style.borderColor='#fef08a';">
+                            <span style="font-size: 1.4rem;">${item.icon} ${item.name}</span>
+                            <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">${item.desc}</span>
                         </button>
                     `).join('')}
                 </div>
@@ -702,25 +757,34 @@
 
     window.playScaleQuestionSound = function() {
         const q = window.GameState.currentQuestion;
-        if (q) {
+        if (!q) return;
+
+        const mode = q.mode || 'run';
+        if (mode === 'run') {
             const seq = q.target.intervals.map(i => q.rootMidi + i);
-            playSequence(seq, 0.35);
+            playSequence(seq, 0.32);
+        } else if (mode === 'lick') {
+            const intervals = q.target.intervals;
+            const root = q.rootMidi;
+            const lickIndices = [0, 2, 4, 3, 5, 4, 0].map(idx => idx % intervals.length);
+            const lickNotes = lickIndices.map(i => root + intervals[i]);
+            playSequence(lickNotes, 0.28);
         }
     };
 
-    window.checkScaleAnswer = function(idx) {
+    window.checkScaleAnswer = function(answerId) {
         const q = window.GameState.currentQuestion;
         const feedback = document.getElementById('game-feedback');
         if (!q || !feedback) return;
 
-        if (SCALES[idx].name === q.target.name) {
+        if (answerId === q.target.id) {
             window.GameState.score += 10;
             window.GameState.streak += 1;
-            feedback.innerHTML = `<span style="color: #22c55e;">🎉 Rất giỏi! Đây là ${q.target.name}</span>`;
-            setTimeout(() => renderGameUI(), 900);
+            feedback.innerHTML = `<span style="color: #22c55e;">🎉 Chính xác! ${q.target.icon} ${q.target.name} (${q.target.desc})</span>`;
+            setTimeout(() => renderGameUI(), 1000);
         } else {
             window.GameState.streak = 0;
-            feedback.innerHTML = `<span style="color: #ef4444;">❌ Tiếc quá! Đáp án đúng là: ${q.target.name}</span>`;
+            feedback.innerHTML = `<span style="color: #ef4444;">❌ Chưa đúng! Đáp án là: ${q.target.icon} ${q.target.name}</span>`;
         }
     };
 
@@ -1092,12 +1156,73 @@
             }
         } else if (gameId === 'scale') {
             htmlContent = `
-                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Âm Giai (Scales)</h3>
-                    <p style="font-size: 1rem; color: #475569;">Âm giai là dãy nốt sắp xếp theo thứ tự cao độ tăng dần:</p>
-                    
-                    <div style="margin: 20px 0; background: linear-gradient(135deg, #fefce8, #f0fdf4); padding: 20px; border-radius: 16px; border: 2px solid #fde047;">
-                        <div id="theory-scale-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #facc15;"></div>
+                <div style="background: white; padding: 32px; border-radius: 24px; border: 2px solid #e2e8f0; line-height: 1.8; color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <!-- HEADER -->
+                    <div style="background: linear-gradient(135deg, #eab308, #ca8a04); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(234,179,8,0.3);">
+                        <span style="background: #fef08a; color: #713f12; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎓 GIÁO TRÌNH LÝ THUYẾT ÂM GIAI</span>
+                        <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">Cẩm Nang Lý Thuyết Âm Giai (Scales Guide — 3 Levels)</h2>
+                        <p style="margin: 6px 0 0 0; color: #fefce8; font-weight: 600; font-size: 1rem;">Kho vật liệu cảm xúc trong âm nhạc từ Trưởng, Thứ đến Blues và các Điệu thức (Modes)</p>
+                    </div>
+
+                    <!-- BANNER 2 PLAYBACK MODES -->
+                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 22px; border-radius: 18px; border: 2px solid #bfdbfe;">
+                        <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 1.15rem; font-weight: 800;">💡 2 Chế Độ Luyện Tai Âm Giai:</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+                            <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
+                                <b>📖 Chế Độ Học (Scale Run):</b> Máy phát lần lượt từng nốt từ thấp lên cao (hoặc từ cao xuống thấp) để bạn ghi nhớ màu sắc tổng thể.
+                            </div>
+                            <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
+                                <b>🎸 Chế Độ Thực Chiến (Melody/Lick):</b> Máy không chạy lần lượt nữa mà bốc các nốt tạo thành câu giai điệu ngắn 3s (Lick) vô cùng cuốn hút và thực tế!
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 1 -->
+                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 22px; border-radius: 18px; border: 2px solid #fef08a;">
+                        <h4 style="margin: 0 0 14px 0; color: #a16207; font-size: 1.2rem; font-weight: 800;">☀️ Level 1 (Người mới bắt đầu): Màu Sắc Cơ Bản & Cực Đoan</h4>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                <b>☀️ Major Scale (Âm giai Trưởng):</b> Cảm xúc Vui vẻ, Sáng sủa, Hào hùng, Trọn vẹn. Công thức: <code>1 2 3 4 5 6 7 8</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                <b>🌧️ Natural Minor Scale (Âm giai Thứ tự nhiên):</b> Cảm xúc Buồn bã, Da diết, Tối tăm. Công thức: <code>1 2 ♭3 4 5 ♭6 ♭7 8</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                <b>🎋 Major Pentatonic (Ngũ cung Trưởng):</b> Đậm chất nhạc Dân ca, Á Đông (Việt Nam, Trung Quốc). Thiếu nửa cung nên rất thoáng. Công thức: <code>1 2 3 5 6 8</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 2 -->
+                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 22px; border-radius: 18px; border: 2px solid #bbf7d0;">
+                        <h4 style="margin: 0 0 14px 0; color: #15803d; font-size: 1.2rem; font-weight: 800;">🌿 Level 2 (Trung cấp): Sắc Thái Văn Hóa & Cổ Điển</h4>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                <b>🏜️ Harmonic Minor (Thứ Hòa âm):</b> Đậm chất sa mạc Ai Cập, Ba Tư, Trung Đông ma mị. Công thức: <code>1 2 ♭3 4 5 ♭6 7 8</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                <b>🎻 Melodic Minor (Thứ Giai điệu):</b> Đoạn đầu buồn (Thứ), đoạn kết vút lên sáng rực rỡ (Trưởng). Phổ biến trong nhạc Cổ điển. Công thức: <code>1 2 ♭3 4 5 6 7 8</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                <b>🎸 Minor Pentatonic (Ngũ cung Thứ):</b> Gai góc, mạnh mẽ. Thang âm quốc dân của các bài Solo Guitar Rock/Pop. Công thức: <code>1 ♭3 4 5 ♭7 8</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 3 -->
+                    <div style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
+                        <h4 style="margin: 0 0 14px 0; color: #7e22ce; font-size: 1.2rem; font-weight: 800;">🎷 Level 3 (Khó / Cao cấp): Nhạc Jazz, Blues và các Mode</h4>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                <b>🎷 Blues Scale:</b> Ngũ cung Thứ + "nốt chói" (Blue note). Nghe lả lướt, bụi bặm, đường phố đặc trưng Blues/Jazz. Công thức: <code>1 ♭3 4 ♭5 5 ♭7 8</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                <b>✨ Dorian Mode:</b> Âm giai Thứ nâng cấp sáng sủa hơn. Bồng bềnh, thần tiên (Phim viễn tưởng, Celtic). Công thức: <code>1 2 ♭3 4 5 6 ♭7 8</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                <b>🕶️ Mixolydian Mode:</b> Âm giai Trưởng làm tối 1 nốt (♭7). Vui nhưng có chút bụi bặm, lười biếng. Công thức: <code>1 2 3 4 5 6 ♭7 8</code>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
