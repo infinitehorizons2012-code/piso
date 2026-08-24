@@ -535,6 +535,11 @@
         renderGameUI();
     };
 
+    window.switchIntervalTheorySubTab = function(subTab) {
+        window.GameState.intervalTheorySubTab = subTab;
+        renderGameUI();
+    };
+
     function generateIntervalQuestion(cardBody) {
         const lvl = window.GameState.level || 1;
         const pool = getIntervalPool(lvl);
@@ -845,84 +850,246 @@
                 </div>
             `;
         } else if (gameId === 'interval') {
-            const intervalsTheoryData = [
-                {
-                    lvlName: '🎼 Level 1 (Dễ — Nền Tảng & Rõ Rệt)',
-                    color: '#0284c7', bg: 'linear-gradient(135deg, #ecfeff, #eff6ff)', border: '#a5f3fc',
-                    items: [
-                        { id: 'P8', name: 'Quãng 8 Đúng (P8 / Octave)', semi: 12, desc: 'Dễ nhất. Nghe y hệt 1 nốt nhạc nhưng độ cao chênh nhau hẳn 1 quãng 8.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC c | [Cc]2 |\nw: Đô4 Đô5 | Octave(P8)' },
-                        { id: 'P5', name: 'Quãng 5 Đúng (P5 / Perfect 5th)', semi: 7, desc: 'Nghe rất oai vệ, vang dội, rỗng (Ví dụ: Nhạc Star Wars).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC G | [CG]2 |\nw: Đô4 Son4 | 5-Đúng(P5)' },
-                        { id: 'P4', name: 'Quãng 4 Đúng (P4 / Perfect 4th)', semi: 5, desc: 'Nghe vươn lên, ổn định (Ví dụ: Nhạc Cưới).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC F | [CF]2 |\nw: Đô4 Pha4 | 4-Đúng(P4)' },
-                        { id: 'M3', name: 'Quãng 3 Trưởng (M3 / Major 3rd)', semi: 4, desc: 'Cảm xúc VUI, tươi sáng, rực rỡ.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC E | [CE]2 |\nw: Đô4 Mi4 | 3-Trưởng(M3)' },
-                        { id: 'm3', name: 'Quãng 3 Thứ (m3 / Minor 3rd)', semi: 3, desc: 'Cảm xúc BUỒN, u trầm, tối.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _E | [C_E]2 |\nw: Đô4 Mi♭4 | 3-Thứ(m3)' }
-                    ]
-                },
-                {
-                    lvlName: '🎼 Level 2 (Trung Cấp — Bước Đi & Bay Bổng)',
-                    color: '#a16207', bg: 'linear-gradient(135deg, #fefce8, #fff7ed)', border: '#fef08a',
-                    items: [
-                        { id: 'm2', name: 'Quãng 2 Thứ (m2 / Minor 2nd)', semi: 1, desc: 'Cực kỳ căng thẳng, ma quái (Nhạc phim Cá mập Jaws).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _D | [C_D]2 |\nw: Đô4 Rê♭4 | 2-Thứ(m2)' },
-                        { id: 'M2', name: 'Quãng 2 Trưởng (M2 / Major 2nd)', semi: 2, desc: 'Nghe như bước đi bình thường lên bậc thang (Nốt Đô lên Rê).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC D | [CD]2 |\nw: Đô4 Rê4 | 2-Trưởng(M2)' },
-                        { id: 'M6', name: 'Quãng 6 Trưởng (M6 / Major 6th)', semi: 9, desc: 'Bay bổng rực rỡ (Rất phổ biến trong các bản nhạc Ballad).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC A | [CA]2 |\nw: Đô4 La4 | 6-Trưởng(M6)' },
-                        { id: 'm6', name: 'Quãng 6 Thứ (m6 / Minor 6th)', semi: 8, desc: 'U buồn da diết, đòi hỏi giữ nốt đầu tiên trong đầu.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _A | [C_A]2 |\nw: Đô4 La♭4 | 6-Thứ(m6)' }
-                    ]
-                },
-                {
-                    lvlName: '🎼 Level 3 (Khó — Mâu Thuẫn & Căng Thẳng)',
-                    color: '#be123c', bg: 'linear-gradient(135deg, #fff1f2, #fff7ed)', border: '#fecdd3',
-                    items: [
-                        { id: 'M7', name: 'Quãng 7 Trưởng (M7 / Major 7th)', semi: 11, desc: 'Nghe cực kỳ chói, gào thét đòi giải quyết vọt lên Quãng 8.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC B | [CB]2 |\nw: Đô4 Si4 | 7-Trưởng(M7)' },
-                        { id: 'm7', name: 'Quãng 7 Thứ (m7 / Minor 7th)', semi: 10, desc: 'Bụi bặm, lang bạt (Đậm chất Blues / Funk).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _B | [C_B]2 |\nw: Đô4 Si♭4 | 7-Thứ(m7)' },
-                        { id: 'TT', name: 'Quãng 3 Cung / Tritone (A4/d5)', semi: 6, desc: 'Quãng ma mị & bất ổn nhất thế giới âm nhạc (Điềm dữ / Nghi vấn).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC ^F | [C^F]2 |\nw: Đô4 Pha♯4 | Tritone(TT)' }
-                    ]
-                }
-            ];
+            window.GameState.intervalTheorySubTab = window.GameState.intervalTheorySubTab || 'guide';
+            const subTab = window.GameState.intervalTheorySubTab;
 
-            let theoryHTML = `
-                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Chi Tiết Từng Quãng Âm (Ear Training Intervals)</h3>
-                    
-                    <!-- 21 AUDIO MATERIALS PEDAGOGICAL BANNER -->
-                    <div style="margin: 16px 0 24px 0; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 18px 22px; border-radius: 16px; border: 2px solid #86efac; color: #166534;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 1.12rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                            💡 Tư Duy Ma Trận 21 Âm Thanh Nguyên Liệu / Quãng:
-                        </h4>
-                        <p style="margin: 0; font-size: 0.96rem; line-height: 1.6; font-weight: 600; color: #15803d;">
-                            Với <b>7 nốt nhạc cơ bản</b> (Đô, Rê, Mi, Pha, Son, La, Si) làm nốt gốc, khi kết hợp cùng <b>3 hướng nghe</b> (📈 Nghe Lên, 📉 Nghe Xuống, 🎹 Nghe Song Song) ➔ Mỗi Quãng Âm được nạp tổng cộng <b>21 biến thể âm thanh nguyên liệu độc lập</b>! Giúp não bộ người học cảm nhận sâu bản chất màu sắc Quãng chứ không bị học vẹt 1 nốt cố định.
-                        </p>
-                    </div>
+            const activeBtnStyle = 'background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; font-weight: 800; padding: 10px 22px; border-radius: 20px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); cursor: pointer; transition: all 0.2s;';
+            const inactiveBtnStyle = 'background: white; color: #475569; font-weight: 700; border-radius: 20px; border: 2px solid #cbd5e1; padding: 10px 22px; cursor: pointer; transition: all 0.2s;';
 
-                    <p style="font-size: 1rem; color: #475569;">Dưới đây là định nghĩa, tính chất cảm xúc và khuông nhạc chi tiết của <b>từng Quãng Âm</b> theo 3 Level:</p>
+            let subTabHeader = `
+                <div style="display: flex; gap: 12px; margin-bottom: 22px; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="window.switchIntervalTheorySubTab('guide')" style="${subTab === 'guide' ? activeBtnStyle : inactiveBtnStyle}">📘 Cẩm Nang Lý Thuyết Quãng Âm (5 Mục Cốt Lõi)</button>
+                    <button onclick="window.switchIntervalTheorySubTab('staves')" style="${subTab === 'staves' ? activeBtnStyle : inactiveBtnStyle}">🎼 12 Quãng Âm Chi Tiết & Sheet Nhạc</button>
+                </div>
             `;
 
-            intervalsTheoryData.forEach((section, sIdx) => {
-                theoryHTML += `
-                    <div style="margin: 24px 0; background: ${section.bg}; padding: 22px; border-radius: 18px; border: 2px solid ${section.border};">
-                        <h4 style="margin: 0 0 15px 0; color: ${section.color}; font-size: 1.2rem; font-weight: 800;">${section.lvlName}:</h4>
-                        <div style="display: flex; flex-direction: column; gap: 16px;">
+            if (subTab === 'guide') {
+                htmlContent = subTabHeader + `
+                    <div style="background: white; padding: 32px; border-radius: 24px; border: 2px solid #e2e8f0; line-height: 1.8; color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <!-- HEADER BANNER -->
+                        <div style="background: linear-gradient(135deg, #0284c7, #0369a1); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(2,132,199,0.3);">
+                            <span style="background: #facc15; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎓 GIÁO TRÌNH NHẠC VIỆN</span>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">Cẩm Nang Lý Thuyết Quãng Âm (Interval Guide)</h2>
+                            <p style="margin: 6px 0 0 0; color: #e0f2fe; font-weight: 600; font-size: 1rem;">Nền tảng tối thượng của Cảm Âm (Relative Pitch), Âm Giai (Scale) và Hợp Âm (Chord)</p>
+                        </div>
+
+                        <!-- MỤC 1: QUÃNG LÀ GÌ -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 24px; border-radius: 20px; border: 2px solid #bfdbfe;">
+                            <h3 style="margin-top: 0; color: #1d4ed8; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                1️⃣ Quãng (Interval) Là Gì?
+                            </h3>
+                            <p style="font-size: 1rem; color: #334155; margin-bottom: 14px;">
+                                <b>Quãng</b> đơn giản là khoảng cách về cao độ giữa hai nốt nhạc, được tính bằng số lượng tên nốt (hoặc số bậc trên khuông nhạc) mà chúng trải dài qua.
+                            </p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #93c5fd; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                                    <h4 style="margin: 0 0 6px 0; color: #0284c7; font-weight: 800;">📈 Quãng Giai Điệu (Melodic Interval)</h4>
+                                    <p style="margin: 0; font-size: 0.92rem; color: #475569;">Hai nốt vang lên <b>lần lượt</b> (nốt này sau nốt kia), tạo thành xương sống của các câu hát bắt tai.</p>
+                                </div>
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #93c5fd; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                                    <h4 style="margin: 0 0 6px 0; color: #7e22ce; font-weight: 800;">🎹 Quãng Hòa Âm (Harmonic Interval)</h4>
+                                    <p style="margin: 0; font-size: 0.92rem; color: #475569;">Hai nốt vang lên <b>cùng một lúc</b>, tạo ra cấu trúc chiều dọc của bản nhạc (chính là hợp âm).</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MỤC 2: TẠI SAO QUÃNG LẠI LÀ BÀI HỌC QUAN TRỌNG NHẤT -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 24px; border-radius: 20px; border: 2px solid #bbf7d0;">
+                            <h3 style="margin-top: 0; color: #15803d; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                2️⃣ Tại Sao Quãng Lại Là Bài Học Quan Trọng Nhất?
+                            </h3>
+                            <p style="font-size: 1rem; color: #166534; margin-bottom: 14px;">
+                                Nếu Âm giai (Scale) là <i>"bảng chữ cái"</i>, thì <b>Quãng chính là ngữ pháp</b> tạo nên mọi thứ trong âm nhạc. Nắm vững Quãng mang lại cho bạn <b>4 siêu năng lực</b>:
+                            </p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px;">
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                    <div style="font-weight: 800; color: #15803d; font-size: 1.02rem; margin-bottom: 4px;">👂 1. Chìa Khóa Cảm Âm (Relative Pitch)</div>
+                                    <div style="font-size: 0.9rem; color: #475569;">Nhạc công chuyên nghiệp không nhớ vẹt từng nốt rời rạc, họ nghe khoảng cách (Quãng). Mở đầu bài hát bằng Quãng 5 Đúng (Star Wars), họ có thể dò giai điệu cực kỳ chuẩn xác!</div>
+                                </div>
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                    <div style="font-weight: 800; color: #15803d; font-size: 1.02rem; margin-bottom: 4px;">⚡ 2. "Hack" Công Thức Hợp Âm</div>
+                                    <div style="font-size: 0.9rem; color: #475569;">Mọi hợp âm đều là các quãng xếp chồng lên nhau. Biết Quãng, bạn tự xếp được mọi hợp âm trên đời không cần học vẹt (VD: Hợp âm trưởng = Nốt gốc + Q3 trưởng + Q5 đúng).</div>
+                                </div>
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                    <div style="font-weight: 800; color: #15803d; font-size: 1.02rem; margin-bottom: 4px;">🎤 3. Tuyệt Chiêu Hát Bè / Đánh Bè</div>
+                                    <div style="font-size: 0.9rem; color: #475569;">Để hát bè hòa quyện, người ta thường hát cao hơn nốt giai điệu chính một khoảng Quãng 3 hoặc Quãng 6.</div>
+                                </div>
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                    <div style="font-weight: 800; color: #15803d; font-size: 1.02rem; margin-bottom: 4px;">🔄 4. Dịch Giọng (Transpose) Siêu Tốc</div>
+                                    <div style="font-size: 0.9rem; color: #475569;">Khi đổi tông bài hát từ Đô sang Rê, các nốt thực tế thay đổi, nhưng Quãng giữa các bậc nốt giữ nguyên. Tư duy Quãng giúp bạn nâng/hạ tông mọi bài hát dễ như trở bàn tay.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- MỤC 3: TAM GIÁC THẦN THÁNH -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fff7ed, #ffedd5); padding: 24px; border-radius: 20px; border: 2px solid #fed7aa;">
+                            <h3 style="margin-top: 0; color: #c2410c; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                3️⃣ Tam Giác Thần Thánh: Interval — Scale — Chord
+                            </h3>
+                            <p style="font-size: 1rem; color: #9a3412; margin-bottom: 14px;">
+                                Để dễ hình dung nhất, hãy tưởng tượng âm nhạc là quá trình xây dựng một ngôi nhà:
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;">
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border-left: 6px solid #f97316; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                                    <b>Cấp độ 1: INTERVAL (Quãng) — "Viên gạch":</b> Đơn vị đo lường nhỏ nhất.
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border-left: 6px solid #eab308; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                                    <b>Cấp độ 2: SCALE (Âm giai) — "Kho vật liệu":</b> Là một chuỗi các Interval xếp nối tiếp theo chiều ngang. Khi chọn một Scale (VD: Đô Trưởng), bạn quy định chỉ được dùng 7 viên gạch cụ thể để xây nhà, 5 viên gạch đen bị loại.
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border-left: 6px solid #a855f7; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                                    <b>Cấp độ 3: CHORD (Hợp âm) — "Bức tường":</b> Là việc bốc các viên gạch (nốt nhạc) từ trong Scale ra, xếp chồng chúng lên nhau theo chiều dọc bằng các Interval nhất định (thường là chồng Quãng 3) và đánh vang lên cùng lúc.
+                                </div>
+                            </div>
+                            <div style="background: #ffedd5; padding: 14px 20px; border-radius: 14px; color: #9a3412; font-weight: 800; font-size: 1rem; text-align: center; border: 1.5px dashed #f97316;">
+                                🎯 TÓM LẠI: Interval kết hợp lại tạo ra Scale ➔ Lấy các nốt trong Scale nối với nhau bằng Interval ➔ Sinh ra Chord!
+                            </div>
+                        </div>
+
+                        <!-- MỤC 4: BẢNG TRA CỨU 12 QUÃNG NỬA CUNG -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 24px; border-radius: 20px; border: 2px solid #fef08a;">
+                            <h3 style="margin-top: 0; color: #a16207; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                4️⃣ Bảng Tra Cứu 12 Quãng Nửa Cung (Chromatic Intervals)
+                            </h3>
+                            <p style="font-size: 1rem; color: #854d0e; margin-bottom: 16px;">
+                                Nằm gọn trong một quãng 8, có 12 quãng riêng biệt đo bằng số lượng nửa cung (half steps). Mỗi độ rộng mang một "tính chất" (Đúng, Trưởng, Thứ, Tăng, Giảm) tạo ra những cảm xúc khác nhau:
+                            </p>
+
+                            <!-- CHROMATIC TABLE -->
+                            <div style="overflow-x: auto;">
+                                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,0.04); font-size: 0.92rem;">
+                                    <thead>
+                                        <tr style="background: linear-gradient(135deg, #0284c7, #0369a1); color: white; text-align: left;">
+                                            <th style="padding: 12px 14px; text-align: center;">Nửa Cung</th>
+                                            <th style="padding: 12px 14px; text-align: center;">Ký Hiệu</th>
+                                            <th style="padding: 12px 14px;">Tên Quãng (Việt - Anh)</th>
+                                            <th style="padding: 12px 14px; text-align: center;">Ví Dụ (từ C)</th>
+                                            <th style="padding: 12px 14px;">Đặc Điểm Âm Thanh</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">0</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">P1</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 1 Đúng (Perfect Unison)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ C</code></td><td style="padding: 10px 14px; color: #475569;">Hoàn toàn đồng âm</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">1</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">m2</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 2 Thứ (Minor 2nd)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ D♭</code></td><td style="padding: 10px 14px; color: #475569;">Căng thẳng, chói tai (Jaws)</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">2</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">M2</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 2 Trưởng (Major 2nd)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ D</code></td><td style="padding: 10px 14px; color: #475569;">Tiến bước nhẹ nhàng</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">3</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">m3</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 3 Thứ (Minor 3rd)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ E♭</code></td><td style="padding: 10px 14px; color: #475569;">Tối tăm, buồn bã</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">4</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">M3</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 3 Trưởng (Major 3rd)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ E</code></td><td style="padding: 10px 14px; color: #475569;">Sáng sủa, vui vẻ</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">5</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">P4</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 4 Đúng (Perfect 4th)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ F</code></td><td style="padding: 10px 14px; color: #475569;">Hào hùng, ổn định (Nhạc Cưới)</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">6</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">A4/d5</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 3 Cung (Tritone)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ F♯</code></td><td style="padding: 10px 14px; color: #475569;">Cực kỳ ma mị, bất ổn</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">7</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">P5</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 5 Đúng (Perfect 5th)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ G</code></td><td style="padding: 10px 14px; color: #475569;">Rộng lớn, uy nghi (Star Wars)</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">8</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">m6</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 6 Thứ (Minor 6th)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ A♭</code></td><td style="padding: 10px 14px; color: #475569;">Trầm ngâm, da diết</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">9</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">M6</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 6 Trưởng (Major 6th)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ A</code></td><td style="padding: 10px 14px; color: #475569;">Lãng mạn, ngọt ngào (My Bonnie)</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">10</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">m7</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 7 Thứ (Minor 7th)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ B♭</code></td><td style="padding: 10px 14px; color: #475569;">Bụi bặm (đậm chất Blues)</td></tr>
+                                        <tr style="border-bottom: 1px solid #f1f5f9; background: #fafafa;"><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">11</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">M7</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 7 Trưởng (Major 7th)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ B</code></td><td style="padding: 10px 14px; color: #475569;">Bay bổng, sang trọng</td></tr>
+                                        <tr><td style="padding: 10px 14px; text-align: center; font-weight: 800; color: #0284c7;">12</td><td style="padding: 10px 14px; text-align: center; font-weight: 800;">P8</td><td style="padding: 10px 14px; font-weight: 800;">Quãng 8 Đúng (Perfect Octave)</td><td style="padding: 10px 14px; text-align: center;"><code>C ➔ c</code></td><td style="padding: 10px 14px; color: #475569;">Trong vắt, hòa quyện</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- MỤC 5: PHƯƠNG PHÁP THỰC HÀNH -->
+                        <div style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 24px; border-radius: 20px; border: 2px solid #e9d5ff;">
+                            <h3 style="margin-top: 0; color: #7e22ce; font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                5️⃣ Phương Pháp Thực Hành (Luyện Tai)
+                            </h3>
+                            <p style="font-size: 1rem; color: #6b21a8; margin-bottom: 14px;">
+                                Cách hiệu quả nhất để nạp âm thanh của các quãng vào não bộ là <b>gắn chúng với các bài hát quen thuộc</b>:
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+                                <div style="background: white; padding: 12px 18px; border-radius: 12px; border: 1.5px solid #d8b4fe;">
+                                    <b>🔔 Quãng 4 Đúng (P4):</b> Nghe giống 2 nốt mở đầu của bản nhạc kèn đám cưới <i>"Here Comes the Bride"</i>.
+                                </div>
+                                <div style="background: white; padding: 12px 18px; border-radius: 12px; border: 1.5px solid #d8b4fe;">
+                                    <b>⚔️ Quãng 5 Đúng (P5):</b> Nghe giống tiếng kèn vang dội mở đầu nhạc phim <i>"Star Wars"</i>.
+                                </div>
+                                <div style="background: white; padding: 12px 18px; border-radius: 12px; border: 1.5px solid #d8b4fe;">
+                                    <b>🕊️ Quãng 6 Trưởng (M6):</b> Nghe giống 2 nốt mở đầu của bài <i>"My Bonnie Lies Over the Ocean"</i>.
+                                </div>
+                            </div>
+                            <p style="margin: 0; font-size: 0.95rem; color: #581c87; font-weight: 600; background: #f3e8ff; padding: 14px; border-radius: 14px; border: 1px dashed #c084fc;">
+                                💡 Hãy tự tạo ra những mối liên hệ này với các bài hát bạn yêu thích. Qua luyện tập, âm thanh của chúng sẽ tự động biến thành phản xạ tự nhiên của bạn (Relative Pitch), giúp bạn nghe thấu mọi cấu trúc bài hát mà không cần nhìn vào sheet nhạc!
+                            </p>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const intervalsTheoryData = [
+                    {
+                        lvlName: '🎼 Level 1 (Dễ — Nền Tảng & Rõ Rệt)',
+                        color: '#0284c7', bg: 'linear-gradient(135deg, #ecfeff, #eff6ff)', border: '#a5f3fc',
+                        items: [
+                            { id: 'P8', name: 'Quãng 8 Đúng (P8 / Octave)', semi: 12, desc: 'Dễ nhất. Nghe y hệt 1 nốt nhạc nhưng độ cao chênh nhau hẳn 1 quãng 8.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC c | [Cc]2 |\nw: Đô4 Đô5 | Octave(P8)' },
+                            { id: 'P5', name: 'Quãng 5 Đúng (P5 / Perfect 5th)', semi: 7, desc: 'Nghe rất oai vệ, vang dội, rỗng (Ví dụ: Nhạc Star Wars).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC G | [CG]2 |\nw: Đô4 Son4 | 5-Đúng(P5)' },
+                            { id: 'P4', name: 'Quãng 4 Đúng (P4 / Perfect 4th)', semi: 5, desc: 'Nghe vươn lên, ổn định (Ví dụ: Nhạc Cưới).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC F | [CF]2 |\nw: Đô4 Pha4 | 4-Đúng(P4)' },
+                            { id: 'M3', name: 'Quãng 3 Trưởng (M3 / Major 3rd)', semi: 4, desc: 'Cảm xúc VUI, tươi sáng, rực rỡ.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC E | [CE]2 |\nw: Đô4 Mi4 | 3-Trưởng(M3)' },
+                            { id: 'm3', name: 'Quãng 3 Thứ (m3 / Minor 3rd)', semi: 3, desc: 'Cảm xúc BUỒN, u trầm, tối.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _E | [C_E]2 |\nw: Đô4 Mi♭4 | 3-Thứ(m3)' }
+                        ]
+                    },
+                    {
+                        lvlName: '🎼 Level 2 (Trung Cấp — Bước Đi & Bay Bổng)',
+                        color: '#a16207', bg: 'linear-gradient(135deg, #fefce8, #fff7ed)', border: '#fef08a',
+                        items: [
+                            { id: 'm2', name: 'Quãng 2 Thứ (m2 / Minor 2nd)', semi: 1, desc: 'Cực kỳ căng thẳng, ma quái (Nhạc phim Cá mập Jaws).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _D | [C_D]2 |\nw: Đô4 Rê♭4 | 2-Thứ(m2)' },
+                            { id: 'M2', name: 'Quãng 2 Trưởng (M2 / Major 2nd)', semi: 2, desc: 'Nghe như bước đi bình thường lên bậc thang (Nốt Đô lên Rê).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC D | [CD]2 |\nw: Đô4 Rê4 | 2-Trưởng(M2)' },
+                            { id: 'M6', name: 'Quãng 6 Trưởng (M6 / Major 6th)', semi: 9, desc: 'Bay bổng rực rỡ (Rất phổ biến trong các bản nhạc Ballad).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC A | [CA]2 |\nw: Đô4 La4 | 6-Trưởng(M6)' },
+                            { id: 'm6', name: 'Quãng 6 Thứ (m6 / Minor 6th)', semi: 8, desc: 'U buồn da diết, đòi hỏi giữ nốt đầu tiên trong đầu.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _A | [C_A]2 |\nw: Đô4 La♭4 | 6-Thứ(m6)' }
+                        ]
+                    },
+                    {
+                        lvlName: '🎼 Level 3 (Khó — Mâu Thuẫn & Căng Thẳng)',
+                        color: '#be123c', bg: 'linear-gradient(135deg, #fff1f2, #fff7ed)', border: '#fecdd3',
+                        items: [
+                            { id: 'M7', name: 'Quãng 7 Trưởng (M7 / Major 7th)', semi: 11, desc: 'Nghe cực kỳ chói, gào thét đòi giải quyết vọt lên Quãng 8.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC B | [CB]2 |\nw: Đô4 Si4 | 7-Trưởng(M7)' },
+                            { id: 'm7', name: 'Quãng 7 Thứ (m7 / Minor 7th)', semi: 10, desc: 'Bụi bặm, lang bạt (Đậm chất Blues / Funk).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _B | [C_B]2 |\nw: Đô4 Si♭4 | 7-Thứ(m7)' },
+                            { id: 'TT', name: 'Quãng 3 Cung / Tritone (A4/d5)', semi: 6, desc: 'Quãng ma mị & bất ổn nhất thế giới âm nhạc (Điềm dữ / Nghi vấn).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC ^F | [C^F]2 |\nw: Đô4 Pha♯4 | Tritone(TT)' }
+                        ]
+                    }
+                ];
+
+                let theoryHTML = subTabHeader + `
+                    <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                        <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Chi Tiết Từng Quãng Âm (Ear Training Intervals)</h3>
+                        
+                        <!-- 21 AUDIO MATERIALS PEDAGOGICAL BANNER -->
+                        <div style="margin: 16px 0 24px 0; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 18px 22px; border-radius: 16px; border: 2px solid #86efac; color: #166534;">
+                            <h4 style="margin: 0 0 8px 0; font-size: 1.12rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                💡 Tư Duy Ma Trận 21 Âm Thanh Nguyên Liệu / Quãng:
+                            </h4>
+                            <p style="margin: 0; font-size: 0.96rem; line-height: 1.6; font-weight: 600; color: #15803d;">
+                                Với <b>7 nốt nhạc cơ bản</b> (Đô, Rê, Mi, Pha, Son, La, Si) làm nốt gốc, khi kết hợp cùng <b>3 hướng nghe</b> (📈 Nghe Lên, 📉 Nghe Xuống, 🎹 Nghe Song Song) ➔ Mỗi Quãng Âm được nạp tổng cộng <b>21 biến thể âm thanh nguyên liệu độc lập</b>! Giúp phát triển phản xạ cảm âm toàn diện.
+                            </p>
+                        </div>
+
+                        <p style="font-size: 1rem; color: #475569;">Dưới đây là định nghĩa, tính chất cảm xúc và khuông nhạc chi tiết của <b>từng Quãng Âm</b> theo 3 Level:</p>
                 `;
 
-                section.items.forEach((item, iIdx) => {
-                    const paperId = `theory-interval-paper-${sIdx}-${iIdx}`;
+                intervalsTheoryData.forEach((section, sIdx) => {
                     theoryHTML += `
-                        <div style="background: white; border-radius: 14px; padding: 18px; border: 1.5px solid ${section.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
-                                <div style="font-weight: 800; color: ${section.color}; font-size: 1.08rem;">🎵 ${item.name}</div>
-                                <button onclick="window.playTheoryIntervalSound(${item.semi})" style="padding: 7px 18px; border-radius: 20px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; font-weight: 800; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
-                                    🔊 Nghe Ví Dụ
-                                </button>
-                            </div>
-                            <div style="color: #475569; font-size: 0.95rem; margin-bottom: 12px; font-weight: 600;">💡 <i>${item.desc}</i></div>
-                            <div id="${paperId}" style="min-height: 120px; background: #fafafa; border-radius: 10px; padding: 8px; border: 1px dashed ${section.border};"></div>
-                        </div>
+                        <div style="margin: 24px 0; background: ${section.bg}; padding: 22px; border-radius: 18px; border: 2px solid ${section.border};">
+                            <h4 style="margin: 0 0 15px 0; color: ${section.color}; font-size: 1.2rem; font-weight: 800;">${section.lvlName}:</h4>
+                            <div style="display: flex; flex-direction: column; gap: 16px;">
                     `;
+
+                    section.items.forEach((item, iIdx) => {
+                        const paperId = `theory-interval-paper-${sIdx}-${iIdx}`;
+                        theoryHTML += `
+                            <div style="background: white; border-radius: 14px; padding: 18px; border: 1.5px solid ${section.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+                                    <div style="font-weight: 800; color: ${section.color}; font-size: 1.08rem;">🎵 ${item.name}</div>
+                                    <button onclick="window.playTheoryIntervalSound(${item.semi})" style="padding: 7px 18px; border-radius: 20px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; font-weight: 800; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+                                        🔊 Nghe Ví Dụ
+                                    </button>
+                                </div>
+                                <div style="color: #475569; font-size: 0.95rem; margin-bottom: 12px; font-weight: 600;">💡 <i>${item.desc}</i></div>
+                                <div id="${paperId}" style="min-height: 120px; background: #fafafa; border-radius: 10px; padding: 8px; border: 1px dashed ${section.border};"></div>
+                            </div>
+                        `;
+                    });
+
+                    theoryHTML += `</div></div>`;
                 });
 
-                theoryHTML += `</div></div>`;
-            });
-
-            theoryHTML += `</div>`;
-            htmlContent = theoryHTML;
+                theoryHTML += `</div>`;
+                htmlContent = theoryHTML;
+            }
         } else if (gameId === 'scale') {
             htmlContent = `
                 <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
