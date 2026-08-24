@@ -81,7 +81,15 @@
         score: 0,
         streak: 0,
         totalPlayed: 0,
-        currentQuestion: null
+        currentQuestion: null,
+        flashcardIndex: 0,
+        flashcardFlipped: false,
+        intervalFlashcardIndex: 0,
+        intervalFlashcardFlipped: false,
+        intervalFlashcardFilter: 'ALL',
+        scaleFlashcardIndex: 0,
+        scaleFlashcardFlipped: false,
+        scaleFlashcardFilter: 'ALL'
     };
 
     // 3. Switch Main Game
@@ -1673,11 +1681,19 @@
         const lvl = window.GameState.level || 1;
         const baseScales = getScalePool(lvl);
         const granularPool = getGranularScaleCards(lvl);
-        if (window.GameState.scaleFlashcardIndex >= granularPool.length) {
+        if (!granularPool || granularPool.length === 0) {
+            cardBody.innerHTML = '<div style="padding: 20px; text-align: center;">Chưa có thẻ flashcard.</div>';
+            return;
+        }
+
+        let idx = window.GameState.scaleFlashcardIndex;
+        if (typeof idx !== 'number' || isNaN(idx) || idx < 0 || idx >= granularPool.length) {
+            idx = 0;
             window.GameState.scaleFlashcardIndex = 0;
         }
 
-        const currentCard = granularPool[window.GameState.scaleFlashcardIndex];
+        const currentCard = granularPool[idx];
+        if (!currentCard) return;
         const currentFilter = window.GameState.scaleFlashcardFilter || 'ALL';
 
         cardBody.innerHTML = `
