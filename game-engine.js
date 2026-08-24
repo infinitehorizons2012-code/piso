@@ -501,63 +501,113 @@
         }
     };
 
-    // --- GAME 3: INTERVAL MATCH ---
-    const INTERVALS = [
-        { name: 'Quãng 1 (Unison)', semi: 0 },
-        { name: 'Quãng 2 Trưởng (Major 2nd)', semi: 2 },
-        { name: 'Quãng 3 Trưởng (Major 3rd)', semi: 4 },
-        { name: 'Quãng 4 Đúng (Perfect 4th)', semi: 5 },
-        { name: 'Quãng 5 Đúng (Perfect 5th)', semi: 7 },
-        { name: 'Quãng 8 (Octave)', semi: 12 }
-    ];
+    // --- GAME 3: INTERVAL MATCH (EAR TRAINING QUÃNG ÂM) ---
+    const INTERVAL_LEVELS = {
+        lvl1: [
+            { id: 'P8', name: 'Quãng 8 Đúng (P8)', semi: 12, desc: 'Giống y hệt 1 nốt, chênh 1 octave', icon: '🌌' },
+            { id: 'P5', name: 'Quãng 5 Đúng (P5)', semi: 7, desc: 'Vang dội, oai vệ (Star Wars)', icon: '⚔️' },
+            { id: 'P4', name: 'Quãng 4 Đúng (P4)', semi: 5, desc: 'Vươn lên, ổn định (Nhạc Cưới)', icon: '🔔' },
+            { id: 'M3', name: 'Quãng 3 Trưởng (M3)', semi: 4, desc: 'Cảm xúc Vui, sáng rực rỡ', icon: '☀️' },
+            { id: 'm3', name: 'Quãng 3 Thứ (m3)', semi: 3, desc: 'Cảm xúc Buồn, u trầm', icon: '🌧️' }
+        ],
+        lvl2: [
+            { id: 'm2', name: 'Quãng 2 Thứ (m2)', semi: 1, desc: 'Căng thẳng, ma quái (Nhạc Jaws)', icon: '🦈' },
+            { id: 'M2', name: 'Quãng 2 Trưởng (M2)', semi: 2, desc: 'Bước đi bậc thang bình thường', icon: '🚶' },
+            { id: 'M6', name: 'Quãng 6 Trưởng (M6)', semi: 9, desc: 'Bay bổng rực rỡ (Ballad)', icon: '🕊️' },
+            { id: 'm6', name: 'Quãng 6 Thứ (m6)', semi: 8, desc: 'U buồn da diết (Ballad)', icon: '🥀' }
+        ],
+        lvl3: [
+            { id: 'M7', name: 'Quãng 7 Trưởng (M7)', semi: 11, desc: 'Chói tai, đòi giải quyết vọt lên P8', icon: '⚡' },
+            { id: 'm7', name: 'Quãng 7 Thứ (m7)', semi: 10, desc: 'Bụi bặm, lang bạt (Blues/Funk)', icon: '🎷' },
+            { id: 'TT', name: 'Quãng 3 Cung (Tritone)', semi: 6, desc: 'Ma mị & bất ổn nhất âm nhạc', icon: '🔮' }
+        ]
+    };
+
+    function getIntervalPool(level) {
+        if (level === 1) return INTERVAL_LEVELS.lvl1;
+        if (level === 2) return [...INTERVAL_LEVELS.lvl1, ...INTERVAL_LEVELS.lvl2];
+        return [...INTERVAL_LEVELS.lvl1, ...INTERVAL_LEVELS.lvl2, ...INTERVAL_LEVELS.lvl3];
+    }
+
+    window.setIntervalMode = function(mode) {
+        window.GameState.intervalMode = mode;
+        renderGameUI();
+    };
 
     function generateIntervalQuestion(cardBody) {
-        const target = INTERVALS[Math.floor(Math.random() * INTERVALS.length)];
-        const rootMidi = 60 + Math.floor(Math.random() * 5);
-        window.GameState.currentQuestion = { target, rootMidi };
+        const lvl = window.GameState.level || 1;
+        const pool = getIntervalPool(lvl);
+        const target = pool[Math.floor(Math.random() * pool.length)];
+        const rootMidi = 60 + Math.floor(Math.random() * 7); // Random C4 to G4 root
+        window.GameState.currentQuestion = { target, rootMidi, pool };
+
+        const mode = window.GameState.intervalMode || 'asc';
+
+        const modeBtnStyle = (m) => mode === m
+            ? 'background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; font-weight: 800; padding: 8px 18px; border-radius: 20px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); cursor: pointer;'
+            : 'background: white; color: #475569; border: 2px solid #cbd5e1; font-weight: 700; padding: 8px 18px; border-radius: 20px; cursor: pointer;';
 
         cardBody.innerHTML = `
             <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎵 Nghe 2 nốt nhạc & xác định Quãng Âm (Interval):</h3>
+                <!-- Playback Mode Switcher -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; padding: 12px; border-radius: 16px; border: 1px solid #e2e8f0;">
+                    <span style="font-weight: 800; color: #334155; font-size: 0.95rem;">🎧 Chế Độ Phát:</span>
+                    <button onclick="window.setIntervalMode('asc')" style="${modeBtnStyle('asc')}">📈 Tăng Dần (Ascending)</button>
+                    <button onclick="window.setIntervalMode('desc')" style="${modeBtnStyle('desc')}">📉 Giảm Dần (Descending)</button>
+                    <button onclick="window.setIntervalMode('harm')" style="${modeBtnStyle('harm')}">🎹 Cùng Lúc (Harmonic)</button>
+                </div>
+
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎵 Luyện Tai Nghe Quãng Âm — Level ${lvl} (${pool.length} Quãng):</h3>
+                <p style="color: #64748b; font-size: 0.95rem; margin-top: -5px;">Nhấn vào nút dưới đây để nghe âm thanh quãng nhạc:</p>
                 
-                <button onclick="window.playIntervalQuestionSound()" style="font-size: 1.15rem; padding: 14px 30px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 15px 0; box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
-                    🔊 Nghe Lại Quãng Âm
+                <button onclick="window.playIntervalQuestionSound()" style="font-size: 1.2rem; padding: 16px 36px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 10px 0 20px 0; box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px) scale(1.03)'" onmouseout="this.style.transform='none'">
+                    🔊 Nghe Quãng Âm
                 </button>
 
-                <div id="game-feedback" style="min-height: 32px; font-weight: 800; font-size: 1.2rem; margin: 15px 0;"></div>
+                <div id="game-feedback" style="min-height: 36px; font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;"></div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 15px;">
-                    ${INTERVALS.map((item, idx) => `
-                        <button onclick="window.checkIntervalAnswer(${idx})" style="padding: 18px; border-radius: 16px; border: 2.5px solid #bfdbfe; background: linear-gradient(135deg, #eff6ff, #dbeafe); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #1d4ed8; box-shadow: 0 4px 12px rgba(59,130,246,0.15); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
-                            ${item.name}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 10px;">
+                    ${pool.map((item) => `
+                        <button onclick="window.checkIntervalAnswer('${item.id}')" style="padding: 16px 14px; border-radius: 16px; border: 2.5px solid #bfdbfe; background: linear-gradient(135deg, #eff6ff, #dbeafe); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #1d4ed8; box-shadow: 0 4px 12px rgba(59,130,246,0.15); transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
+                            <span style="font-size: 1.25rem;">${item.icon} ${item.name}</span>
+                            <span style="font-size: 0.82rem; font-weight: 600; color: #475569;">${item.desc}</span>
                         </button>
                     `).join('')}
                 </div>
             </div>
         `;
-        window.playIntervalQuestionSound();
     }
 
     window.playIntervalQuestionSound = function() {
         const q = window.GameState.currentQuestion;
-        if (q) {
-            playSequence([q.rootMidi, q.rootMidi + q.target.semi], 0.5);
+        if (!q) return;
+
+        const mode = window.GameState.intervalMode || 'asc';
+        const root = q.rootMidi;
+        const targetMidi = root + q.target.semi;
+
+        if (mode === 'asc') {
+            playSequence([root, targetMidi], 0.55);
+        } else if (mode === 'desc') {
+            playSequence([targetMidi, root], 0.55);
+        } else if (mode === 'harm') {
+            playChord([root, targetMidi], 0.7);
         }
     };
 
-    window.checkIntervalAnswer = function(idx) {
+    window.checkIntervalAnswer = function(answerId) {
         const q = window.GameState.currentQuestion;
         const feedback = document.getElementById('game-feedback');
         if (!q || !feedback) return;
 
-        if (INTERVALS[idx].name === q.target.name) {
+        if (answerId === q.target.id) {
             window.GameState.score += 10;
             window.GameState.streak += 1;
-            feedback.innerHTML = `<span style="color: #22c55e;">🎉 Chính xác! Đó là ${q.target.name}</span>`;
-            setTimeout(() => renderGameUI(), 900);
+            feedback.innerHTML = `<span style="color: #22c55e;">🎉 Chính xác! ${q.target.icon} ${q.target.name} (${q.target.desc})</span>`;
+            setTimeout(() => renderGameUI(), 1000);
         } else {
             window.GameState.streak = 0;
-            feedback.innerHTML = `<span style="color: #ef4444;">❌ Chưa đúng! Đáp án là: ${q.target.name}</span>`;
+            feedback.innerHTML = `<span style="color: #ef4444;">❌ Chưa đúng! Đáp án là: ${q.target.icon} ${q.target.name}</span>`;
         }
     };
 
@@ -743,11 +793,25 @@
         } else if (gameId === 'interval') {
             htmlContent = `
                 <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Quãng Âm (Music Intervals)</h3>
-                    <p style="font-size: 1rem; color: #475569;">Quãng âm là khoảng cách giữa 2 nốt nhạc vang lên nối tiếp hoặc cùng lúc:</p>
+                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Quãng Âm (Ear Training Intervals 3 Levels)</h3>
+                    <p style="font-size: 1rem; color: #475569;">Lộ trình luyện tai nghe Quãng Âm chuẩn nhạc viện được thiết kế 3 Level từ dễ đến nâng cao:</p>
                     
-                    <div style="margin: 20px 0; background: linear-gradient(135deg, #faf5ff, #eff6ff); padding: 20px; border-radius: 16px; border: 2px solid #e9d5ff;">
-                        <div id="theory-interval-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #c084fc;"></div>
+                    <!-- LEVEL 1 DEMO -->
+                    <div style="margin: 22px 0; background: linear-gradient(135deg, #ecfeff, #eff6ff); padding: 20px; border-radius: 16px; border: 2px solid #a5f3fc;">
+                        <h4 style="margin: 0 0 10px 0; color: #0284c7; font-size: 1.15rem; font-weight: 800;">🎼 Level 1 (Dễ — Nền Tảng & Rõ Rệt: 5 Quãng P8, P5, P4, M3, m3):</h4>
+                        <div id="theory-interval-lvl1-paper" style="min-height: 140px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #38bdf8;"></div>
+                    </div>
+
+                    <!-- LEVEL 2 DEMO -->
+                    <div style="margin: 22px 0; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 20px; border-radius: 16px; border: 2px solid #fef08a;">
+                        <h4 style="margin: 0 0 10px 0; color: #a16207; font-size: 1.15rem; font-weight: 800;">🎼 Level 2 (Vừa — Bước Đi & Bay Bổng: m2, M2, M6, m6):</h4>
+                        <div id="theory-interval-lvl2-paper" style="min-height: 140px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #facc15;"></div>
+                    </div>
+
+                    <!-- LEVEL 3 DEMO -->
+                    <div style="margin: 22px 0; background: linear-gradient(135deg, #fff1f2, #fff7ed); padding: 20px; border-radius: 16px; border: 2px solid #fecdd3;">
+                        <h4 style="margin: 0 0 10px 0; color: #be123c; font-size: 1.15rem; font-weight: 800;">🎼 Level 3 (Khó — Mâu Thuẫn & Căng Thẳng: M7, m7, Tritone):</h4>
+                        <div id="theory-interval-lvl3-paper" style="min-height: 140px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #fda4af;"></div>
                     </div>
                 </div>
             `;
@@ -798,8 +862,13 @@
             const rhythmAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nc c2 c/2 c/2 c4 |\nw: Nốt_Đen(1phách) Trắng(2phách) Móc_đơn(1/2) Móc_đơn(1/2) Tròn(4phách)`;
             renderTheoryAbcHelper('theory-rhythm-paper', rhythmAbc);
         } else if (gameId === 'interval') {
-            const intervalAbc = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n[CE] [CG] [Cc] |\nw: Quãng_3_Trưởng Quãng_5_Đúng Quãng_8_(Octave)`;
-            renderTheoryAbcHelper('theory-interval-paper', intervalAbc);
+            const intervalLvl1Abc = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n[Cc] [CG] [CF] | [CE] [C_E] |\nw: Quãng_8(P8) Quãng_5(P5) Quãng_4(P4) | 3Trưởng(M3) 3Thứ(m3)`;
+            const intervalLvl2Abc = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n[C_D] [CD] [CA] | [C_A] |\nw: 2Thứ(m2) 2Trưởng(M2) 6Trưởng(M6) | 6Thứ(m6)`;
+            const intervalLvl3Abc = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n[CB] [C_B] [C^F] |\nw: 7Trưởng(M7) 7Thứ(m7) Tritone(A4/d5)`;
+
+            renderTheoryAbcHelper('theory-interval-lvl1-paper', intervalLvl1Abc);
+            renderTheoryAbcHelper('theory-interval-lvl2-paper', intervalLvl2Abc);
+            renderTheoryAbcHelper('theory-interval-lvl3-paper', intervalLvl3Abc);
         } else if (gameId === 'scale') {
             const scaleAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nC D E F | G A B c |\nw: C D E F G A B c`;
             renderTheoryAbcHelper('theory-scale-paper', scaleAbc);
