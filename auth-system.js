@@ -235,10 +235,10 @@
             });
         }
         // Total notes across all levels:
-        // Sol Lvl1 (7), Sol Lvl2 (7), Sol Lvl3 (11) = 25
-        // Fa Lvl1 (7), Fa Lvl2 (7), Fa Lvl3 (8) = 22
-        // Total notes = 47 notes * 6 max pts = 282 max pts
-        const totalMax = 282;
+        // Sol Lvl1 (14), Sol Lvl2 (7), Sol Lvl3 (7) = 28
+        // Fa Lvl1 (14), Fa Lvl2 (7), Fa Lvl3 (7) = 28
+        // Total notes = 56 notes * 6 max pts = 336 max pts
+        const totalMax = 336;
         const percentage = Math.round((totalEarned / totalMax) * 100);
         return { totalEarned, totalMax, percentage };
     };
