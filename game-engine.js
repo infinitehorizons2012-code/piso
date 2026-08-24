@@ -791,30 +791,68 @@
                 </div>
             `;
         } else if (gameId === 'interval') {
-            htmlContent = `
+            const intervalsTheoryData = [
+                {
+                    lvlName: '🎼 Level 1 (Dễ — Nền Tảng & Rõ Rệt)',
+                    color: '#0284c7', bg: 'linear-gradient(135deg, #ecfeff, #eff6ff)', border: '#a5f3fc',
+                    items: [
+                        { id: 'P8', name: 'Quãng 8 Đúng (P8 / Octave)', desc: 'Dễ nhất. Nghe y hệt 1 nốt nhạc nhưng độ cao chênh nhau hẳn 1 quãng 8.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC c | [Cc]2 |\nw: Đô4 Đô5 | Quãng_8(P8)' },
+                        { id: 'P5', name: 'Quãng 5 Đúng (P5 / Perfect 5th)', desc: 'Nghe rất oai vệ, vang dội, rỗng (Ví dụ: Nhạc Star Wars).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC G | [CG]2 |\nw: Đô4 Son4 | Quãng_5(P5)' },
+                        { id: 'P4', name: 'Quãng 4 Đúng (P4 / Perfect 4th)', desc: 'Nghe vươn lên, ổn định (Ví dụ: Nhạc Cưới).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC F | [CF]2 |\nw: Đô4 Pha4 | Quãng_4(P4)' },
+                        { id: 'M3', name: 'Quãng 3 Trưởng (M3 / Major 3rd)', desc: 'Cảm xúc VUI, tươi sáng, rực rỡ.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC E | [CE]2 |\nw: Đô4 Mi4 | Quãng_3_Trưởng(M3)' },
+                        { id: 'm3', name: 'Quãng 3 Thứ (m3 / Minor 3rd)', desc: 'Cảm xúc BUỒN, u trầm, tối.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _E | [C_E]2 |\nw: Đô4 Mi_giáng4 | Quãng_3_Thứ(m3)' }
+                    ]
+                },
+                {
+                    lvlName: '🎼 Level 2 (Trung Cấp — Bước Đi & Bay Bổng)',
+                    color: '#a16207', bg: 'linear-gradient(135deg, #fefce8, #fff7ed)', border: '#fef08a',
+                    items: [
+                        { id: 'm2', name: 'Quãng 2 Thứ (m2 / Minor 2nd)', desc: 'Cực kỳ căng thẳng, ma quái (Nhạc phim Cá mập Jaws).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _D | [C_D]2 |\nw: Đô4 Rê_giáng4 | Quãng_2_Thứ(m2)' },
+                        { id: 'M2', name: 'Quãng 2 Trưởng (M2 / Major 2nd)', desc: 'Nghe như bước đi bình thường lên bậc thang (Nốt Đô lên Rê).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC D | [CD]2 |\nw: Đô4 Rê4 | Quãng_2_Trưởng(M2)' },
+                        { id: 'M6', name: 'Quãng 6 Trưởng (M6 / Major 6th)', desc: 'Bay bổng rực rỡ (Rất phổ biến trong các bản nhạc Ballad).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC A | [CA]2 |\nw: Đô4 La4 | Quãng_6_Trưởng(M6)' },
+                        { id: 'm6', name: 'Quãng 6 Thứ (m6 / Minor 6th)', desc: 'U buồn da diết, đòi hỏi giữ nốt đầu tiên trong đầu.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _A | [C_A]2 |\nw: Đô4 La_giáng4 | Quãng_6_Thứ(m6)' }
+                    ]
+                },
+                {
+                    lvlName: '🎼 Level 3 (Khó — Mâu Thuẫn & Căng Thẳng)',
+                    color: '#be123c', bg: 'linear-gradient(135deg, #fff1f2, #fff7ed)', border: '#fecdd3',
+                    items: [
+                        { id: 'M7', name: 'Quãng 7 Trưởng (M7 / Major 7th)', desc: 'Nghe cực kỳ chói, gào thét đòi giải quyết vọt lên Quãng 8.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC B | [CB]2 |\nw: Đô4 Si4 | Quãng_7_Trưởng(M7)' },
+                        { id: 'm7', name: 'Quãng 7 Thứ (m7 / Minor 7th)', desc: 'Bụi bặm, lang bạt (Đậm chất Blues / Funk).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _B | [C_B]2 |\nw: Đô4 Si_giáng4 | Quãng_7_Thứ(m7)' },
+                        { id: 'TT', name: 'Quãng 3 Cung / Tritone (A4/d5)', desc: 'Quãng ma mị & bất ổn nhất thế giới âm nhạc (Điềm dữ / Nghi vấn).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC ^F | [C^F]2 |\nw: Đô4 Pha_thăng4 | Tritone(A4/d5)' }
+                    ]
+                }
+            ];
+
+            let theoryHTML = `
                 <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Quãng Âm (Ear Training Intervals 3 Levels)</h3>
-                    <p style="font-size: 1rem; color: #475569;">Lộ trình luyện tai nghe Quãng Âm chuẩn nhạc viện được thiết kế 3 Level từ dễ đến nâng cao:</p>
-                    
-                    <!-- LEVEL 1 DEMO -->
-                    <div style="margin: 22px 0; background: linear-gradient(135deg, #ecfeff, #eff6ff); padding: 20px; border-radius: 16px; border: 2px solid #a5f3fc;">
-                        <h4 style="margin: 0 0 10px 0; color: #0284c7; font-size: 1.15rem; font-weight: 800;">🎼 Level 1 (Dễ — Nền Tảng & Rõ Rệt: 5 Quãng P8, P5, P4, M3, m3):</h4>
-                        <div id="theory-interval-lvl1-paper" style="min-height: 140px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #38bdf8;"></div>
-                    </div>
-
-                    <!-- LEVEL 2 DEMO -->
-                    <div style="margin: 22px 0; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 20px; border-radius: 16px; border: 2px solid #fef08a;">
-                        <h4 style="margin: 0 0 10px 0; color: #a16207; font-size: 1.15rem; font-weight: 800;">🎼 Level 2 (Vừa — Bước Đi & Bay Bổng: m2, M2, M6, m6):</h4>
-                        <div id="theory-interval-lvl2-paper" style="min-height: 140px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #facc15;"></div>
-                    </div>
-
-                    <!-- LEVEL 3 DEMO -->
-                    <div style="margin: 22px 0; background: linear-gradient(135deg, #fff1f2, #fff7ed); padding: 20px; border-radius: 16px; border: 2px solid #fecdd3;">
-                        <h4 style="margin: 0 0 10px 0; color: #be123c; font-size: 1.15rem; font-weight: 800;">🎼 Level 3 (Khó — Mâu Thuẫn & Căng Thẳng: M7, m7, Tritone):</h4>
-                        <div id="theory-interval-lvl3-paper" style="min-height: 140px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #fda4af;"></div>
-                    </div>
-                </div>
+                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Chi Tiết Từng Quãng Âm (Ear Training Intervals)</h3>
+                    <p style="font-size: 1rem; color: #475569;">Dưới đây là định nghĩa, tính chất cảm xúc và khuông nhạc chi tiết của <b>từng Quãng Âm</b> theo 3 Level:</p>
             `;
+
+            intervalsTheoryData.forEach((section, sIdx) => {
+                theoryHTML += `
+                    <div style="margin: 24px 0; background: ${section.bg}; padding: 22px; border-radius: 18px; border: 2px solid ${section.border};">
+                        <h4 style="margin: 0 0 15px 0; color: ${section.color}; font-size: 1.2rem; font-weight: 800;">${section.lvlName}:</h4>
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                `;
+
+                section.items.forEach((item, iIdx) => {
+                    const paperId = `theory-interval-paper-${sIdx}-${iIdx}`;
+                    theoryHTML += `
+                        <div style="background: white; border-radius: 14px; padding: 16px; border: 1.5px solid ${section.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+                            <div style="font-weight: 800; color: ${section.color}; font-size: 1.05rem; margin-bottom: 4px;">🎵 ${item.name}</div>
+                            <div style="color: #475569; font-size: 0.95rem; margin-bottom: 10px; font-weight: 600;">💡 <i>${item.desc}</i></div>
+                            <div id="${paperId}" style="min-height: 120px; background: #fafafa; border-radius: 10px; padding: 8px; border: 1px dashed ${section.border};"></div>
+                        </div>
+                    `;
+                });
+
+                theoryHTML += `</div></div>`;
+            });
+
+            theoryHTML += `</div>`;
+            htmlContent = theoryHTML;
         } else if (gameId === 'scale') {
             htmlContent = `
                 <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
@@ -862,13 +900,33 @@
             const rhythmAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nc c2 c/2 c/2 c4 |\nw: Nốt_Đen(1phách) Trắng(2phách) Móc_đơn(1/2) Móc_đơn(1/2) Tròn(4phách)`;
             renderTheoryAbcHelper('theory-rhythm-paper', rhythmAbc);
         } else if (gameId === 'interval') {
-            const intervalLvl1Abc = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n[Cc] [CG] [CF] | [CE] [C_E] |\nw: Quãng_8(P8) Quãng_5(P5) Quãng_4(P4) | 3Trưởng(M3) 3Thứ(m3)`;
-            const intervalLvl2Abc = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n[C_D] [CD] [CA] | [C_A] |\nw: 2Thứ(m2) 2Trưởng(M2) 6Trưởng(M6) | 6Thứ(m6)`;
-            const intervalLvl3Abc = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n[CB] [C_B] [C^F] |\nw: 7Trưởng(M7) 7Thứ(m7) Tritone(A4/d5)`;
+            const intervalsTheoryData = [
+                { items: [
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC c | [Cc]2 |\nw: Đô4 Đô5 | Quãng_8(P8)' },
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC G | [CG]2 |\nw: Đô4 Son4 | Quãng_5(P5)' },
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC F | [CF]2 |\nw: Đô4 Pha4 | Quãng_4(P4)' },
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC E | [CE]2 |\nw: Đô4 Mi4 | Quãng_3_Trưởng(M3)' },
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _E | [C_E]2 |\nw: Đô4 Mi_giáng4 | Quãng_3_Thứ(m3)' }
+                ]},
+                { items: [
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _D | [C_D]2 |\nw: Đô4 Rê_giáng4 | Quãng_2_Thứ(m2)' },
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC D | [CD]2 |\nw: Đô4 Rê4 | Quãng_2_Trưởng(M2)' },
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC A | [CA]2 |\nw: Đô4 La4 | Quãng_6_Trưởng(M6)' },
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _A | [C_A]2 |\nw: Đô4 La_giáng4 | Quãng_6_Thứ(m6)' }
+                ]},
+                { items: [
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC B | [CB]2 |\nw: Đô4 Si4 | Quãng_7_Trưởng(M7)' },
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _B | [C_B]2 |\nw: Đô4 Si_giáng4 | Quãng_7_Thứ(m7)' },
+                    { abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC ^F | [C^F]2 |\nw: Đô4 Pha_thăng4 | Tritone(A4/d5)' }
+                ]}
+            ];
 
-            renderTheoryAbcHelper('theory-interval-lvl1-paper', intervalLvl1Abc);
-            renderTheoryAbcHelper('theory-interval-lvl2-paper', intervalLvl2Abc);
-            renderTheoryAbcHelper('theory-interval-lvl3-paper', intervalLvl3Abc);
+            intervalsTheoryData.forEach((sec, sIdx) => {
+                sec.items.forEach((item, iIdx) => {
+                    const paperId = `theory-interval-paper-${sIdx}-${iIdx}`;
+                    renderTheoryAbcHelper(paperId, item.abc);
+                });
+            });
         } else if (gameId === 'scale') {
             const scaleAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nC D E F | G A B c |\nw: C D E F G A B c`;
             renderTheoryAbcHelper('theory-scale-paper', scaleAbc);
