@@ -921,33 +921,96 @@
     };
 
     // --- GAME 5: CHORD MATCH ---
-    const CHORDS = [
-        { name: 'Hợp Âm Trưởng (Major Triad)', semitones: [0, 4, 7] },
-        { name: 'Hợp Âm Thứ (Minor Triad)', semitones: [0, 3, 7] },
-        { name: 'Hợp Âm Giảm (Diminished)', semitones: [0, 3, 6] },
-        { name: 'Hợp Âm Bảy Trưởng (Major 7th)', semitones: [0, 4, 7, 11] }
-    ];
+    const CHORD_LEVELS = {
+        lvl1: [
+            { id: 'major', icon: '☀️', name: 'Hợp Âm Trưởng (Major Triad)', desc: 'Vui vẻ, sáng sủa, hào hùng', semitones: [0, 4, 7], formula: '1 - 3 - 5', abc: '[C E G]' },
+            { id: 'minor', icon: '🌧️', name: 'Hợp Âm Thứ (Minor Triad)', desc: 'Buồn bã, u uất, tối tăm', semitones: [0, 3, 7], formula: '1 - ♭3 - 5', abc: '[C _E G]' },
+            { id: 'sus4', icon: '🎋', name: 'Hợp Âm Sus4 (Sus4 Triad)', desc: 'Lơ lửng, trung tính, chờ giải quyết', semitones: [0, 5, 7], formula: '1 - 4 - 5', abc: '[C F G]' },
+            { id: 'sus2', icon: '🍃', name: 'Hợp Âm Sus2 (Sus2 Triad)', desc: 'Lơ lửng, nhẹ nhàng, mênh mang', semitones: [0, 2, 7], formula: '1 - 2 - 5', abc: '[C D G]' }
+        ],
+        lvl2: [
+            { id: 'dim', icon: '⚡', name: 'Hợp Âm Giảm (Diminished - dim)', desc: 'Cực kỳ căng thẳng, rùng rợn, giật gân (Kinh dị)', semitones: [0, 3, 6], formula: '1 - ♭3 - ♭5', abc: '[C _E _G]' },
+            { id: 'aug', icon: '🌌', name: 'Hợp Âm Tăng (Augmented - aug)', desc: 'Huyền bí, mộng mơ, lơ lửng giấc mơ', semitones: [0, 4, 8], formula: '1 - 3 - ♯5', abc: '[C E ^G]' },
+            { id: 'dom7', icon: '🎷', name: 'Hợp Âm 7 Át (Dominant 7 - C7)', desc: 'Căng thẳng vừa phải, bụi bặm, lả lướt (Blues/Funk)', semitones: [0, 4, 7, 10], formula: '1 - 3 - 5 - ♭7', abc: '[C E G _B]' },
+            { id: 'maj7', icon: '✨', name: 'Hợp Âm 7 Trưởng (Major 7 - Maj7)', desc: 'Sang trọng, thư thái, bay bổng (Lo-fi / Pop)', semitones: [0, 4, 7, 11], formula: '1 - 3 - 5 - 7', abc: '[C E G B]' }
+        ],
+        lvl3: [
+            { id: 'add9', icon: '💎', name: 'Hợp Âm Add9 (Cadd9)', desc: 'Mở rộng hiện đại, lấp lánh, ngập tràn cảm xúc', semitones: [0, 4, 7, 14], formula: '1 - 3 - 5 - 9', abc: '[C E G d]' },
+            { id: 'm7b5', icon: '🧠', name: 'Hợp Âm Nửa Giảm (m7♭5 / Half-Diminished)', desc: 'Hại não, bí ẩn, da diết đặc trưng Jazz', semitones: [0, 3, 6, 10], formula: '1 - ♭3 - ♭5 - ♭7', abc: '[C _E _G _B]' },
+            { id: 'dim7', icon: '🕸️', name: 'Hợp Âm Giảm 7 (dim7 / Full Diminished 7)', desc: 'Kịch tính tối thượng, mâu thuẫn tột cùng', semitones: [0, 3, 6, 9], formula: '1 - ♭3 - ♭5 - ♭♭7', abc: '[C _E _G A]' },
+            { id: 'inv1', icon: '🔄', name: 'Đảo Thế 1 (1st Inversion - C/E)', desc: 'Nốt Bass ở đáy là Nốt Bậc 3 (Mi ở đáy)', semitones: [4, 7, 12], formula: '3 - 5 - 8', abc: '[E G c]' },
+            { id: 'inv2', icon: '🔀', name: 'Đảo Thế 2 (2nd Inversion - C/G)', desc: 'Nốt Bass ở đáy là Nốt Bậc 5 (Sol ở đáy)', semitones: [7, 12, 16], formula: '5 - 8 - 10', abc: '[G c e]' }
+        ]
+    };
+
+    function getChordPool(level) {
+        if (level === 1) return CHORD_LEVELS.lvl1;
+        if (level === 2) return CHORD_LEVELS.lvl2;
+        return CHORD_LEVELS.lvl3;
+    }
+
+    window.setChordPlaybackMode = function(mode) {
+        window.GameState.chordPlaybackMode = mode;
+        renderGameUI();
+    };
 
     function generateChordQuestion(cardBody) {
-        const target = CHORDS[Math.floor(Math.random() * CHORDS.length)];
-        const NATURAL_ROOTS = [60, 62, 64, 65, 67, 69, 71];
-        const rootMidi = NATURAL_ROOTS[Math.floor(Math.random() * NATURAL_ROOTS.length)];
-        window.GameState.currentQuestion = { target, rootMidi };
+        const lvl = window.GameState.level || 1;
+        const pool = getChordPool(lvl);
+        
+        // Pick target chord from current level pool
+        const target = pool[Math.floor(Math.random() * pool.length)];
+        
+        // Pick random root from 12 CHROMATIC_ROOTS
+        const rootObj = CHROMATIC_ROOTS[Math.floor(Math.random() * CHROMATIC_ROOTS.length)];
+        const rootMidi = rootObj.midi;
+        
+        // Pick 2 distinct distractors from current level pool
+        const distractors = pool.filter(c => c.id !== target.id);
+        const shuffledDistractors = distractors.sort(() => 0.5 - Math.random()).slice(0, 2);
+        
+        // Build 3 choices & shuffle
+        const choices = [target, ...shuffledDistractors].sort(() => 0.5 - Math.random());
+        
+        const mode = window.GameState.chordPlaybackMode || 'block';
+        window.GameState.currentQuestion = { target, rootMidi, rootName: rootObj.name, choices, mode };
+
+        const blockActiveStyle = mode === 'block'
+            ? 'background: linear-gradient(135deg, #a855f7, #9333ea); color: white; border: none; font-weight: 800; padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(168,85,247,0.35); cursor: pointer;'
+            : 'background: white; color: #475569; border: 2px solid #cbd5e1; font-weight: 700; padding: 10px 20px; border-radius: 20px; cursor: pointer;';
+        
+        const arpeggioActiveStyle = mode === 'arpeggio'
+            ? 'background: linear-gradient(135deg, #06b6d4, #0284c7); color: white; border: none; font-weight: 800; padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(6,182,212,0.35); cursor: pointer;'
+            : 'background: white; color: #475569; border: 2px solid #cbd5e1; font-weight: 700; padding: 10px 20px; border-radius: 20px; cursor: pointer;';
 
         cardBody.innerHTML = `
             <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎼 Nghe hòa âm & xác định loại Hợp Âm (Chord):</h3>
+                <!-- Playback Mode Switcher -->
+                <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap;">
+                    <button onclick="window.setChordPlaybackMode('block')" style="${blockActiveStyle}">
+                        🎹 Block Chord (Đập Hòa Âm)
+                    </button>
+                    <button onclick="window.setChordPlaybackMode('arpeggio')" style="${arpeggioActiveStyle}">
+                        🎸 Arpeggio (Rải Từng Nốt)
+                    </button>
+                </div>
+
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">
+                    🎼 Nghe hòa âm (${mode === 'block' ? 'Đập Block Chord' : 'Rải Arpeggio'}) & Chọn 1 trong 3 đáp án:
+                </h3>
                 
-                <button onclick="window.playChordQuestionSound()" style="font-size: 1.15rem; padding: 14px 30px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 15px 0; box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
-                    🔊 Nghe Lại Hợp Âm
-                </button>
+                <div style="display: flex; justify-content: center; gap: 12px; margin: 16px 0; flex-wrap: wrap;">
+                    <button onclick="window.playChordQuestionSound()" style="font-size: 1.1rem; padding: 14px 28px; border-radius: 30px; background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; border: none; cursor: pointer; font-weight: 800; box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+                        🔊 ${mode === 'block' ? '🎹 Phát Block Chord' : '🎸 Phát Rải Arpeggio'}
+                    </button>
+                </div>
 
                 <div id="game-feedback" style="min-height: 32px; font-weight: 800; font-size: 1.2rem; margin: 15px 0;"></div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 15px;">
-                    ${CHORDS.map((item, idx) => `
-                        <button onclick="window.checkChordAnswer(${idx})" style="padding: 18px; border-radius: 16px; border: 2.5px solid #e9d5ff; background: linear-gradient(135deg, #faf5ff, #f3e8ff); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #6b21a8; box-shadow: 0 4px 12px rgba(168,85,247,0.2); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
-                            ${item.name}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 15px;">
+                    ${choices.map((item) => `
+                        <button onclick="window.checkChordAnswer('${item.id}')" style="padding: 18px; border-radius: 16px; border: 2.5px solid #e9d5ff; background: linear-gradient(135deg, #faf5ff, #f3e8ff); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #6b21a8; box-shadow: 0 4px 12px rgba(168,85,247,0.15); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
+                            ${item.icon} ${item.name}
                         </button>
                     `).join('')}
                 </div>
@@ -959,11 +1022,16 @@
         const q = window.GameState.currentQuestion;
         if (q) {
             const chordMidis = q.target.semitones.map(s => q.rootMidi + s);
-            playChord(chordMidis, 1.2);
+            const mode = q.mode || 'block';
+            if (mode === 'block') {
+                playChord(chordMidis, 1.2);
+            } else {
+                playSequence(chordMidis, 0.38);
+            }
         }
     };
 
-    window.checkChordAnswer = function(idx) {
+    window.checkChordAnswer = function(choiceId) {
         const q = window.GameState.currentQuestion;
         const feedback = document.getElementById('game-feedback');
         if (!q || !feedback) return;
@@ -971,26 +1039,54 @@
         const rootName = formatMidiNoteName(q.rootMidi);
         const playedMidis = q.target.semitones.map(s => q.rootMidi + s);
         const notesText = playedMidis.map(m => formatMidiNoteName(m)).join(' - ');
+        const sampleKey = `${q.target.id}_${q.rootMidi}`;
 
-        if (CHORDS[idx].name === q.target.name) {
+        const activeUser = window.getActiveChildUser ? window.getActiveChildUser() : null;
+        const userId = activeUser ? activeUser.id : 'guest';
+        const storageKey = `chord_samples_progress_${userId}`;
+        const userProgress = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        if (!userProgress[sampleKey]) {
+            userProgress[sampleKey] = { stage: 'unseen', score: 0, streak: 0 };
+        }
+
+        if (choiceId === q.target.id) {
             window.GameState.score += 10;
             window.GameState.streak += 1;
+
+            let itemData = userProgress[sampleKey];
+            itemData.streak = (itemData.streak || 0) + 1;
+            if (itemData.streak === 1) {
+                itemData.stage = 'sprout';
+                itemData.score = 1;
+            } else if (itemData.streak === 2) {
+                itemData.stage = 'tree';
+                itemData.score = 3;
+            } else if (itemData.streak >= 3) {
+                itemData.stage = 'flower';
+                itemData.score = 6;
+            }
+            localStorage.setItem(storageKey, JSON.stringify(userProgress));
+
             feedback.innerHTML = `
                 <div style="background: #faf5ff; border: 2px solid #e9d5ff; padding: 14px 18px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(168,85,247,0.15);">
-                    <div style="color: #7e22ce; font-size: 1.2rem; font-weight: 800;">🎉 Chính xác! Bạn nhận biết đúng ${q.target.name}</div>
+                    <div style="color: #7e22ce; font-size: 1.2rem; font-weight: 800;">🎉 Chính xác! ${q.target.icon} ${q.target.name} (${q.target.desc})</div>
                     <div style="margin-top: 6px; font-size: 0.95rem; color: #6b21a8; font-weight: 700;">
-                        🎼 <b>Hợp Âm Gốc:</b> Hợp âm trên nốt ${rootName} &nbsp;|&nbsp; 🎹 <b>Các nốt hòa âm đã chơi:</b> ${notesText}
+                        🎼 <b>Giọng / Nốt Gốc:</b> Hợp âm trên nốt ${rootName} &nbsp;|&nbsp; 🎹 <b>Các nốt hòa âm đã chơi:</b> ${notesText}
                     </div>
                 </div>
             `;
             setTimeout(() => renderGameUI(), 2200);
         } else {
             window.GameState.streak = 0;
+            let itemData = userProgress[sampleKey];
+            itemData.streak = 0;
+            localStorage.setItem(storageKey, JSON.stringify(userProgress));
+
             feedback.innerHTML = `
                 <div style="background: #fef2f2; border: 2px solid #fca5a5; padding: 14px 18px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(239,68,68,0.15);">
-                    <div style="color: #b91c1c; font-size: 1.2rem; font-weight: 800;">❌ Chưa chính xác! Đáp án đúng là: ${q.target.name}</div>
+                    <div style="color: #b91c1c; font-size: 1.2rem; font-weight: 800;">❌ Chưa chính xác! Đáp án đúng là: ${q.target.icon} ${q.target.name}</div>
                     <div style="margin-top: 6px; font-size: 0.95rem; color: #991b1b; font-weight: 700;">
-                        🎼 <b>Hợp Âm Gốc:</b> Hợp âm trên nốt ${rootName} &nbsp;|&nbsp; 🎹 <b>Các nốt hòa âm đã chơi:</b> ${notesText}
+                        🎼 <b>Giọng / Nốt Gốc:</b> Hợp âm trên nốt ${rootName} &nbsp;|&nbsp; 🎹 <b>Các nốt hòa âm đã chơi:</b> ${notesText}
                     </div>
                 </div>
             `;
@@ -1551,12 +1647,76 @@
             }
         } else if (gameId === 'chord') {
             htmlContent = `
-                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Hợp Âm (Chords)</h3>
-                    <p style="font-size: 1rem; color: #475569;">Hợp âm được tạo thành khi vang lên cùng lúc 3 nốt nhạc trở lên:</p>
-                    
-                    <div style="margin: 20px 0; background: linear-gradient(135deg, #fff7ed, #faf5ff); padding: 20px; border-radius: 16px; border: 2px solid #fed7aa;">
-                        <div id="theory-chord-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #fb923c;"></div>
+                <div style="background: white; padding: 32px; border-radius: 24px; border: 2px solid #e2e8f0; line-height: 1.8; color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <!-- HEADER -->
+                    <div style="background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(168,85,247,0.3);">
+                        <span style="background: #fde047; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎓 GIÁO TRÌNH LÝ THUYẾT HỢP ÂM (CHORDS)</span>
+                        <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">Lộ Trình Cảm Nhận Hợp Âm Chuẩn Nhạc Viện (3 Levels)</h2>
+                        <p style="margin: 6px 0 0 0; color: #f3e8ff; font-weight: 600; font-size: 1rem;">Từ cảm xúc nền tảng Trưởng/Thứ đến hợp âm 7, hợp âm mở rộng và đảo thế</p>
+                    </div>
+
+                    <!-- BANNER 2 PLAYBACK MODES -->
+                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
+                        <h4 style="margin: 0 0 8px 0; color: #7e22ce; font-size: 1.15rem; font-weight: 800;">💡 2 Chế Độ Luyện Tai Hợp Âm (Chord Test):</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+                            <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #d8b4fe;">
+                                <b>🎹 Block Chord (Đập Hòa Âm):</b> Đập tất cả các nốt vang lên cùng một lúc ➔ Thử thách tai phân tích màu sắc & không khí hòa âm tổng thể.
+                            </div>
+                            <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #d8b4fe;">
+                                <b>🎸 Arpeggio (Rải Từng Nốt):</b> Rải từng nốt lần lượt từ dưới lên ➔ Giúp tai dễ dàng rà soát từng bậc nốt nhạc.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 1 -->
+                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 22px; border-radius: 18px; border: 2px solid #fef08a;">
+                        <h4 style="margin: 0 0 14px 0; color: #a16207; font-size: 1.2rem; font-weight: 800;">☀️ Level 1 (Người mới bắt đầu): Phân Biệt "Cảm Xúc Nền Tảng" (Basic Triads)</h4>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                <b>☀️ Hợp Âm Trưởng (Major Triad):</b> Cảm xúc Vui vẻ, Sáng sủa, Hào hùng. Cấu trúc: <code>1 - 3 - 5</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                <b>🌧️ Hợp Âm Thứ (Minor Triad):</b> Cảm xúc Buồn bã, U uất, Tối tăm. Cấu trúc: <code>1 - ♭3 - 5</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                <b>🎋 Hợp Âm Sus (Sus2 / Sus4):</b> Cảm xúc Lơ lửng, Trung tính (không vui không buồn), Nghe như đang chờ đợi giải quyết. Cấu trúc Sus4: <code>1 - 4 - 5</code> | Sus2: <code>1 - 2 - 5</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 2 -->
+                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 22px; border-radius: 18px; border: 2px solid #bfdbfe;">
+                        <h4 style="margin: 0 0 14px 0; color: #1d4ed8; font-size: 1.2rem; font-weight: 800;">🌿 Level 2 (Trung cấp): Phân Biệt "Gia Vị & Độ Căng Thẳng" (Color Chords & 7th)</h4>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
+                                <b>⚡ Hợp Âm Giảm (Diminished - dim):</b> Nghe CỰC KỲ căng thẳng, rùng rợn, giật gân (Đặc trưng nhạc phim kinh dị). Cấu trúc: <code>1 - ♭3 - ♭5</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
+                                <b>🌌 Hợp Âm Tăng (Augmented - aug):</b> Nghe huyền bí, mộng mơ, lơ lửng giống như đang trong giấc mơ. Cấu trúc: <code>1 - 3 - ♯5</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
+                                <b>🎷 Hợp Âm 7 Át (Dominant 7 - C7):</b> Nghe căng thẳng vừa phải, bụi bặm, lả lướt (Đặc trưng Blues/Funk). Cấu trúc: <code>1 - 3 - 5 - ♭7</code>
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
+                                <b>✨ Hợp Âm 7 Trưởng (Major 7 - Maj7):</b> Nghe cực kỳ Sang trọng, Thư thái, Bay bổng (Lo-fi, Pop hiện đại). Cấu trúc: <code>1 - 3 - 5 - 7</code>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 3 -->
+                    <div style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
+                        <h4 style="margin: 0 0 14px 0; color: #7e22ce; font-size: 1.2rem; font-weight: 800;">🎷 Level 3 (Cao cấp): Nhạc Jazz Nâng Cao & Đảo Thế (Extended & Inversions)</h4>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                <b>💎 Hợp Âm Mở Rộng (Extended Chords / Add9):</b> Cadd9, 9th, 11th (Nhiều lớp âm thanh xếp chồng phức tạp, lấp lánh).
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                <b>🧠 Hợp Âm Giảm 7 (dim7) vs Nửa Giảm (m7♭5):</b> Hai hợp âm "hại não" nhất trong nhạc lý Cổ điển và Jazz.
+                            </div>
+                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                <b>🔄 Nhận Diện Đảo Thế (Chord Inversions):</b> Đánh hợp âm Đô Trưởng nhưng đảo thế C/E (Đảo 1 - nốt Mi ở đáy) hoặc C/G (Đảo 2 - nốt Sol ở đáy). Nghe phân biệt nốt Bass thấp nhất!
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
@@ -2388,11 +2548,335 @@
         }
     };
 
+    function getGranularChordCards(level) {
+        const pool = getChordPool(level);
+        const cards = [];
+        const filter = window.GameState.chordFlashcardFilter || 'ALL';
+
+        pool.forEach(chord => {
+            if (filter !== 'ALL' && filter !== chord.id) return;
+
+            CHROMATIC_ROOTS.forEach(root => {
+                const sampleKey = `${chord.id}_${root.midi}`;
+                const playedMidis = chord.semitones.map(s => root.midi + s);
+                const notesText = playedMidis.map(m => formatMidiNoteName(m)).join(' - ');
+
+                cards.push({
+                    chordId: chord.id,
+                    chordName: chord.name,
+                    chordIcon: chord.icon,
+                    chordDesc: chord.desc,
+                    chordFormula: chord.formula,
+                    chordAbc: chord.abc,
+                    rootMidi: root.midi,
+                    rootName: root.name,
+                    sampleKey: sampleKey,
+                    playedMidis: playedMidis,
+                    notesText: notesText
+                });
+            });
+        });
+
+        return cards;
+    }
+
+    window.toggleChordFlashcardFlip = function() {
+        window.GameState.chordFlashcardFlipped = !window.GameState.chordFlashcardFlipped;
+        const cardInner = document.getElementById('flashcard-chord-inner');
+        if (cardInner) {
+            if (window.GameState.chordFlashcardFlipped) {
+                cardInner.style.transform = 'rotateY(180deg)';
+            } else {
+                cardInner.style.transform = 'rotateY(0deg)';
+            }
+        }
+    };
+
+    window.nextChordFlashcard = function() {
+        const lvl = window.GameState.level || 1;
+        const pool = getGranularChordCards(lvl);
+        if (pool.length === 0) return;
+        window.GameState.chordFlashcardIndex = (window.GameState.chordFlashcardIndex + 1) % pool.length;
+        window.GameState.chordFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.prevChordFlashcard = function() {
+        const lvl = window.GameState.level || 1;
+        const pool = getGranularChordCards(lvl);
+        if (pool.length === 0) return;
+        window.GameState.chordFlashcardIndex = (window.GameState.chordFlashcardIndex - 1 + pool.length) % pool.length;
+        window.GameState.chordFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.shuffleChordFlashcards = function() {
+        const lvl = window.GameState.level || 1;
+        const pool = getGranularChordCards(lvl);
+        if (pool.length === 0) return;
+        window.GameState.chordFlashcardIndex = Math.floor(Math.random() * pool.length);
+        window.GameState.chordFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.setChordFlashcardFilter = function(filterId) {
+        window.GameState.chordFlashcardFilter = filterId;
+        window.GameState.chordFlashcardIndex = 0;
+        window.GameState.chordFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.playChordFlashcardBlockSound = function() {
+        const lvl = window.GameState.level || 1;
+        const pool = getGranularChordCards(lvl);
+        let idx = window.GameState.chordFlashcardIndex || 0;
+        if (idx >= pool.length) idx = 0;
+        const card = pool[idx];
+        if (card) {
+            playChord(card.playedMidis, 1.2);
+        }
+    };
+
+    window.playChordFlashcardArpeggioSound = function() {
+        const lvl = window.GameState.level || 1;
+        const pool = getGranularChordCards(lvl);
+        let idx = window.GameState.chordFlashcardIndex || 0;
+        if (idx >= pool.length) idx = 0;
+        const card = pool[idx];
+        if (card) {
+            playSequence(card.playedMidis, 0.38);
+        }
+    };
+
+    function renderChordFlashcardsView() {
+        const cardBody = document.getElementById('game-card-body');
+        if (!cardBody) return;
+
+        const lvl = window.GameState.level || 1;
+        const baseChords = getChordPool(lvl);
+        const granularPool = getGranularChordCards(lvl);
+        if (!granularPool || granularPool.length === 0) {
+            cardBody.innerHTML = '<div style="padding: 20px; text-align: center;">Chưa có thẻ flashcard hợp âm.</div>';
+            return;
+        }
+
+        let idx = window.GameState.chordFlashcardIndex;
+        if (typeof idx !== 'number' || isNaN(idx) || idx < 0 || idx >= granularPool.length) {
+            idx = 0;
+            window.GameState.chordFlashcardIndex = 0;
+        }
+
+        const currentCard = granularPool[idx];
+        if (!currentCard) return;
+        const currentFilter = window.GameState.chordFlashcardFilter || 'ALL';
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">🎴 Thẻ Học Hợp Âm Theo 12 Giọng (${granularPool.length} Thẻ Hợp Âm)</h3>
+                
+                <!-- Filter bar -->
+                <div style="display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+                    <button onclick="window.setChordFlashcardFilter('ALL')" style="padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.85rem; cursor: pointer; ${currentFilter === 'ALL' ? 'background: #9333ea; color: white; border: none;' : 'background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;'}">
+                        🌐 Tất Cả Thẻ (${baseChords.length * 12})
+                    </button>
+                    ${baseChords.map(c => `
+                        <button onclick="window.setChordFlashcardFilter('${c.id}')" style="padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.85rem; cursor: pointer; ${currentFilter === c.id ? 'background: #9333ea; color: white; border: none;' : 'background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;'}">
+                            ${c.icon} ${c.name} (12 Thẻ)
+                        </button>
+                    `).join('')}
+                </div>
+
+                <!-- 3D Flashcard -->
+                <div style="perspective: 1000px; max-width: 520px; height: 340px; margin: 0 auto 20px auto;">
+                    <div id="flashcard-chord-inner" onclick="window.toggleChordFlashcardFlip()" style="position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; ${window.GameState.chordFlashcardFlipped ? 'transform: rotateY(180deg);' : ''}">
+                        
+                        <!-- Front Face -->
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #faf5ff, #f3e8ff); border-radius: 24px; border: 3px solid #d8b4fe; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(168,85,247,0.15);">
+                            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="background: #e9d5ff; color: #6b21a8; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">THẺ ${idx + 1} / ${granularPool.length}</span>
+                                <span style="background: #f3e8ff; color: #7e22ce; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">Giọng ${currentCard.rootName}</span>
+                            </div>
+
+                            <div>
+                                <div style="font-size: 3.5rem; margin-bottom: 6px;">${currentCard.chordIcon}</div>
+                                <h3 style="margin: 0; color: #6b21a8; font-size: 1.5rem; font-weight: 800;">Hợp Âm ${currentCard.rootName} ${currentCard.chordName}</h3>
+                                <p style="margin: 6px 0 0 0; color: #7e22ce; font-size: 0.95rem; font-weight: 600;"><i>${currentCard.chordDesc}</i></p>
+                            </div>
+
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="event.stopPropagation(); window.playChordFlashcardBlockSound();" style="background: white; border: 2.5px solid #9333ea; color: #7e22ce; font-weight: 800; padding: 8px 16px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+                                    🔊 🎹 Block Chord
+                                </button>
+                                <button onclick="event.stopPropagation(); window.playChordFlashcardArpeggioSound();" style="background: white; border: 2.5px solid #06b6d4; color: #0891b2; font-weight: 800; padding: 8px 16px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+                                    🔊 🎸 Arpeggio
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Back Face -->
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-radius: 24px; border: 3px solid #86efac; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; align-items: center; transform: rotateY(180deg); box-shadow: 0 10px 25px rgba(34,197,94,0.15);">
+                            <div style="width: 100%; text-align: left;">
+                                <span style="background: #bbf7d0; color: #166534; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">CHI TIẾT NỐT HÒA ÂM</span>
+                            </div>
+
+                            <div style="width: 100%;">
+                                <div style="font-weight: 800; color: #15803d; font-size: 1.15rem; margin-bottom: 6px;">📐 Công Thức: ${currentCard.chordFormula}</div>
+                                <div style="background: white; padding: 12px; border-radius: 12px; border: 1.5px solid #86efac; color: #166534; font-weight: 800; font-size: 1.05rem; line-height: 1.6;">
+                                    🎵 các nốt vang lên:<br/>
+                                    <span style="color: #047857; font-size: 1.15rem;">${currentCard.notesText}</span>
+                                </div>
+                            </div>
+
+                            <div style="display: flex; gap: 10px;">
+                                <button onclick="event.stopPropagation(); window.playChordFlashcardBlockSound();" style="background: white; border: 2.5px solid #16a34a; color: #15803d; font-weight: 800; padding: 8px 16px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+                                    🔊 🎹 Block Chord
+                                </button>
+                                <button onclick="event.stopPropagation(); window.playChordFlashcardArpeggioSound();" style="background: white; border: 2.5px solid #06b6d4; color: #0891b2; font-weight: 800; padding: 8px 16px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+                                    🔊 🎸 Arpeggio
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Bar -->
+                <div style="display: flex; gap: 12px; justify-content: center; align-items: center; max-width: 520px; margin: 0 auto; flex-wrap: wrap;">
+                    <button onclick="window.prevChordFlashcard()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #334155; border: 2px solid #cbd5e1; cursor: pointer; transition: all 0.2s; flex: 1; min-width: 100px;">⬅️ Thẻ Trước</button>
+                    <button onclick="window.toggleChordFlashcardFlip()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #facc15, #eab308); color: #431407; border: 2px solid #fde047; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(250,204,21,0.3); flex: 1; min-width: 100px;">🔄 Lật Thẻ</button>
+                    <button onclick="window.shuffleChordFlashcards()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #a855f7, #9333ea); color: white; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(168,85,247,0.3); flex: 1; min-width: 100px;">🔀 Ngẫu Nhiên</button>
+                    <button onclick="window.nextChordFlashcard()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(2,132,199,0.3); flex: 1; min-width: 100px;">➡️ Thẻ Tiếp</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderChordProgressReportView() {
+        const cardBody = document.getElementById('game-card-body');
+        if (!cardBody) return;
+
+        const lvl = window.GameState.level || 1;
+        const pool = getChordPool(lvl);
+        const activeUser = window.getActiveChildUser ? window.getActiveChildUser() : null;
+        const userNameStr = activeUser ? activeUser.childName : 'Bé (Chưa đăng nhập)';
+        const userId = activeUser ? activeUser.id : 'guest';
+        const storageKey = `chord_samples_progress_${userId}`;
+        const userProgress = JSON.parse(localStorage.getItem(storageKey) || '{}');
+
+        const MAX_PER_CHORD = 12 * 6; // 72pt
+        const totalMax = pool.length * MAX_PER_CHORD;
+        let totalEarned = 0;
+
+        let chordCardsHTML = pool.map(chord => {
+            let chordEarned = 0;
+
+            let microCardsHTML = CHROMATIC_ROOTS.map(root => {
+                const sampleKey = `${chord.id}_${root.midi}`;
+                const p = userProgress[sampleKey] || { stage: 'unseen', score: 0, streak: 0 };
+                chordEarned += (p.score || 0);
+
+                let stageIcon = '⚪';
+                let stageBadgeStyle = 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1;';
+
+                if (p.stage === 'sprout') {
+                    stageIcon = '🌿';
+                    stageBadgeStyle = 'background: #dcfce7; color: #15803d; border: 1px solid #86efac;';
+                } else if (p.stage === 'tree') {
+                    stageIcon = '🌳';
+                    stageBadgeStyle = 'background: #bbf7d0; color: #166534; border: 1.5px solid #4ade80; font-weight: 800;';
+                } else if (p.stage === 'flower') {
+                    stageIcon = '🌸';
+                    stageBadgeStyle = 'background: #fce7f3; color: #be185d; border: 2px solid #f472b6; font-weight: 800; box-shadow: 0 2px 8px rgba(244,114,182,0.3);';
+                }
+
+                return `
+                    <div style="background: white; border-radius: 12px; border: 1.5px solid #e2e8f0; padding: 10px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.03);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span style="font-size: 1.1rem;">${stageIcon}</span>
+                            <span style="font-size: 0.72rem; font-weight: 800; padding: 2px 6px; border-radius: 8px; ${stageBadgeStyle}">${p.score || 0}/6pt</span>
+                        </div>
+                        <div style="font-weight: 800; color: #1e293b; font-size: 0.85rem;">Giọng ${root.name}</div>
+                    </div>
+                `;
+            }).join('');
+
+            const chordPercentage = Math.round((chordEarned / MAX_PER_CHORD) * 100);
+
+            return `
+                <div style="margin-bottom: 24px; background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 20px; border-radius: 20px; border: 2px solid #e9d5ff; box-shadow: 0 6px 16px rgba(0,0,0,0.03);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+                        <div>
+                            <h4 style="margin: 0; color: #6b21a8; font-size: 1.2rem; font-weight: 800;">${chord.icon} ${chord.name} (12 Giọng Chromatic)</h4>
+                            <p style="margin: 2px 0 0 0; color: #7e22ce; font-size: 0.88rem; font-weight: 600;">Tích lũy: <b>${chordEarned} / ${MAX_PER_CHORD} pt</b> (Mỗi giọng đạt hoa 🌸 = 6pt)</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-weight: 800; color: #9333ea; font-size: 1.25rem;">${chordPercentage}% Tiết Độ</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar for this Chord -->
+                    <div style="width: 100%; height: 12px; background: #e9d5ff; border-radius: 8px; overflow: hidden; margin-bottom: 16px;">
+                        <div style="width: ${chordPercentage}%; height: 100%; background: linear-gradient(90deg, #c084fc, #9333ea); border-radius: 8px; transition: width 0.5s;"></div>
+                    </div>
+
+                    <!-- 12 Micro Cards Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px;">
+                        ${microCardsHTML}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        totalEarned = 0;
+        pool.forEach(chord => {
+            CHROMATIC_ROOTS.forEach(root => {
+                const sampleKey = `${chord.id}_${root.midi}`;
+                const p = userProgress[sampleKey] || { score: 0 };
+                totalEarned += (p.score || 0);
+            });
+        });
+
+        const percentage = totalMax > 0 ? Math.round((totalEarned / totalMax) * 100) : 0;
+        const lvlTitle = lvl === 1 ? 'Level 1 (4 Hợp Âm × 12 Giọng = 48 Mẫu)' : (lvl === 2 ? 'Level 2 (4 Hợp Âm × 12 Giọng = 48 Mẫu)' : 'Level 3 (5 Hợp Âm × 12 Giọng = 60 Mẫu)');
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 24px; border: 2px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <!-- MASTER HEADER BANNER -->
+                <div style="background: linear-gradient(135deg, #9333ea, #7e22ce); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(147,51,234,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <span style="background: #fde047; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">📊 BÁO CÁO TIẾN ĐỘ THẺ HỌC HỢP ÂM (CHORD MATCH)</span>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.6rem; font-weight: 800;">Hành Trình Cảm Âm Hợp Âm — ${userNameStr}</h2>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #fde047;">${percentage}%</div>
+                            <div style="font-size: 0.9rem; color: #f3e8ff; font-weight: 700;">Tiến Độ ${lvlTitle}</div>
+                        </div>
+                    </div>
+
+                    <!-- Master Progress Bar -->
+                    <div style="width: 100%; height: 20px; background: rgba(255,255,255,0.2); border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.3); margin-bottom: 12px;">
+                        <div style="width: ${percentage}%; height: 100%; background: linear-gradient(90deg, #facc15, #4ade80); border-radius: 12px; transition: width 0.6s;"></div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #f3e8ff; font-weight: 700;">
+                        <span>Tích lũy: ${totalEarned} / ${totalMax} pt</span>
+                        <span>${pool.length * 12} Thẻ Học Hợp Âm</span>
+                    </div>
+                </div>
+
+                <!-- Sections for each chord -->
+                ${chordCardsHTML}
+            </div>
+        `;
+    }
+
     function renderFlashcardView() {
         if (window.GameState.activeGame === 'interval') {
             renderIntervalFlashcardsView();
         } else if (window.GameState.activeGame === 'scale') {
             renderScaleFlashcardsView();
+        } else if (window.GameState.activeGame === 'chord') {
+            renderChordFlashcardsView();
         } else {
             renderNoteFlashcardsView();
         }
@@ -2404,6 +2888,8 @@
             renderIntervalProgressReportView();
         } else if (window.GameState.activeGame === 'scale') {
             renderScaleProgressReportView();
+        } else if (window.GameState.activeGame === 'chord') {
+            renderChordProgressReportView();
         } else {
             renderNoteProgressReportView();
         }
