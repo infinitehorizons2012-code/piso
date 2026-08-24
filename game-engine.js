@@ -616,6 +616,15 @@
         }
     };
 
+    function formatMidiNoteName(midi) {
+        const names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+        const viNames = ['Đô', 'Đô♯', 'Rê', 'Rê♯', 'Mi', 'Pha', 'Pha♯', 'Son', 'Son♯', 'La', 'La♯', 'Si'];
+        const note = names[midi % 12];
+        const vi = viNames[midi % 12];
+        const octave = Math.floor(midi / 12) - 1;
+        return `${vi}${octave} (${note}${octave})`;
+    }
+
     window.checkIntervalAnswer = function(answerId) {
         const q = window.GameState.currentQuestion;
         const feedback = document.getElementById('game-feedback');
@@ -635,7 +644,19 @@
             userProgress[sampleKey] = { score: 0, streak: 0, stage: 'seed' };
         }
 
-        if (answerId === q.target.id) {
+        const rootName = formatMidiNoteName(q.rootMidi);
+        const targetNoteName = formatMidiNoteName(q.rootMidi + q.target.semi);
+        let notesText = '';
+        if (mode === 'asc') {
+            notesText = `${rootName} ➔ ${targetNoteName}`;
+        } else if (mode === 'desc') {
+            notesText = `${targetNoteName} ➔ ${rootName}`;
+        } else {
+            notesText = `${rootName} & ${targetNoteName}`;
+        }
+
+        const isCorrect = (answerId === q.target.id);
+        if (isCorrect) {
             window.GameState.score += 10;
             window.GameState.streak += 1;
 
@@ -653,19 +674,33 @@
             }
             localStorage.setItem(storageKey, JSON.stringify(userProgress));
 
-            feedback.innerHTML = `<span style="color: #22c55e;">🎉 Chính xác! ${q.target.icon} ${q.target.name} (${q.target.desc})</span>`;
-            setTimeout(() => renderGameUI(), 1000);
+            feedback.innerHTML = `
+                <div style="background: #f0fdf4; border: 2px solid #86efac; padding: 14px 18px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(34,197,94,0.15);">
+                    <div style="color: #15803d; font-size: 1.2rem; font-weight: 800;">🎉 Chính xác! ${q.target.icon} ${q.target.name} (${q.target.desc})</div>
+                    <div style="margin-top: 6px; font-size: 0.95rem; color: #166534; font-weight: 700;">
+                        🎼 <b>Giọng / Nốt Gốc:</b> ${rootName} &nbsp;|&nbsp; 🎵 <b>Các nốt đã chơi:</b> ${notesText}
+                    </div>
+                </div>
+            `;
+            setTimeout(() => renderGameUI(), 2200);
         } else {
             window.GameState.streak = 0;
             let itemData = userProgress[sampleKey];
             itemData.streak = 0;
             localStorage.setItem(storageKey, JSON.stringify(userProgress));
 
-            feedback.innerHTML = `<span style="color: #ef4444;">❌ Chưa đúng! Đáp án là: ${q.target.icon} ${q.target.name}</span>`;
+            feedback.innerHTML = `
+                <div style="background: #fef2f2; border: 2px solid #fca5a5; padding: 14px 18px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(239,68,68,0.15);">
+                    <div style="color: #b91c1c; font-size: 1.2rem; font-weight: 800;">❌ Chưa đúng! Đáp án là: ${q.target.icon} ${q.target.name}</div>
+                    <div style="margin-top: 6px; font-size: 0.95rem; color: #991b1b; font-weight: 700;">
+                        🎼 <b>Giọng / Nốt Gốc:</b> ${rootName} &nbsp;|&nbsp; 🎵 <b>Các nốt đã chơi:</b> ${notesText}
+                    </div>
+                </div>
+            `;
         }
     };
 
-    // --- GAME 4: SCALE MATCH (3 LEVELS + 2 PLAYBACK MODES: SCALE RUN & MELODY/LICK + 3 MULTIPLE CHOICE) ---
+    // --- GAME 4: SCALE MATCH ---
     const SCALE_LEVELS = {
         lvl1: [
             { id: 'major', icon: '☀️', name: 'Âm Giai Trưởng (Major Scale)', desc: 'Vui vẻ, sáng sủa, hào hùng, trọn vẹn', intervals: [0, 2, 4, 5, 7, 9, 11, 12] },
@@ -702,7 +737,6 @@
 
         const target = pool[Math.floor(Math.random() * pool.length)];
 
-        // Select 2 wrong distractors to form exactly 3 multiple choice options
         let otherScales = pool.filter(x => x.id !== target.id);
         if (otherScales.length < 2) {
             otherScales = allPool.filter(x => x.id !== target.id);
@@ -713,7 +747,7 @@
 
         const NATURAL_ROOTS = [60, 62, 64, 65, 67, 69, 71];
         const rootMidi = NATURAL_ROOTS[Math.floor(Math.random() * NATURAL_ROOTS.length)];
-        const mode = window.GameState.scalePlaybackMode || 'run'; // 'run' (Scale Run) or 'lick' (Melody/Lick)
+        const mode = window.GameState.scalePlaybackMode || 'run';
 
         window.GameState.currentQuestion = { target, rootMidi, mode, options };
 
@@ -777,14 +811,43 @@
         const feedback = document.getElementById('game-feedback');
         if (!q || !feedback) return;
 
+        const rootName = formatMidiNoteName(q.rootMidi);
+        const mode = q.mode || 'run';
+        
+        let playedMidis = [];
+        if (mode === 'run') {
+            playedMidis = q.target.intervals.map(i => q.rootMidi + i);
+        } else if (mode === 'lick') {
+            const intervals = q.target.intervals;
+            const root = q.rootMidi;
+            const lickIndices = [0, 2, 4, 3, 5, 4, 0].map(idx => idx % intervals.length);
+            playedMidis = lickIndices.map(i => root + intervals[i]);
+        }
+
+        const notesText = playedMidis.map(m => formatMidiNoteName(m)).join(' - ');
+
         if (answerId === q.target.id) {
             window.GameState.score += 10;
             window.GameState.streak += 1;
-            feedback.innerHTML = `<span style="color: #22c55e;">🎉 Chính xác! ${q.target.icon} ${q.target.name} (${q.target.desc})</span>`;
-            setTimeout(() => renderGameUI(), 1000);
+            feedback.innerHTML = `
+                <div style="background: #fefce8; border: 2px solid #fde047; padding: 14px 18px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(234,179,8,0.15);">
+                    <div style="color: #a16207; font-size: 1.2rem; font-weight: 800;">🎉 Chính xác! ${q.target.icon} ${q.target.name} (${q.target.desc})</div>
+                    <div style="margin-top: 6px; font-size: 0.95rem; color: #854d0e; font-weight: 700;">
+                        🎼 <b>Giọng / Tông:</b> Giọng ${rootName} &nbsp;|&nbsp; 🎶 <b>Chuỗi nốt đã phát (${mode === 'run' ? 'Scale Run' : 'Lick Giai Điệu'}):</b><br/>${notesText}
+                    </div>
+                </div>
+            `;
+            setTimeout(() => renderGameUI(), 2500);
         } else {
             window.GameState.streak = 0;
-            feedback.innerHTML = `<span style="color: #ef4444;">❌ Chưa đúng! Đáp án là: ${q.target.icon} ${q.target.name}</span>`;
+            feedback.innerHTML = `
+                <div style="background: #fef2f2; border: 2px solid #fca5a5; padding: 14px 18px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(239,68,68,0.15);">
+                    <div style="color: #b91c1c; font-size: 1.2rem; font-weight: 800;">❌ Chưa đúng! Đáp án đúng là: ${q.target.icon} ${q.target.name}</div>
+                    <div style="margin-top: 6px; font-size: 0.95rem; color: #991b1b; font-weight: 700;">
+                        🎼 <b>Giọng / Tông:</b> Giọng ${rootName} &nbsp;|&nbsp; 🎶 <b>Chuỗi nốt đã phát (${mode === 'run' ? 'Scale Run' : 'Lick Giai Điệu'}):</b><br/>${notesText}
+                    </div>
+                </div>
+            `;
         }
     };
 
@@ -798,7 +861,8 @@
 
     function generateChordQuestion(cardBody) {
         const target = CHORDS[Math.floor(Math.random() * CHORDS.length)];
-        const rootMidi = 60;
+        const NATURAL_ROOTS = [60, 62, 64, 65, 67, 69, 71];
+        const rootMidi = NATURAL_ROOTS[Math.floor(Math.random() * NATURAL_ROOTS.length)];
         window.GameState.currentQuestion = { target, rootMidi };
 
         cardBody.innerHTML = `
@@ -836,14 +900,32 @@
         const feedback = document.getElementById('game-feedback');
         if (!q || !feedback) return;
 
+        const rootName = formatMidiNoteName(q.rootMidi);
+        const playedMidis = q.target.semitones.map(s => q.rootMidi + s);
+        const notesText = playedMidis.map(m => formatMidiNoteName(m)).join(' - ');
+
         if (CHORDS[idx].name === q.target.name) {
             window.GameState.score += 10;
             window.GameState.streak += 1;
-            feedback.innerHTML = `<span style="color: #22c55e;">🎉 Chính xác! Bạn nhận biết đúng ${q.target.name}</span>`;
-            setTimeout(() => renderGameUI(), 900);
+            feedback.innerHTML = `
+                <div style="background: #faf5ff; border: 2px solid #e9d5ff; padding: 14px 18px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(168,85,247,0.15);">
+                    <div style="color: #7e22ce; font-size: 1.2rem; font-weight: 800;">🎉 Chính xác! Bạn nhận biết đúng ${q.target.name}</div>
+                    <div style="margin-top: 6px; font-size: 0.95rem; color: #6b21a8; font-weight: 700;">
+                        🎼 <b>Hợp Âm Gốc:</b> Hợp âm trên nốt ${rootName} &nbsp;|&nbsp; 🎹 <b>Các nốt hòa âm đã chơi:</b> ${notesText}
+                    </div>
+                </div>
+            `;
+            setTimeout(() => renderGameUI(), 2200);
         } else {
             window.GameState.streak = 0;
-            feedback.innerHTML = `<span style="color: #ef4444;">❌ Chưa chính xác! Đáp án đúng là: ${q.target.name}</span>`;
+            feedback.innerHTML = `
+                <div style="background: #fef2f2; border: 2px solid #fca5a5; padding: 14px 18px; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 14px rgba(239,68,68,0.15);">
+                    <div style="color: #b91c1c; font-size: 1.2rem; font-weight: 800;">❌ Chưa chính xác! Đáp án đúng là: ${q.target.name}</div>
+                    <div style="margin-top: 6px; font-size: 0.95rem; color: #991b1b; font-weight: 700;">
+                        🎼 <b>Hợp Âm Gốc:</b> Hợp âm trên nốt ${rootName} &nbsp;|&nbsp; 🎹 <b>Các nốt hòa âm đã chơi:</b> ${notesText}
+                    </div>
+                </div>
+            `;
         }
     };
 
