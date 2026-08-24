@@ -526,8 +526,8 @@
 
     function getIntervalPool(level) {
         if (level === 1) return INTERVAL_LEVELS.lvl1;
-        if (level === 2) return [...INTERVAL_LEVELS.lvl1, ...INTERVAL_LEVELS.lvl2];
-        return [...INTERVAL_LEVELS.lvl1, ...INTERVAL_LEVELS.lvl2, ...INTERVAL_LEVELS.lvl3];
+        if (level === 2) return INTERVAL_LEVELS.lvl2;
+        return INTERVAL_LEVELS.lvl3;
     }
 
     window.setIntervalMode = function(mode) {
