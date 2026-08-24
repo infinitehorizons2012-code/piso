@@ -39,8 +39,8 @@
             <button class="dropdown-item" onclick="window.selectGame('scale')">🎹 Scale Match (Cảm Âm Âm Giai)</button>
             <button class="dropdown-item" onclick="window.selectGame('chord')">🎼 Chord Match (Cảm Âm Hợp Âm)</button>
           </div>
-        </div>
-
+        <!-- USER PROFILE HEADER SLOT -->
+        <div id="user-profile-header-slot"></div>
       </nav>
     </header>
 
@@ -822,13 +822,121 @@ z2 z2 [Fc]2 z2 |</pre>
     </div>
     <!-- END TRANSPOSE KEY MODAL -->
 
-    <!-- Global functions export for onclick handlers -->
+    <!-- AUTH MODAL DIALOG -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+      <div class="theory-modal-container" style="max-width: 440px; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+        <div class="modal-header" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0; font-size: 1.3rem; color: white; font-weight: 800;" id="auth-modal-title">👤 Đăng Nhập Tài Khoản Bé</h3>
+          <button onclick="window.closeAuthModal()" style="background: white; border: none; color: #1d4ed8; font-size: 0.95rem; cursor: pointer; padding: 6px 14px; border-radius: 20px; font-weight: bold;">✕ Đóng</button>
+        </div>
+        
+        <div class="modal-body" style="padding: 25px; background: #ffffff;">
+          <div id="auth-feedback" style="min-height: 24px; font-weight: bold; font-size: 0.95rem; margin-bottom: 15px; text-align: center;"></div>
+          
+          <!-- LOGIN FORM -->
+          <div id="auth-form-login">
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; font-weight: 800; color: #334155; margin-bottom: 6px; font-size: 0.95rem;">Tên Đăng Nhập:</label>
+              <input type="text" id="login-username" placeholder="Nhập tên đăng nhập..." style="width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #cbd5e1; outline: none; font-size: 1rem; box-sizing: border-box;" />
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-weight: 800; color: #334155; margin-bottom: 6px; font-size: 0.95rem;">Mật Khẩu:</label>
+              <input type="password" id="login-password" placeholder="Nhập mật khẩu..." style="width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #cbd5e1; outline: none; font-size: 1rem; box-sizing: border-box;" />
+            </div>
+            <button onclick="window.handleLoginSubmit()" style="width: 100%; padding: 14px; border-radius: 16px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; font-weight: 800; font-size: 1.05rem; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(59,130,246,0.35);">🔑 Đăng Nhập</button>
+            
+            <p style="text-align: center; margin-top: 18px; color: #64748b; font-size: 0.95rem;">
+              Chưa có tài khoản cho bé? <a href="#" onclick="window.switchAuthTab('register'); return false;" style="color: #2563eb; font-weight: 800; text-decoration: underline;">Đăng ký mới ngay</a>
+            </p>
+          </div>
+
+          <!-- REGISTER FORM -->
+          <div id="auth-form-register" style="display: none;">
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; font-weight: 800; color: #334155; margin-bottom: 6px; font-size: 0.95rem;">Tên Bé (Hiển thị trên bảng thành tích):</label>
+              <input type="text" id="reg-childname" placeholder="Ví dụ: Búp Băng, Bảo An..." style="width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #cbd5e1; outline: none; font-size: 1rem; box-sizing: border-box;" />
+            </div>
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; font-weight: 800; color: #334155; margin-bottom: 6px; font-size: 0.95rem;">Tên Đăng Nhập:</label>
+              <input type="text" id="reg-username" placeholder="Nhập tên tài khoản không dấu..." style="width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #cbd5e1; outline: none; font-size: 1rem; box-sizing: border-box;" />
+            </div>
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; font-weight: 800; color: #334155; margin-bottom: 6px; font-size: 0.95rem;">Mật Khẩu:</label>
+              <input type="password" id="reg-password" placeholder="Tạo mật khẩu..." style="width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #cbd5e1; outline: none; font-size: 1rem; box-sizing: border-box;" />
+            </div>
+            <button onclick="window.handleRegisterSubmit()" style="width: 100%; padding: 14px; border-radius: 16px; background: linear-gradient(135deg, #10b981, #059669); color: white; font-weight: 800; font-size: 1.05rem; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.35);">🎉 Đăng Ký Tài Khoản</button>
+            
+            <p style="text-align: center; margin-top: 18px; color: #64748b; font-size: 0.95rem;">
+              Đã có tài khoản? <a href="#" onclick="window.switchAuthTab('login'); return false;" style="color: #2563eb; font-weight: 800; text-decoration: underline;">Đăng nhập tại đây</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auth System Script -->
+    <script type="module" src="./auth-system.js"></script>
     <script>
-       // We will attach global handlers in main.js
+      window.openAuthModal = function() {
+        const modal = document.getElementById('auth-modal');
+        if (modal) {
+          modal.style.display = 'flex';
+          modal.classList.add('show');
+        }
+      };
+      window.closeAuthModal = function() {
+        const modal = document.getElementById('auth-modal');
+        if (modal) {
+          modal.style.display = 'none';
+          modal.classList.remove('show');
+        }
+      };
+      window.switchAuthTab = function(type) {
+        const loginForm = document.getElementById('auth-form-login');
+        const regForm = document.getElementById('auth-form-register');
+        const title = document.getElementById('auth-modal-title');
+        const fb = document.getElementById('auth-feedback');
+        if (fb) fb.innerHTML = '';
+
+        if (type === 'register') {
+          if (loginForm) loginForm.style.display = 'none';
+          if (regForm) regForm.style.display = 'block';
+          if (title) title.innerText = '🎉 Đăng Ký Tài Khoản Cho Bé';
+        } else {
+          if (regForm) regForm.style.display = 'none';
+          if (loginForm) loginForm.style.display = 'block';
+          if (title) title.innerText = '👤 Đăng Nhập Tài Khoản Bé';
+        }
+      };
+      window.handleLoginSubmit = function() {
+        const u = document.getElementById('login-username').value;
+        const p = document.getElementById('login-password').value;
+        const fb = document.getElementById('auth-feedback');
+        const res = window.loginChildAccount(u, p);
+        if (res.success) {
+          if (fb) fb.innerHTML = `<span style="color: #22c55e;">${res.message}</span>`;
+          setTimeout(() => window.closeAuthModal(), 600);
+        } else {
+          if (fb) fb.innerHTML = `<span style="color: #ef4444;">${res.message}</span>`;
+        }
+      };
+      window.handleRegisterSubmit = function() {
+        const name = document.getElementById('reg-childname').value;
+        const u = document.getElementById('reg-username').value;
+        const p = document.getElementById('reg-password').value;
+        const fb = document.getElementById('auth-feedback');
+        const res = window.registerChildAccount(u, p, name);
+        if (res.success) {
+          if (fb) fb.innerHTML = `<span style="color: #22c55e;">${res.message}</span>`;
+          setTimeout(() => window.closeAuthModal(), 800);
+        } else {
+          if (fb) fb.innerHTML = `<span style="color: #ef4444;">${res.message}</span>`;
+        }
+      };
     </script>
-  <!-- Game Engine Script -->
-  <script type="module" src="./game-engine.js"></script>
-  <!-- Main Script -->
-  <script type="module" src="/main.js"></script>
+    <!-- Game Engine Script -->
+    <script type="module" src="./game-engine.js"></script>
+    <!-- Main Script -->
+    <script type="module" src="/main.js"></script>
   </body>
 </html>

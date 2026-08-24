@@ -161,6 +161,8 @@
             renderGameTheory(g.activeGame);
         } else if (g.activeSubTab === 'flashcard') {
             renderFlashcardView();
+        } else if (g.activeSubTab === 'report') {
+            renderProgressReportView();
         } else {
             generateNextQuestion();
         }
@@ -198,12 +200,14 @@
                 <button onclick="window.switchGameSubTab('fa')" style="${activeTab === 'fa' ? activeStyle : inactiveStyle}">𝄢 Test Khóa Fa</button>
                 <button onclick="window.switchGameSubTab('theory')" style="${activeTab === 'theory' ? activeStyle : inactiveStyle}">📖 Lý Thuyết</button>
                 <button onclick="window.switchGameSubTab('flashcard')" style="${activeTab === 'flashcard' ? activeStyle : inactiveStyle}">🎴 Flashcard Nốt Nhạc</button>
+                <button onclick="window.switchGameSubTab('report')" style="${activeTab === 'report' ? activeStyle : inactiveStyle}">📊 Báo Cáo Tiến Độ</button>
             `;
         } else {
             return `
                 <button onclick="window.switchGameSubTab('test')" style="${activeTab === 'test' ? activeStyle : inactiveStyle}">🎮 Làm Bài Test</button>
                 <button onclick="window.switchGameSubTab('theory')" style="${activeTab === 'theory' ? activeStyle : inactiveStyle}">📖 Lý Thuyết</button>
                 <button onclick="window.switchGameSubTab('flashcard')" style="${activeTab === 'flashcard' ? activeStyle : inactiveStyle}">🎴 Flashcard Nốt Nhạc</button>
+                <button onclick="window.switchGameSubTab('report')" style="${activeTab === 'report' ? activeStyle : inactiveStyle}">📊 Báo Cáo Tiến Độ</button>
             `;
         }
     }
@@ -338,6 +342,7 @@
     function generateLedgerQuestion(cardBody) {
         const isTreble = window.GameState.activeSubTab === 'sol';
         const lvl = window.GameState.level;
+        const clefKey = isTreble ? 'sol' : 'fa';
 
         let pool = isTreble 
             ? (lvl === 1 ? TREBLE_NOTES_LVL1 : (lvl === 2 ? TREBLE_NOTES_LVL2 : TREBLE_NOTES_LVL3))
@@ -345,6 +350,11 @@
 
         const target = pool[Math.floor(Math.random() * pool.length)];
         window.GameState.currentQuestion = target;
+
+        // Record seed encounter
+        if (window.recordNoteTestResult) {
+            window.recordNoteTestResult(clefKey, lvl, target, false);
+        }
 
         const options3 = generate3Options(target.noteOnly);
         const clefStr = isTreble ? 'treble' : 'bass';
@@ -407,7 +417,17 @@
         const feedback = document.getElementById('game-feedback');
         if (!q || !feedback) return;
 
-        if (answer === q.noteOnly) {
+        const isTreble = window.GameState.activeSubTab === 'sol';
+        const lvl = window.GameState.level;
+        const clefKey = isTreble ? 'sol' : 'fa';
+        const isCorrect = (answer === q.noteOnly);
+
+        // Record progress & update note stage
+        if (window.recordNoteTestResult) {
+            window.recordNoteTestResult(clefKey, lvl, q, isCorrect);
+        }
+
+        if (isCorrect) {
             window.GameState.score += 10;
             window.GameState.streak += 1;
             feedback.innerHTML = `<span style="color: #22c55e;">🎉 Chính xác! Đó là nốt ${q.name}</span>`;
@@ -918,5 +938,132 @@
             playNoteByName(currentNote.abc, 0.6);
         }
     };
+
+    // --- 7. VISUAL COMPREHENSIVE PROGRESS REPORT DASHBOARD ---
+    function renderProgressReportView() {
+        const cardBody = document.getElementById('game-card-body');
+        if (!cardBody) return;
+
+        const master = window.getMasterProgress ? window.getMasterProgress() : { totalEarned: 0, totalMax: 282, percentage: 0 };
+        const activeUser = window.getActiveChildUser ? window.getActiveChildUser() : null;
+        const userNameStr = activeUser ? activeUser.childName : 'Bé (Chưa đăng nhập)';
+
+        // Sections configuration
+        const sections = [
+            { id: 'sol-1', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 1, lvlTitle: 'Level 1 (Dễ - Trong khuông)', pool: TREBLE_NOTES_LVL1, bg: 'linear-gradient(135deg, #fff1f2, #fff7ed)', border: '#fecdd3', text: '#be123c' },
+            { id: 'sol-2', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 2, lvlTitle: 'Level 2 (Vừa - Nốt thường)', pool: TREBLE_NOTES_LVL2, bg: 'linear-gradient(135deg, #fefce8, #fff7ed)', border: '#fef08a', text: '#a16207' },
+            { id: 'sol-3', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 3, lvlTitle: 'Level 3 (Khó - Dòng kẻ phụ)', pool: TREBLE_NOTES_LVL3, bg: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', border: '#e9d5ff', text: '#7e22ce' },
+            { id: 'fa-1',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 1, lvlTitle: 'Level 1 (Dễ - Trong khuông)', pool: BASS_NOTES_LVL1,   bg: 'linear-gradient(135deg, #eff6ff, #dbeafe)', border: '#bfdbfe', text: '#1d4ed8' },
+            { id: 'fa-2',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 2, lvlTitle: 'Level 2 (Vừa - Dòng kẻ phụ trên)', pool: BASS_NOTES_LVL2,   bg: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', border: '#bbf7d0', text: '#15803d' },
+            { id: 'fa-3',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 3, lvlTitle: 'Level 3 (Khó - Phẩy đôi & cao)', pool: BASS_NOTES_LVL3,   bg: 'linear-gradient(135deg, #fff7ed, #ffedd5)', border: '#fed7aa', text: '#c2410c' }
+        ];
+
+        let sectionsHTML = '';
+
+        sections.forEach(sec => {
+            const progress = window.getClefLevelProgress ? window.getClefLevelProgress(sec.clef, sec.lvl, sec.pool) : { earnedPoints: 0, maxPoints: sec.pool.length * 6, percentage: 0 };
+            
+            let notesGridHTML = sec.pool.map(note => {
+                const p = window.getNoteProgress ? window.getNoteProgress(sec.clef, sec.lvl, note.abc) : { stage: 'unseen', score: 0, streak: 0 };
+                
+                let stageIcon = '⚪';
+                let stageName = 'Chưa học';
+                let stageBadgeStyle = 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1;';
+
+                if (p.stage === 'seed') {
+                    stageIcon = '🌱';
+                    stageName = 'Hạt (0pt)';
+                    stageBadgeStyle = 'background: #fef3c7; color: #b45309; border: 1px solid #fde047;';
+                } else if (p.stage === 'sprout') {
+                    stageIcon = '🌿';
+                    stageName = 'Mầm (1pt)';
+                    stageBadgeStyle = 'background: #dcfce7; color: #15803d; border: 1px solid #86efac;';
+                } else if (p.stage === 'tree') {
+                    stageIcon = '🌳';
+                    stageName = 'Cây (3pt)';
+                    stageBadgeStyle = 'background: #bbf7d0; color: #166534; border: 1.5px solid #4ade80; font-weight: 800;';
+                } else if (p.stage === 'flower') {
+                    stageIcon = '🌸';
+                    stageName = 'Hoa (6pt)';
+                    stageBadgeStyle = 'background: #fce7f3; color: #be185d; border: 2px solid #f472b6; font-weight: 800; box-shadow: 0 2px 8px rgba(244,114,182,0.3);';
+                }
+
+                return `
+                    <div style="background: white; border-radius: 16px; border: 2px solid #e2e8f0; padding: 14px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 1.4rem;">${stageIcon}</span>
+                            <span style="font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 10px; ${stageBadgeStyle}">${stageName}</span>
+                        </div>
+                        
+                        <div>
+                            <h4 style="margin: 4px 0; color: #1e293b; font-size: 1.2rem; font-weight: 800;">${note.name}</h4>
+                            <code style="background: #f8fafc; color: #475569; padding: 2px 8px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #e2e8f0;">ABC: ${note.abc}</code>
+                        </div>
+
+                        <div style="margin-top: 10px; font-size: 0.85rem; font-weight: 800; color: #0284c7; background: #f0f9ff; padding: 4px; border-radius: 8px;">
+                            ${p.score} / 6 điểm
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            sectionsHTML += `
+                <div style="margin-bottom: 28px; background: ${sec.bg}; padding: 24px; border-radius: 20px; border: 2.5px solid ${sec.border}; box-shadow: 0 8px 20px rgba(0,0,0,0.04);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <h4 style="margin: 0; color: ${sec.text}; font-size: 1.2rem; font-weight: 800;">${sec.clefTitle} — ${sec.lvlTitle}</h4>
+                            <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.9rem; font-weight: 700;">Gồm ${sec.pool.length} nốt • Tích lũy: <b>${progress.earnedPoints} / ${progress.maxPoints} điểm</b></p>
+                        </div>
+                        <div style="text-align: right; min-width: 140px;">
+                            <span style="font-weight: 800; color: ${sec.text}; font-size: 1.3rem;">${progress.percentage}% Tiến Độ</span>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div style="width: 100%; height: 16px; background: rgba(255,255,255,0.8); border-radius: 10px; overflow: hidden; border: 1.5px solid ${sec.border}; margin-bottom: 20px;">
+                        <div style="width: ${progress.percentage}%; height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 10px; transition: width 0.5s;"></div>
+                    </div>
+
+                    <!-- Note Cards Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px;">
+                        ${notesGridHTML}
+                    </div>
+                </div>
+            `;
+        });
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 24px; border: 2px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <!-- MASTER HEADER BANNER -->
+                <div style="background: linear-gradient(135deg, #1e293b, #0f172a); color: white; padding: 24px; border-radius: 20px; margin-bottom: 30px; box-shadow: 0 10px 25px rgba(15,23,42,0.25);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <span style="background: #facc15; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">📊 BÁO CÁO TIẾN ĐỘ TRỰC QUAN</span>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.6rem; font-weight: 800;">Hành Trình Trồng Cây Nốt Nhạc — ${userNameStr}</h2>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #38bdf8;">${master.percentage}%</div>
+                            <div style="font-size: 0.9rem; color: #94a3b8; font-weight: 700;">Tổng Tiến Độ Hệ Thống</div>
+                        </div>
+                    </div>
+
+                    <!-- Master Progress Bar -->
+                    <div style="width: 100%; height: 20px; background: rgba(255,255,255,0.15); border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.25); margin-bottom: 12px;">
+                        <div style="width: ${master.percentage}%; height: 100%; background: linear-gradient(90deg, #facc15, #10b981); border-radius: 12px; transition: width 0.6s;"></div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #cbd5e1; font-weight: 700;">
+                        <span>🏆 Tổng Điểm Tích Lũy: <b style="color: #fde047;">${master.totalEarned} / ${master.totalMax} pt</b></span>
+                        <span>🌱 Hạt (0pt) ➔ 🌿 Mầm (1pt) ➔ 🌳 Cây (3pt) ➔ 🌸 Hoa (6pt)</span>
+                    </div>
+                </div>
+
+                <!-- ALL 6 SECTIONS COMPREHENSIVE VIEW -->
+                <div>
+                    ${sectionsHTML}
+                </div>
+            </div>
+        `;
+    }
 
 })();
