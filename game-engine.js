@@ -729,6 +729,11 @@
         }
     };
 
+    window.playTheoryIntervalSound = function(semi) {
+        const rootMidi = 60; // C4
+        playSequence([rootMidi, rootMidi + semi], 0.55);
+    };
+
     // --- GAME THEORY RENDERER WITH SHEET MUSIC DEMOS ---
     function renderGameTheory(gameId) {
         const cardBody = document.getElementById('game-card-body');
@@ -740,7 +745,7 @@
             htmlContent = `
                 <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
                     <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">📖 Lý Thuyết Dòng Kẻ Phụ & Tên Nốt Nhạc (Theo Level)</h3>
-                    <p style="font-size: 1rem; color: #475569;">Dưới đây là vị trí và tên gọi từng nốt nhạc trên <b>Khóa Sol (3 Level)</b> và <b>Khóa Fa</b>:</p>
+                    <p style="font-size: 1rem; color: #475569;">Dưới đây là vị trí và tên gọi từng nốt nhạc trên <b>Khóa Sol (3 Level)</b> và <b>Khóa Fa (3 Level)</b>:</p>
                     
                     <!-- DEMO 1: KHÓA SOL LEVEL 1 -->
                     <div style="margin: 22px 0; background: linear-gradient(135deg, #fff1f2, #fff7ed); padding: 20px; border-radius: 16px; border: 2px solid #fecdd3;">
@@ -796,30 +801,30 @@
                     lvlName: '🎼 Level 1 (Dễ — Nền Tảng & Rõ Rệt)',
                     color: '#0284c7', bg: 'linear-gradient(135deg, #ecfeff, #eff6ff)', border: '#a5f3fc',
                     items: [
-                        { id: 'P8', name: 'Quãng 8 Đúng (P8 / Octave)', desc: 'Dễ nhất. Nghe y hệt 1 nốt nhạc nhưng độ cao chênh nhau hẳn 1 quãng 8.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC c | [Cc]2 |\nw: Đô4 Đô5 | Quãng_8(P8)' },
-                        { id: 'P5', name: 'Quãng 5 Đúng (P5 / Perfect 5th)', desc: 'Nghe rất oai vệ, vang dội, rỗng (Ví dụ: Nhạc Star Wars).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC G | [CG]2 |\nw: Đô4 Son4 | Quãng_5(P5)' },
-                        { id: 'P4', name: 'Quãng 4 Đúng (P4 / Perfect 4th)', desc: 'Nghe vươn lên, ổn định (Ví dụ: Nhạc Cưới).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC F | [CF]2 |\nw: Đô4 Pha4 | Quãng_4(P4)' },
-                        { id: 'M3', name: 'Quãng 3 Trưởng (M3 / Major 3rd)', desc: 'Cảm xúc VUI, tươi sáng, rực rỡ.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC E | [CE]2 |\nw: Đô4 Mi4 | Quãng_3_Trưởng(M3)' },
-                        { id: 'm3', name: 'Quãng 3 Thứ (m3 / Minor 3rd)', desc: 'Cảm xúc BUỒN, u trầm, tối.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _E | [C_E]2 |\nw: Đô4 Mi_giáng4 | Quãng_3_Thứ(m3)' }
+                        { id: 'P8', name: 'Quãng 8 Đúng (P8 / Octave)', semi: 12, desc: 'Dễ nhất. Nghe y hệt 1 nốt nhạc nhưng độ cao chênh nhau hẳn 1 quãng 8.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC c | [Cc]2 |\nw: Đô4 Đô5 | Octave(P8)' },
+                        { id: 'P5', name: 'Quãng 5 Đúng (P5 / Perfect 5th)', semi: 7, desc: 'Nghe rất oai vệ, vang dội, rỗng (Ví dụ: Nhạc Star Wars).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC G | [CG]2 |\nw: Đô4 Son4 | 5-Đúng(P5)' },
+                        { id: 'P4', name: 'Quãng 4 Đúng (P4 / Perfect 4th)', semi: 5, desc: 'Nghe vươn lên, ổn định (Ví dụ: Nhạc Cưới).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC F | [CF]2 |\nw: Đô4 Pha4 | 4-Đúng(P4)' },
+                        { id: 'M3', name: 'Quãng 3 Trưởng (M3 / Major 3rd)', semi: 4, desc: 'Cảm xúc VUI, tươi sáng, rực rỡ.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC E | [CE]2 |\nw: Đô4 Mi4 | 3-Trưởng(M3)' },
+                        { id: 'm3', name: 'Quãng 3 Thứ (m3 / Minor 3rd)', semi: 3, desc: 'Cảm xúc BUỒN, u trầm, tối.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _E | [C_E]2 |\nw: Đô4 Mi♭4 | 3-Thứ(m3)' }
                     ]
                 },
                 {
                     lvlName: '🎼 Level 2 (Trung Cấp — Bước Đi & Bay Bổng)',
                     color: '#a16207', bg: 'linear-gradient(135deg, #fefce8, #fff7ed)', border: '#fef08a',
                     items: [
-                        { id: 'm2', name: 'Quãng 2 Thứ (m2 / Minor 2nd)', desc: 'Cực kỳ căng thẳng, ma quái (Nhạc phim Cá mập Jaws).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _D | [C_D]2 |\nw: Đô4 Rê_giáng4 | Quãng_2_Thứ(m2)' },
-                        { id: 'M2', name: 'Quãng 2 Trưởng (M2 / Major 2nd)', desc: 'Nghe như bước đi bình thường lên bậc thang (Nốt Đô lên Rê).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC D | [CD]2 |\nw: Đô4 Rê4 | Quãng_2_Trưởng(M2)' },
-                        { id: 'M6', name: 'Quãng 6 Trưởng (M6 / Major 6th)', desc: 'Bay bổng rực rỡ (Rất phổ biến trong các bản nhạc Ballad).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC A | [CA]2 |\nw: Đô4 La4 | Quãng_6_Trưởng(M6)' },
-                        { id: 'm6', name: 'Quãng 6 Thứ (m6 / Minor 6th)', desc: 'U buồn da diết, đòi hỏi giữ nốt đầu tiên trong đầu.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _A | [C_A]2 |\nw: Đô4 La_giáng4 | Quãng_6_Thứ(m6)' }
+                        { id: 'm2', name: 'Quãng 2 Thứ (m2 / Minor 2nd)', semi: 1, desc: 'Cực kỳ căng thẳng, ma quái (Nhạc phim Cá mập Jaws).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _D | [C_D]2 |\nw: Đô4 Rê♭4 | 2-Thứ(m2)' },
+                        { id: 'M2', name: 'Quãng 2 Trưởng (M2 / Major 2nd)', semi: 2, desc: 'Nghe như bước đi bình thường lên bậc thang (Nốt Đô lên Rê).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC D | [CD]2 |\nw: Đô4 Rê4 | 2-Trưởng(M2)' },
+                        { id: 'M6', name: 'Quãng 6 Trưởng (M6 / Major 6th)', semi: 9, desc: 'Bay bổng rực rỡ (Rất phổ biến trong các bản nhạc Ballad).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC A | [CA]2 |\nw: Đô4 La4 | 6-Trưởng(M6)' },
+                        { id: 'm6', name: 'Quãng 6 Thứ (m6 / Minor 6th)', semi: 8, desc: 'U buồn da diết, đòi hỏi giữ nốt đầu tiên trong đầu.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _A | [C_A]2 |\nw: Đô4 La♭4 | 6-Thứ(m6)' }
                     ]
                 },
                 {
                     lvlName: '🎼 Level 3 (Khó — Mâu Thuẫn & Căng Thẳng)',
                     color: '#be123c', bg: 'linear-gradient(135deg, #fff1f2, #fff7ed)', border: '#fecdd3',
                     items: [
-                        { id: 'M7', name: 'Quãng 7 Trưởng (M7 / Major 7th)', desc: 'Nghe cực kỳ chói, gào thét đòi giải quyết vọt lên Quãng 8.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC B | [CB]2 |\nw: Đô4 Si4 | Quãng_7_Trưởng(M7)' },
-                        { id: 'm7', name: 'Quãng 7 Thứ (m7 / Minor 7th)', desc: 'Bụi bặm, lang bạt (Đậm chất Blues / Funk).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _B | [C_B]2 |\nw: Đô4 Si_giáng4 | Quãng_7_Thứ(m7)' },
-                        { id: 'TT', name: 'Quãng 3 Cung / Tritone (A4/d5)', desc: 'Quãng ma mị & bất ổn nhất thế giới âm nhạc (Điềm dữ / Nghi vấn).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC ^F | [C^F]2 |\nw: Đô4 Pha_thăng4 | Tritone(A4/d5)' }
+                        { id: 'M7', name: 'Quãng 7 Trưởng (M7 / Major 7th)', semi: 11, desc: 'Nghe cực kỳ chói, gào thét đòi giải quyết vọt lên Quãng 8.', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC B | [CB]2 |\nw: Đô4 Si4 | 7-Trưởng(M7)' },
+                        { id: 'm7', name: 'Quãng 7 Thứ (m7 / Minor 7th)', semi: 10, desc: 'Bụi bặm, lang bạt (Đậm chất Blues / Funk).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC _B | [C_B]2 |\nw: Đô4 Si♭4 | 7-Thứ(m7)' },
+                        { id: 'TT', name: 'Quãng 3 Cung / Tritone (A4/d5)', semi: 6, desc: 'Quãng ma mị & bất ổn nhất thế giới âm nhạc (Điềm dữ / Nghi vấn).', abc: 'X:1\nM:4/4\nL:1/2\nK:C clef=treble\nC ^F | [C^F]2 |\nw: Đô4 Pha♯4 | Tritone(TT)' }
                     ]
                 }
             ];
@@ -840,9 +845,14 @@
                 section.items.forEach((item, iIdx) => {
                     const paperId = `theory-interval-paper-${sIdx}-${iIdx}`;
                     theoryHTML += `
-                        <div style="background: white; border-radius: 14px; padding: 16px; border: 1.5px solid ${section.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
-                            <div style="font-weight: 800; color: ${section.color}; font-size: 1.05rem; margin-bottom: 4px;">🎵 ${item.name}</div>
-                            <div style="color: #475569; font-size: 0.95rem; margin-bottom: 10px; font-weight: 600;">💡 <i>${item.desc}</i></div>
+                        <div style="background: white; border-radius: 14px; padding: 18px; border: 1.5px solid ${section.border}; box-shadow: 0 4px 12px rgba(0,0,0,0.04);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+                                <div style="font-weight: 800; color: ${section.color}; font-size: 1.08rem;">🎵 ${item.name}</div>
+                                <button onclick="window.playTheoryIntervalSound(${item.semi})" style="padding: 7px 18px; border-radius: 20px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; font-weight: 800; font-size: 0.88rem; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(6, 182, 212, 0.35); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+                                    🔊 Nghe Ví Dụ
+                                </button>
+                            </div>
+                            <div style="color: #475569; font-size: 0.95rem; margin-bottom: 12px; font-weight: 600;">💡 <i>${item.desc}</i></div>
                             <div id="${paperId}" style="min-height: 120px; background: #fafafa; border-radius: 10px; padding: 8px; border: 1px dashed ${section.border};"></div>
                         </div>
                     `;
