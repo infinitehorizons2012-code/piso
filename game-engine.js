@@ -203,10 +203,11 @@
                 <button onclick="window.switchGameSubTab('report')" style="${activeTab === 'report' ? activeStyle : inactiveStyle}">📊 Báo Cáo Tiến Độ</button>
             `;
         } else {
+            const flashcardLabel = gameId === 'interval' ? '🎴 Flashcard Quãng Âm' : '🎴 Flashcard';
             return `
                 <button onclick="window.switchGameSubTab('test')" style="${activeTab === 'test' ? activeStyle : inactiveStyle}">🎮 Làm Bài Test</button>
                 <button onclick="window.switchGameSubTab('theory')" style="${activeTab === 'theory' ? activeStyle : inactiveStyle}">📖 Lý Thuyết</button>
-                <button onclick="window.switchGameSubTab('flashcard')" style="${activeTab === 'flashcard' ? activeStyle : inactiveStyle}">🎴 Flashcard Nốt Nhạc</button>
+                <button onclick="window.switchGameSubTab('flashcard')" style="${activeTab === 'flashcard' ? activeStyle : inactiveStyle}">${flashcardLabel}</button>
                 <button onclick="window.switchGameSubTab('report')" style="${activeTab === 'report' ? activeStyle : inactiveStyle}">📊 Báo Cáo Tiến Độ</button>
             `;
         }
@@ -980,6 +981,24 @@
     window.GameState.flashcardClef = 'sol'; // 'sol' or 'fa'
     window.GameState.flashcardIndex = 0;
     window.GameState.flashcardFlipped = false;
+    window.GameState.intervalFlashcardIndex = 0;
+    window.GameState.intervalFlashcardRoot = 60; // C4
+    window.GameState.intervalFlashcardFlipped = false;
+
+    const INTERVAL_DETAILS = {
+        'P8': { semi: 12, formula: '12 Nửa cung (6 Cung / 1 Octave)', song: 'Nhạc giao hưởng / Giống nốt gốc', abc: 'C c | [Cc]2 |' },
+        'P5': { semi: 7, formula: '7 Nửa cung (3.5 Cung)', song: 'Star Wars Theme, Superman Theme', abc: 'C G | [CG]2 |' },
+        'P4': { semi: 5, formula: '5 Nửa cung (2.5 Cung)', song: 'Nhạc Cưới (Here Comes the Bride)', abc: 'C F | [CF]2 |' },
+        'M3': { semi: 4, formula: '4 Nửa cung (2 Cung)', song: 'Tiếng Chuông Đồng Đồng, Nhạc Vui', abc: 'C E | [CE]2 |' },
+        'm3': { semi: 3, formula: '3 Nửa cung (1.5 Cung)', song: 'Greensleeves, Nhạc Buồn', abc: 'C _E | [C_E]2 |' },
+        'm2': { semi: 1, formula: '1 Nửa cung (0.5 Cung)', song: 'Nhạc phim Jaws (Cá mập)', abc: 'C _D | [C_D]2 |' },
+        'M2': { semi: 2, formula: '2 Nửa cung (1 Cung)', song: 'Bước đi bậc thang (Đô lên Rê)', abc: 'C D | [CD]2 |' },
+        'M6': { semi: 9, formula: '9 Nửa cung (4.5 Cung)', song: 'Nhạc Ballad bay bổng, My Bonnie', abc: 'C A | [CA]2 |' },
+        'm6': { semi: 8, formula: '8 Nửa cung (4 Cung)', song: 'Ballad hoài niệm, Love Story', abc: 'C _A | [C_A]2 |' },
+        'M7': { semi: 11, formula: '11 Nửa cung (5.5 Cung)', song: 'Take On Me, Nhạc Jazz chói', abc: 'C B | [CB]2 |' },
+        'm7': { semi: 10, formula: '10 Nửa cung (5 Cung)', song: 'Nhạc Blues / Funk bụi bặm', abc: 'C _B | [C_B]2 |' },
+        'TT': { semi: 6, formula: '6 Nửa cung (3 Cung / Tritone)', song: 'Nhạc Phim The Simpsons, Quãng ma mị', abc: 'C ^F | [C^F]2 |' }
+    };
 
     window.toggleFlashcardFlip = function() {
         window.GameState.flashcardFlipped = !window.GameState.flashcardFlipped;
@@ -993,10 +1012,27 @@
         }
     };
 
+    window.toggleIntervalFlashcardFlip = function() {
+        window.GameState.intervalFlashcardFlipped = !window.GameState.intervalFlashcardFlipped;
+        const cardInner = document.getElementById('flashcard-interval-inner');
+        if (cardInner) {
+            if (window.GameState.intervalFlashcardFlipped) {
+                cardInner.style.transform = 'rotateY(180deg)';
+            } else {
+                cardInner.style.transform = 'rotateY(0deg)';
+            }
+        }
+    };
+
     window.switchFlashcardClef = function(clef) {
         window.GameState.flashcardClef = clef;
         window.GameState.flashcardIndex = 0;
         window.GameState.flashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.setIntervalFlashcardRoot = function(midi) {
+        window.GameState.intervalFlashcardRoot = midi;
         renderGameUI();
     };
 
@@ -1021,6 +1057,47 @@
         renderGameUI();
     };
 
+    window.nextIntervalFlashcard = function() {
+        const pool = getIntervalPool(window.GameState.level || 1);
+        window.GameState.intervalFlashcardIndex = (window.GameState.intervalFlashcardIndex + 1) % pool.length;
+        window.GameState.intervalFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.prevIntervalFlashcard = function() {
+        const pool = getIntervalPool(window.GameState.level || 1);
+        window.GameState.intervalFlashcardIndex = (window.GameState.intervalFlashcardIndex - 1 + pool.length) % pool.length;
+        window.GameState.intervalFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.shuffleIntervalFlashcards = function() {
+        const pool = getIntervalPool(window.GameState.level || 1);
+        window.GameState.intervalFlashcardIndex = Math.floor(Math.random() * pool.length);
+        window.GameState.intervalFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.playIntervalFlashcardSound = function(mode) {
+        const pool = getIntervalPool(window.GameState.level || 1);
+        if (!pool || pool.length === 0) return;
+
+        if (window.GameState.intervalFlashcardIndex >= pool.length) {
+            window.GameState.intervalFlashcardIndex = 0;
+        }
+        const currentItem = pool[window.GameState.intervalFlashcardIndex];
+        const root = window.GameState.intervalFlashcardRoot || 60;
+        const targetMidi = root + currentItem.semi;
+
+        if (mode === 'asc') {
+            playSequence([root, targetMidi], 0.55);
+        } else if (mode === 'desc') {
+            playSequence([targetMidi, root], 0.55);
+        } else if (mode === 'harm') {
+            playChord([root, targetMidi], 0.7);
+        }
+    };
+
     function getFlashcardPool() {
         const isSol = window.GameState.flashcardClef === 'sol';
         const lvl = window.GameState.level;
@@ -1032,6 +1109,128 @@
     }
 
     function renderFlashcardView() {
+        if (window.GameState.activeGame === 'interval') {
+            renderIntervalFlashcardsView();
+        } else {
+            renderNoteFlashcardsView();
+        }
+    }
+
+    function renderIntervalFlashcardsView() {
+        const cardBody = document.getElementById('game-card-body');
+        if (!cardBody) return;
+
+        const lvl = window.GameState.level || 1;
+        const pool = getIntervalPool(lvl);
+        if (window.GameState.intervalFlashcardIndex >= pool.length) {
+            window.GameState.intervalFlashcardIndex = 0;
+        }
+
+        const currentItem = pool[window.GameState.intervalFlashcardIndex];
+        const details = INTERVAL_DETAILS[currentItem.id] || { semi: currentItem.semi, formula: `${currentItem.semi} Nửa cung`, song: '', abc: 'C c | [Cc]2 |' };
+        const lvlTitle = lvl === 1 ? 'Level 1 (Dễ — 5 Quãng)' : (lvl === 2 ? 'Level 2 (Vừa — 9 Quãng)' : 'Level 3 (Khó — 12 Quãng)');
+        const currentRoot = window.GameState.intervalFlashcardRoot || 60;
+
+        const rootOptions = [
+            { midi: 60, name: 'Đô (C4)' },
+            { midi: 62, name: 'Rê (D4)' },
+            { midi: 64, name: 'Mi (E4)' },
+            { midi: 65, name: 'Pha (F4)' },
+            { midi: 67, name: 'Son (G4)' },
+            { midi: 69, name: 'La (A4)' },
+            { midi: 71, name: 'Si (B4)' }
+        ];
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">🎴 Thẻ Học Quãng Âm (Interval Flashcards)</h3>
+                <p style="margin: 0 0 18px 0; color: #64748b; font-size: 0.95rem;">Luyện tai nghe <b>21 âm thanh mẫu</b> (7 nốt gốc × 3 hướng phát). Lật thẻ để xem công thức & khuông nhạc!</p>
+
+                <!-- Root Note Selector -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; background: #f8fafc; padding: 10px 16px; border-radius: 16px; border: 1px solid #e2e8f0;">
+                    <span style="font-weight: 800; color: #334155; font-size: 0.9rem;">🎹 Nốt Gốc Bắt Đầu:</span>
+                    ${rootOptions.map(r => `
+                        <button onclick="window.setIntervalFlashcardRoot(${r.midi})" style="padding: 6px 14px; border-radius: 16px; font-weight: 800; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; ${currentRoot === r.midi ? 'background: #0284c7; color: white; border: none; box-shadow: 0 3px 8px rgba(2,132,199,0.3);' : 'background: white; color: #475569; border: 1.5px solid #cbd5e1;'}">${r.name}</button>
+                    `).join('')}
+                </div>
+
+                <!-- 3D Flip Card Container -->
+                <div onclick="window.toggleIntervalFlashcardFlip()" style="perspective: 1000px; width: 100%; max-width: 520px; margin: 0 auto 22px auto; height: 320px; cursor: pointer;">
+                    <div id="flashcard-interval-inner" style="position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; ${window.GameState.intervalFlashcardFlipped ? 'transform: rotateY(180deg);' : ''}">
+                        
+                        <!-- CARD FRONT: Audio Buttons & Title -->
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #ffffff, #eff6ff); border-radius: 24px; border: 3.5px solid #a5f3fc; box-shadow: 0 12px 32px rgba(6,182,212,0.12); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #bae6fd; padding-bottom: 10px;">
+                                <span style="font-weight: 800; color: #0369a1; font-size: 0.95rem;">📌 ${lvlTitle}</span>
+                                <span style="font-weight: 800; color: #0284c7; background: #e0f2fe; padding: 4px 14px; border-radius: 14px; font-size: 0.9rem;">Quãng ${window.GameState.intervalFlashcardIndex + 1} / ${pool.length}</span>
+                            </div>
+                            
+                            <div style="margin: 10px 0;">
+                                <div style="font-size: 3rem; margin-bottom: 4px;">${currentItem.icon || '🎵'}</div>
+                                <h2 style="margin: 0; color: #0c4a6e; font-size: 1.8rem; font-weight: 800;">${currentItem.name}</h2>
+                                <p style="margin: 6px 0 0 0; color: #0369a1; font-weight: 600; font-size: 0.95rem;">💡 <i>${currentItem.desc}</i></p>
+                            </div>
+
+                            <!-- 3 Playback Mode Buttons -->
+                            <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                                <button onclick="event.stopPropagation(); window.playIntervalFlashcardSound('asc');" style="padding: 8px 14px; border-radius: 16px; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 10px rgba(2,132,199,0.3); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='none'">📈 Nghe Lên</button>
+                                <button onclick="event.stopPropagation(); window.playIntervalFlashcardSound('desc');" style="padding: 8px 14px; border-radius: 16px; background: linear-gradient(135deg, #d97706, #b45309); color: white; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 10px rgba(217,119,6,0.3); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='none'">📉 Nghe Xuống</button>
+                                <button onclick="event.stopPropagation(); window.playIntervalFlashcardSound('harm');" style="padding: 8px 14px; border-radius: 16px; background: linear-gradient(135deg, #7e22ce, #6b21a8); color: white; border: none; font-weight: 800; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 10px rgba(126,34,206,0.3); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='none'">🎹 Nghe Song Song</button>
+                            </div>
+                            
+                            <div style="font-weight: 800; color: #d97706; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 6px; background: #fef3c7; padding: 6px; border-radius: 12px;">
+                                👆 Bấm vào thẻ để lật xem nốt nhạc & công thức!
+                            </div>
+                        </div>
+
+                        <!-- CARD BACK: Sheet Music & Formula -->
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-radius: 24px; border: 3.5px solid #4ade80; box-shadow: 0 12px 32px rgba(34,197,94,0.15); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; box-sizing: border-box;">
+                            <span style="font-weight: 800; color: #15803d; font-size: 0.95rem;">🎉 KHUÔNG NHẠC & CÔNG THỨC QUÃNG</span>
+                            
+                            <div id="flashcard-interval-paper" style="min-height: 120px; width: 100%; background: white; border-radius: 12px; padding: 8px; border: 1px dashed #86efac;"></div>
+
+                            <div>
+                                <div style="font-weight: 800; color: #166534; font-size: 1.1rem; margin-bottom: 2px;">📐 ${details.formula}</div>
+                                <div style="font-size: 0.88rem; color: #374151; font-weight: 600;">🎶 <b>Ví dụ:</b> ${details.song || currentItem.desc}</div>
+                            </div>
+
+                            <button onclick="event.stopPropagation(); window.playIntervalFlashcardSound('asc');" style="background: white; border: 2.5px solid #16a34a; color: #15803d; font-weight: 800; padding: 8px 20px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+                                🔊 Nghe Lại Âm Thanh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Bar -->
+                <div style="display: flex; gap: 12px; justify-content: center; align-items: center; max-width: 520px; margin: 0 auto; flex-wrap: wrap;">
+                    <button onclick="window.prevIntervalFlashcard()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #334155; border: 2px solid #cbd5e1; cursor: pointer; transition: all 0.2s; flex: 1; min-width: 100px;">⬅️ Quãng Trước</button>
+                    <button onclick="window.toggleIntervalFlashcardFlip()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #facc15, #eab308); color: #431407; border: 2px solid #fde047; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(250,204,21,0.3); flex: 1; min-width: 100px;">🔄 Lật Thẻ</button>
+                    <button onclick="window.shuffleIntervalFlashcards()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #a855f7, #9333ea); color: white; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(168,85,247,0.3); flex: 1; min-width: 100px;">🔀 Ngẫu Nhiên</button>
+                    <button onclick="window.nextIntervalFlashcard()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(2,132,199,0.3); flex: 1; min-width: 100px;">➡️ Quãng Tiếp</button>
+                </div>
+            </div>
+        `;
+
+        // Render staff interval on card back
+        const abcCode = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n${details.abc}`;
+        setTimeout(() => {
+            const paperEl = document.getElementById('flashcard-interval-paper');
+            const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+            if (paperEl && abcRenderer) {
+                paperEl.innerHTML = '';
+                abcRenderer.renderAbc('flashcard-interval-paper', abcCode, {
+                    responsive: 'resize',
+                    scale: 1.3,
+                    staffwidth: 340,
+                    paddingtop: 10,
+                    paddingbottom: 10,
+                    add_classes: true
+                });
+            }
+        }, 60);
+    }
+
+    function renderNoteFlashcardsView() {
         const cardBody = document.getElementById('game-card-body');
         if (!cardBody) return;
 
@@ -1131,6 +1330,116 @@
 
     // --- 7. VISUAL COMPREHENSIVE PROGRESS REPORT DASHBOARD ---
     function renderProgressReportView() {
+        if (window.GameState.activeGame === 'interval') {
+            renderIntervalProgressReportView();
+        } else {
+            renderNoteProgressReportView();
+        }
+    }
+
+    function renderIntervalProgressReportView() {
+        const cardBody = document.getElementById('game-card-body');
+        if (!cardBody) return;
+
+        const lvl = window.GameState.level || 1;
+        const pool = getIntervalPool(lvl);
+        const activeUser = window.getActiveChildUser ? window.getActiveChildUser() : null;
+        const userNameStr = activeUser ? activeUser.childName : 'Bé (Chưa đăng nhập)';
+        const userId = activeUser ? activeUser.id : 'guest';
+        const storageKey = `interval_progress_${userId}`;
+        const userProgress = JSON.parse(localStorage.getItem(storageKey) || '{}');
+
+        let totalEarned = 0;
+        const totalMax = pool.length * 6;
+
+        pool.forEach(item => {
+            const p = userProgress[item.id] || { score: 0 };
+            totalEarned += (p.score || 0);
+        });
+
+        const percentage = totalMax > 0 ? Math.round((totalEarned / totalMax) * 100) : 0;
+        const lvlTitle = lvl === 1 ? 'Level 1 (Dễ — 5 Quãng)' : (lvl === 2 ? 'Level 2 (Vừa — 9 Quãng)' : 'Level 3 (Khó — 12 Quãng)');
+
+        let cardsHTML = pool.map(item => {
+            const p = userProgress[item.id] || { stage: 'unseen', score: 0, streak: 0 };
+
+            let stageIcon = '⚪';
+            let stageName = 'Chưa học';
+            let stageBadgeStyle = 'background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1;';
+
+            if (p.stage === 'seed') {
+                stageIcon = '🌱';
+                stageName = 'Hạt (0pt)';
+                stageBadgeStyle = 'background: #fef3c7; color: #b45309; border: 1px solid #fde047;';
+            } else if (p.stage === 'sprout') {
+                stageIcon = '🌿';
+                stageName = 'Mầm (1pt)';
+                stageBadgeStyle = 'background: #dcfce7; color: #15803d; border: 1px solid #86efac;';
+            } else if (p.stage === 'tree') {
+                stageIcon = '🌳';
+                stageName = 'Cây (3pt)';
+                stageBadgeStyle = 'background: #bbf7d0; color: #166534; border: 1.5px solid #4ade80; font-weight: 800;';
+            } else if (p.stage === 'flower') {
+                stageIcon = '🌸';
+                stageName = 'Hoa (6pt)';
+                stageBadgeStyle = 'background: #fce7f3; color: #be185d; border: 2px solid #f472b6; font-weight: 800; box-shadow: 0 2px 8px rgba(244,114,182,0.3);';
+            }
+
+            return `
+                <div style="background: white; border-radius: 18px; border: 2px solid #e2e8f0; padding: 18px; text-align: center; box-shadow: 0 6px 16px rgba(0,0,0,0.04); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span style="font-size: 1.6rem;">${item.icon || '🎵'}</span>
+                        <span style="font-size: 0.8rem; font-weight: 800; padding: 4px 10px; border-radius: 12px; ${stageBadgeStyle}">${stageName}</span>
+                    </div>
+                    
+                    <div style="margin: 6px 0;">
+                        <h4 style="margin: 0; color: #1e293b; font-size: 1.15rem; font-weight: 800;">${item.name}</h4>
+                        <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #64748b; font-weight: 600;">${item.desc}</p>
+                    </div>
+
+                    <div style="margin-top: 14px; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 8px 12px; border-radius: 10px; border: 1px solid #e2e8f0; font-size: 0.85rem; font-weight: 800;">
+                        <span style="color: #0284c7;">🔥 Chuỗi: ${p.streak || 0}</span>
+                        <span style="color: #059669;">${p.score || 0} / 6 pt</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 24px; border: 2px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <!-- MASTER HEADER BANNER -->
+                <div style="background: linear-gradient(135deg, #0284c7, #0369a1); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(2,132,199,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <span style="background: #facc15; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">📊 BÁO CÁO TIẾN ĐỘ EAR TRAINING QUÃNG ÂM</span>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.6rem; font-weight: 800;">Hành Trình Cảm Âm Quãng — ${userNameStr}</h2>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #fde047;">${percentage}%</div>
+                            <div style="font-size: 0.9rem; color: #e0f2fe; font-weight: 700;">Tiến Độ ${lvlTitle}</div>
+                        </div>
+                    </div>
+
+                    <!-- Master Progress Bar -->
+                    <div style="width: 100%; height: 20px; background: rgba(255,255,255,0.2); border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.3); margin-bottom: 12px;">
+                        <div style="width: ${percentage}%; height: 100%; background: linear-gradient(90deg, #facc15, #4ade80); border-radius: 12px; transition: width 0.6s;"></div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #e0f2fe; font-weight: 700;">
+                        <span>🏆 Điểm Tích Lũy Level: <b style="color: #fde047;">${totalEarned} / ${totalMax} pt</b></span>
+                        <span>🌱 Hạt (0pt) ➔ 🌿 Mầm (1pt) ➔ 🌳 Cây (3pt) ➔ 🌸 Hoa (6pt)</span>
+                    </div>
+                </div>
+
+                <!-- Interval Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px;">
+                    ${cardsHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderNoteProgressReportView() {
         const cardBody = document.getElementById('game-card-body');
         if (!cardBody) return;
 
