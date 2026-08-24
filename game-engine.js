@@ -786,7 +786,6 @@
                 </div>
             </div>
         `;
-        window.playScaleQuestionSound();
     }
 
     window.playScaleQuestionSound = function() {
@@ -884,7 +883,6 @@
                 </div>
             </div>
         `;
-        window.playChordQuestionSound();
     }
 
     window.playChordQuestionSound = function() {
