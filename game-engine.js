@@ -1643,80 +1643,410 @@
                 `;
             }
         } else if (gameId === 'chord') {
-            htmlContent = `
-                <div style="background: white; padding: 32px; border-radius: 24px; border: 2px solid #e2e8f0; line-height: 1.8; color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                    <!-- HEADER -->
-                    <div style="background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(168,85,247,0.3);">
-                        <span style="background: #fde047; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎓 GIÁO TRÌNH LÝ THUYẾT HỢP ÂM (CHORDS)</span>
-                        <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">Lộ Trình Cảm Nhận Hợp Âm Chuẩn Nhạc Viện (3 Levels)</h2>
-                        <p style="margin: 6px 0 0 0; color: #f3e8ff; font-weight: 600; font-size: 1rem;">Từ cảm xúc nền tảng Trưởng/Thứ đến hợp âm 7, hợp âm mở rộng và đảo thế</p>
-                    </div>
+            const chordSubTab = window.GameState.chordTheorySubTab || 'guide';
 
-                    <!-- BANNER 2 PLAYBACK MODES -->
-                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
-                        <h4 style="margin: 0 0 8px 0; color: #7e22ce; font-size: 1.15rem; font-weight: 800;">💡 2 Chế Độ Luyện Tai Hợp Âm (Chord Test):</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
-                            <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #d8b4fe;">
-                                <b>🎹 Block Chord (Đập Hòa Âm):</b> Đập tất cả các nốt vang lên cùng một lúc ➔ Thử thách tai phân tích màu sắc & không khí hòa âm tổng thể.
-                            </div>
-                            <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #d8b4fe;">
-                                <b>🎸 Arpeggio (Rải Từng Nốt):</b> Rải từng nốt lần lượt từ dưới lên ➔ Giúp tai dễ dàng rà soát từng bậc nốt nhạc.
-                            </div>
-                        </div>
-                    </div>
+            const guideStyle = chordSubTab === 'guide'
+                ? 'background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; border: none; font-weight: 800; padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(168,85,247,0.35); cursor: pointer;'
+                : 'background: white; color: #475569; border: 2px solid #cbd5e1; font-weight: 700; padding: 10px 20px; border-radius: 20px; cursor: pointer;';
 
-                    <!-- LEVEL 1 -->
-                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 22px; border-radius: 18px; border: 2px solid #fef08a;">
-                        <h4 style="margin: 0 0 14px 0; color: #a16207; font-size: 1.2rem; font-weight: 800;">☀️ Level 1 (Người mới bắt đầu): Phân Biệt "Cảm Xúc Nền Tảng" (Basic Triads)</h4>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
-                                <b>☀️ Hợp Âm Trưởng (Major Triad):</b> Cảm xúc Vui vẻ, Sáng sủa, Hào hùng. Cấu trúc: <code>1 - 3 - 5</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
-                                <b>🌧️ Hợp Âm Thứ (Minor Triad):</b> Cảm xúc Buồn bã, U uất, Tối tăm. Cấu trúc: <code>1 - ♭3 - 5</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
-                                <b>🎋 Hợp Âm Sus (Sus2 / Sus4):</b> Cảm xúc Lơ lửng, Trung tính (không vui không buồn), Nghe như đang chờ đợi giải quyết. Cấu trúc Sus4: <code>1 - 4 - 5</code> | Sus2: <code>1 - 2 - 5</code>
-                            </div>
-                        </div>
-                    </div>
+            const formulasStyle = chordSubTab === 'formulas'
+                ? 'background: linear-gradient(135deg, #06b6d4, #0284c7); color: white; border: none; font-weight: 800; padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(6,182,212,0.35); cursor: pointer;'
+                : 'background: white; color: #475569; border: 2px solid #cbd5e1; font-weight: 700; padding: 10px 20px; border-radius: 20px; cursor: pointer;';
 
-                    <!-- LEVEL 2 -->
-                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 22px; border-radius: 18px; border: 2px solid #bfdbfe;">
-                        <h4 style="margin: 0 0 14px 0; color: #1d4ed8; font-size: 1.2rem; font-weight: 800;">🌿 Level 2 (Trung cấp): Phân Biệt "Gia Vị & Độ Căng Thẳng" (Color Chords & 7th)</h4>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
-                                <b>⚡ Hợp Âm Giảm (Diminished - dim):</b> Nghe CỰC KỲ căng thẳng, rùng rợn, giật gân (Đặc trưng nhạc phim kinh dị). Cấu trúc: <code>1 - ♭3 - ♭5</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
-                                <b>🌌 Hợp Âm Tăng (Augmented - aug):</b> Nghe huyền bí, mộng mơ, lơ lửng giống như đang trong giấc mơ. Cấu trúc: <code>1 - 3 - ♯5</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
-                                <b>🎷 Hợp Âm 7 Át (Dominant 7 - C7):</b> Nghe căng thẳng vừa phải, bụi bặm, lả lướt (Đặc trưng Blues/Funk). Cấu trúc: <code>1 - 3 - 5 - ♭7</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
-                                <b>✨ Hợp Âm 7 Trưởng (Major 7 - Maj7):</b> Nghe cực kỳ Sang trọng, Thư thái, Bay bổng (Lo-fi, Pop hiện đại). Cấu trúc: <code>1 - 3 - 5 - 7</code>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- LEVEL 3 -->
-                    <div style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
-                        <h4 style="margin: 0 0 14px 0; color: #7e22ce; font-size: 1.2rem; font-weight: 800;">🎷 Level 3 (Cao cấp): Nhạc Jazz Nâng Cao & Đảo Thế (Extended & Inversions)</h4>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
-                                <b>💎 Hợp Âm Mở Rộng (Extended Chords / Add9):</b> Cadd9, 9th, 11th (Nhiều lớp âm thanh xếp chồng phức tạp, lấp lánh).
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
-                                <b>🧠 Hợp Âm Giảm 7 (dim7) vs Nửa Giảm (m7♭5):</b> Hai hợp âm "hại não" nhất trong nhạc lý Cổ điển và Jazz.
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
-                                <b>🔄 Nhận Diện Đảo Thế (Chord Inversions):</b> Đánh hợp âm Đô Trưởng nhưng đảo thế C/E (Đảo 1 - nốt Mi ở đáy) hoặc C/G (Đảo 2 - nốt Sol ở đáy). Nghe phân biệt nốt Bass thấp nhất!
-                            </div>
-                        </div>
-                    </div>
+            const subTabHeader = `
+                <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <button onclick="window.switchChordTheorySubTab('guide')" style="${guideStyle}">
+                        📘 7 Bài Học Cốt Lõi Hợp Âm & 3 Ma Thuật
+                    </button>
+                    <button onclick="window.switchChordTheorySubTab('formulas')" style="${formulasStyle}">
+                        🎼 10 Loại Hợp Âm theo 3 Levels & Công Thức
+                    </button>
                 </div>
             `;
+
+            if (chordSubTab === 'guide') {
+                htmlContent = subTabHeader + `
+                    <div style="background: white; padding: 32px; border-radius: 24px; border: 2px solid #e2e8f0; line-height: 1.8; color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <!-- MASTER HEADER -->
+                        <div style="background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(168,85,247,0.3);">
+                            <span style="background: #fde047; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎓 GIÁO TRÌNH LÝ THUYẾT HỢP ÂM CỐT LÕI</span>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">7 Bài Học Cốt Lõi Hợp Âm & 3 Ma Thuật Hòa Âm</h2>
+                            <p style="margin: 6px 0 0 0; color: #f3e8ff; font-weight: 600; font-size: 1rem;">Giải mã toàn bộ 120 hợp âm, bộ 7 hợp âm gia đình và 3 ma thuật tạo ra hàng triệu bài hát</p>
+                        </div>
+
+                        <!-- LESSON 1 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
+                            <h3 style="margin: 0 0 12px 0; color: #6b21a8; font-size: 1.3rem; font-weight: 800;">1. Hợp Âm (Chord) Là Gì?</h3>
+                            <p style="margin: 0 0 12px 0; color: #4c1d95; font-size: 1rem; font-weight: 600;">Hợp âm là sự kết hợp của <b>3 nốt nhạc trở lên</b> được vang lên cùng một lúc (hoặc rải lần lượt từng nốt — gọi là <i>Arpeggio</i>).</p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                                <div style="background: white; padding: 14px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>↔️ Giai điệu (Melody):</b> Chạy theo chiều ngang (từng nốt nối tiếp nhau), tạo nên xương sống câu hát.
+                                </div>
+                                <div style="background: white; padding: 14px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>↕️ Hợp âm (Chord):</b> Tạo nên chiều dọc (hòa âm) nâng đỡ và bao bọc cho giai điệu.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LESSON 2 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 22px; border-radius: 18px; border: 2px solid #bfdbfe;">
+                            <h3 style="margin: 0 0 12px 0; color: #1e40af; font-size: 1.3rem; font-weight: 800;">2. Công Thức "Hack" Cấu Tạo Hợp Âm (Xếp Chồng Quãng 3)</h3>
+                            <p style="margin: 0 0 14px 0; color: #1e3a8a; font-size: 1rem;">Mọi hợp âm trên đời đều được xây dựng bằng cách lấy một <b>Nốt Gốc (Root - Bậc 1)</b> và xếp chồng các <b>Quãng 3</b> lên trên nó.</p>
+
+                            <!-- 2A: TRIADS TABLE -->
+                            <h4 style="margin: 16px 0 10px 0; color: #1d4ed8; font-size: 1.1rem; font-weight: 800;">🅰️ Hợp Âm 3 Nốt Cơ Bản (Triads)</h4>
+                            <div style="overflow-x: auto; margin-bottom: 16px;">
+                                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; font-size: 0.92rem;">
+                                    <thead>
+                                        <tr style="background: #1d4ed8; color: white;">
+                                            <th style="padding: 10px; text-align: left;">Loại Hợp Âm</th>
+                                            <th style="padding: 10px; text-align: center;">Ký Hiệu</th>
+                                            <th style="padding: 10px; text-align: center;">Công Thức Bậc</th>
+                                            <th style="padding: 10px; text-align: center;">Ví Dụ (Gốc C)</th>
+                                            <th style="padding: 10px; text-align: left;">Các Nốt</th>
+                                            <th style="padding: 10px; text-align: left;">Cảm Xúc Đặc Trưng</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                                            <td style="padding: 10px; font-weight: 800; color: #15803d;">☀️ Trưởng (Major)</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">C</td>
+                                            <td style="padding: 10px; text-align: center;">1 - 3 - 5</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">C</td>
+                                            <td style="padding: 10px;">C - E - G</td>
+                                            <td style="padding: 10px; color: #166534;">Vui tươi, sáng sủa, ổn định</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+                                            <td style="padding: 10px; font-weight: 800; color: #0369a1;">🌧️ Thứ (Minor)</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">Cm</td>
+                                            <td style="padding: 10px; text-align: center;">1 - ♭3 - 5</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">Cm</td>
+                                            <td style="padding: 10px;">C - E♭ - G</td>
+                                            <td style="padding: 10px; color: #1e40af;">Trầm buồn, u uất, da diết</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                                            <td style="padding: 10px; font-weight: 800; color: #b91c1c;">⚡ Giảm (Diminished)</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">Cdim (C°)</td>
+                                            <td style="padding: 10px; text-align: center;">1 - ♭3 - ♭5</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">Cdim</td>
+                                            <td style="padding: 10px;">C - E♭ - G♭</td>
+                                            <td style="padding: 10px; color: #991b1b;">Căng thẳng, kịch tính, ma mị</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+                                            <td style="padding: 10px; font-weight: 800; color: #a855f7;">🌌 Tăng (Augmented)</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">Caug (C+)</td>
+                                            <td style="padding: 10px; text-align: center;">1 - 3 - ♯5</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">Caug</td>
+                                            <td style="padding: 10px;">C - E - G♯</td>
+                                            <td style="padding: 10px; color: #7e22ce;">Lơ lửng, huyền bí, bí ẩn</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                                            <td style="padding: 10px; font-weight: 800; color: #059669;">🍃 Treo 2 (Sus2)</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">Csus2</td>
+                                            <td style="padding: 10px; text-align: center;">1 - 2 - 5</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">Csus2</td>
+                                            <td style="padding: 10px;">C - D - G</td>
+                                            <td style="padding: 10px; color: #047857;">Mở rộng, nhẹ nhàng, không vui không buồn</td>
+                                        </tr>
+                                        <tr style="background: #f8fafc;">
+                                            <td style="padding: 10px; font-weight: 800; color: #d97706;">🎋 Treo 4 (Sus4)</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">Csus4</td>
+                                            <td style="padding: 10px; text-align: center;">1 - 4 - 5</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">Csus4</td>
+                                            <td style="padding: 10px;">C - F - G</td>
+                                            <td style="padding: 10px; color: #b45309;">Căng thẳng nhẹ, đòi về Hợp âm Trưởng</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 2B: 7TH CHORDS -->
+                            <h4 style="margin: 16px 0 10px 0; color: #1d4ed8; font-size: 1.1rem; font-weight: 800;">🅱️ Hợp Âm 7 (7th Chords) — "Gia Vị Màu Sắc" (Jazz, Pop, Blues)</h4>
+                            <div style="display: flex; flex-direction: column; gap: 10px;">
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
+                                    ✨ <b>7 Trưởng (Major 7 - CMaj7):</b> <code>1 - 3 - 5 - 7</code> (C - E - G - B) 👉 <i>Cảm xúc: Sang trọng, bay bổng, thư thái (Rất hay dùng trong Lo-fi, Pop hiện đại).</i>
+                                </div>
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
+                                    🎷 <b>7 Thứ (Minor 7 - Cm7):</b> <code>1 - ♭3 - 5 - ♭7</code> (C - E♭ - G - B♭) 👉 <i>Cảm xúc: Mượt mà, êm ái, hơi buồn nhẹ (Đặc trưng R&B, Soul).</i>
+                                </div>
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
+                                    💥 <b>7 Át (Dominant 7 - C7):</b> <code>1 - 3 - 5 - ♭7</code> (C - E - G - B♭) 👉 <i>Cảm xúc: Căng thẳng vừa phải, bụi bặm (Trục thần kinh của nhạc Blues/Funk).</i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LESSON 3 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 22px; border-radius: 18px; border: 2px solid #fef08a;">
+                            <h3 style="margin: 0 0 12px 0; color: #a16207; font-size: 1.3rem; font-weight: 800;">3. Bộ 7 Hợp Âm Gia Đình Trong Một Tông (Diatonic Chords)</h3>
+                            <p style="margin: 0 0 14px 0; color: #713f12; font-size: 1rem;">Khi bạn chọn một Tông (ví dụ Tông Đô Trưởng), từ 7 nốt của Scale Đô Trưởng, toán học âm nhạc tự động tạo ra đúng <b>7 hợp âm gia đình đi kèm</b>. Bạn chỉ cần dùng 7 hợp âm này để đệm hát thì đảm bảo <b>100% không bao giờ bị lệch tông</b>!</p>
+
+                            <div style="overflow-x: auto; margin-bottom: 14px;">
+                                <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; font-size: 0.92rem;">
+                                    <thead>
+                                        <tr style="background: #eab308; color: #431407;">
+                                            <th style="padding: 10px; text-align: left;">Bậc Hợp Âm</th>
+                                            <th style="padding: 10px; text-align: center;">Tính Chất</th>
+                                            <th style="padding: 10px; text-align: center;">Ký Hiệu La Mã</th>
+                                            <th style="padding: 10px; text-align: center;">Tông C</th>
+                                            <th style="padding: 10px; text-align: left;">Vai Trò Trong Hòa Âm</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                                            <td style="padding: 10px; font-weight: 800;">Bậc I</td>
+                                            <td style="padding: 10px; text-align: center; color: #15803d; font-weight: 800;">Trưởng</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">I</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">C</td>
+                                            <td style="padding: 10px; font-weight: 700; color: #166534;">Ngôi Nhà Chủ (Về đích, an toàn nhất)</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+                                            <td style="padding: 10px; font-weight: 800;">Bậc ii</td>
+                                            <td style="padding: 10px; text-align: center; color: #0369a1; font-weight: 800;">Thứ</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">ii</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">Dm</td>
+                                            <td style="padding: 10px;">Hợp âm phụ nâng đỡ</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                                            <td style="padding: 10px; font-weight: 800;">Bậc iii</td>
+                                            <td style="padding: 10px; text-align: center; color: #0369a1; font-weight: 800;">Thứ</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">iii</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">Em</td>
+                                            <td style="padding: 10px;">Hợp âm phụ kết nối</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+                                            <td style="padding: 10px; font-weight: 800;">Bậc IV</td>
+                                            <td style="padding: 10px; text-align: center; color: #15803d; font-weight: 800;">Trưởng</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">IV</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">F</td>
+                                            <td style="padding: 10px; font-weight: 700; color: #0369a1;">Hợp âm Dẫn (Đi ra khỏi nhà, mở không gian)</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #e2e8f0;">
+                                            <td style="padding: 10px; font-weight: 800;">Bậc V</td>
+                                            <td style="padding: 10px; text-align: center; color: #15803d; font-weight: 800;">Trưởng</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">V</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">G (G7)</td>
+                                            <td style="padding: 10px; font-weight: 700; color: #b91c1c;">Hợp âm Căng Thẳng (Lực hút cực mạnh kéo về I)</td>
+                                        </tr>
+                                        <tr style="border-bottom: 1px solid #e2e8f0; background: #f8fafc;">
+                                            <td style="padding: 10px; font-weight: 800;">Bậc vi</td>
+                                            <td style="padding: 10px; text-align: center; color: #0369a1; font-weight: 800;">Thứ</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">vi</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">Am</td>
+                                            <td style="padding: 10px; font-weight: 700; color: #6b21a8;">Giọng song song (Nơi trú ẩn u uất)</td>
+                                        </tr>
+                                        <tr style="background: #f8fafc;">
+                                            <td style="padding: 10px; font-weight: 800;">Bậc vii°</td>
+                                            <td style="padding: 10px; text-align: center; color: #b91c1c; font-weight: 800;">Giảm</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800;">vii°</td>
+                                            <td style="padding: 10px; text-align: center; font-weight: 800; color: #0284c7;">Bdim</td>
+                                            <td style="padding: 10px; color: #991b1b;">Căng thẳng cực độ (ít dùng trong nhạc Pop)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="background: white; padding: 12px 16px; border-radius: 12px; border: 1.5px solid #fde047; font-weight: 800; color: #854d0e;">
+                                💡 Công thức vạn năng Tông Trưởng: I (Trưởng) - ii (Thứ) - iii (Thứ) - IV (Trưởng) - V (Trưởng) - vi (Thứ) - vii° (Giảm)
+                            </div>
+                        </div>
+
+                        <!-- LESSON 4 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 22px; border-radius: 18px; border: 2px solid #86efac;">
+                            <h3 style="margin: 0 0 12px 0; color: #166534; font-size: 1.3rem; font-weight: 800;">4. Các Vòng Hợp Âm Quốc Dân (Chord Progressions)</h3>
+                            <p style="margin: 0 0 14px 0; color: #14532d; font-size: 1rem;">Khi bạn nối các hợp âm gia đình lại với nhau theo một thứ tự nhất định, bạn tạo ra Vòng Hợp Âm. Hầu như mọi bài hát nổi tiếng trên thế giới đều dùng lại vài vòng hợp âm kinh điển:</p>
+
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #4ade80;">
+                                    <h4 style="margin: 0 0 6px 0; color: #15803d; font-size: 1.1rem; font-weight: 800;">🎤 Vòng Pop Hào Hùng (I - V - vi - IV):</h4>
+                                    <div style="font-weight: 800; color: #0284c7; font-size: 1.15rem; margin-bottom: 4px;">Trong Tông C: C ➔ G ➔ Am ➔ F</div>
+                                    <div style="font-size: 0.92rem; color: #374151;"><b>Đặc điểm:</b> Vòng hợp âm phổ biến nhất lịch sử loài người (hàng ngàn bài Pop/Rock dùng vòng này: <i>Despacito, Perfect, Counting Stars...</i>).</div>
+                                </div>
+
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #4ade80;">
+                                    <h4 style="margin: 0 0 6px 0; color: #15803d; font-size: 1.1rem; font-weight: 800;">🎸 Vòng Ballad Trầm Buồn (vi - IV - I - V):</h4>
+                                    <div style="font-weight: 800; color: #0284c7; font-size: 1.15rem; margin-bottom: 4px;">Trong Tông C/Am: Am ➔ F ➔ C ➔ G</div>
+                                    <div style="font-size: 0.92rem; color: #374151;"><b>Đặc điểm:</b> Bắt đầu từ nốt La thứ u uất, cực kỳ hợp với nhạc thất tình, da diết.</div>
+                                </div>
+
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #4ade80;">
+                                    <h4 style="margin: 0 0 6px 0; color: #15803d; font-size: 1.1rem; font-weight: 800;">🎷 Vòng Jazz Tiêu Chuẩn (ii - V - I):</h4>
+                                    <div style="font-weight: 800; color: #0284c7; font-size: 1.15rem; margin-bottom: 4px;">Trong Tông C: Dm ➔ G7 ➔ C</div>
+                                    <div style="font-size: 0.92rem; color: #374151;"><b>Đặc điểm:</b> Công thức tạo độ chuyển mượt mà nhất từ căng thẳng về ngôi nhà an toàn (C).</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LESSON 5 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 22px; border-radius: 18px; border: 2px solid #bfdbfe;">
+                            <h3 style="margin: 0 0 12px 0; color: #1d4ed8; font-size: 1.3rem; font-weight: 800;">5. Đảo Thế Hợp Âm (Chord Inversions) — Kỹ Thuật Đánh Nốt Trầm Mượt Mà</h3>
+                            <p style="margin: 0 0 12px 0; color: #1e3a8a; font-size: 1rem;">Một hợp âm Đô Trưởng (C) gồm 3 nốt: <b>C - E - G</b>. Không bắt buộc nốt C luôn phải nằm ở dưới đáy! Việc thay đổi nốt trầm (Bass) bên dưới gọi là Đảo thế:</p>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px;">
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
+                                    <b>Thế Gốc (Root Position):</b><br/>
+                                    Nốt C ở đáy (C - E - G)<br/>
+                                    👉 Ký hiệu: <b>C</b>
+                                </div>
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
+                                    <b>Đảo Thế 1 (1st Inversion):</b><br/>
+                                    Nốt E ở đáy (E - G - C)<br/>
+                                    👉 Ký hiệu: <b>C/E</b> (C bass E)
+                                </div>
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
+                                    <b>Đảo Thế 2 (2nd Inversion):</b><br/>
+                                    Nốt G ở đáy (G - C - E)<br/>
+                                    👉 Ký hiệu: <b>C/G</b> (C bass G)
+                                </div>
+                            </div>
+                            <div style="background: white; padding: 12px 16px; border-radius: 12px; border: 1.5px solid #60a5fa; color: #1e40af; font-weight: 700;">
+                                👉 <b>Tác dụng:</b> Giúp người đánh Piano hoặc Guitar di chuyển các ngón tay rất ít mà âm thanh vẫn chuyển đổi mượt mà, đường tiếng Bass đi nghe mượt như một giai điệu riêng biệt!
+                            </div>
+                        </div>
+
+                        <!-- LESSON 6 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 22px; border-radius: 18px; border: 2px solid #fef08a;">
+                            <h3 style="margin: 0 0 12px 0; color: #a16207; font-size: 1.3rem; font-weight: 800;">🎉 6. Tin Vui Cho Người Học Nhạc: Giải Mã 120 Hợp Âm</h3>
+                            <p style="margin: 0 0 12px 0; color: #713f12; font-size: 1rem; line-height: 1.7;">
+                                Nhiều người chưa học nhạc thường bị hoảng sợ vì nghĩ <i>"biển học âm nhạc là vô tận"</i>, có hàng ngàn hàng vạn hợp âm không bao giờ học hết được.<br/>
+                                💡 <b>Nhưng sự thật nhạc lý đã chứng minh:</b> Toàn bộ việc đệm đàn trên trái đất này thực chất chỉ xoay quanh đúng <b>120 Hợp Âm cơ bản</b> (12 Nốt gốc × 10 Loại cấu trúc) đó thôi!
+                            </p>
+
+                            <div style="background: white; padding: 18px; border-radius: 16px; border: 2px solid #fde047; margin-top: 14px;">
+                                <h4 style="margin: 0 0 8px 0; color: #b45309; font-size: 1.1rem; font-weight: 800;">💡 Sự thật còn "sốc" hơn nữa trong thực tế đệm hát:</h4>
+                                <ul style="margin: 0; padding-left: 20px; color: #451a03; line-height: 1.7; font-weight: 600;">
+                                    <li>Bạn không cần dùng hết cả 120 hợp âm.</li>
+                                    <li>Bạn chỉ cần làm chủ khoảng <b>36 đến 50 hợp âm phổ biến nhất</b> (chủ yếu thuộc Level 1 và Level 2: <i>Trưởng, Thứ, 7, Sus, Add9</i>) là bạn đã đệm được <b>95% tất cả các bài hát Việt Nam và Quốc tế</b> rồi!</li>
+                                    <li>70 hợp âm còn lại (thuộc Level 3 như <i>dim, aug, m7b5, 9th, 11th...</i>) chỉ thi thoảng mới xuất hiện trong các bài nhạc Jazz phức tạp hoặc nhạc phim mà thôi.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- LESSON 7 -->
+                        <div style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
+                            <h3 style="margin: 0 0 14px 0; color: #6b21a8; font-size: 1.3rem; font-weight: 800;">✨ 7. 3 Ma Thuật Biến 120 Hợp Âm Thành Hàng Triệu Bài Hát</h3>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px;">
+                                <!-- MAGIC 1 -->
+                                <div style="background: white; padding: 18px; border-radius: 16px; border: 1.5px solid #d8b4fe;">
+                                    <h4 style="margin: 0 0 6px 0; color: #7e22ce; font-size: 1.1rem; font-weight: 800;">🍳 Ma thuật 1: Tiết tấu / Điệu nhạc (Rhythm)</h4>
+                                    <div style="font-size: 0.95rem; color: #475569; line-height: 1.6;">
+                                        <b>Ví dụ đời thường:</b> Giả sử bạn có cùng 3 nguyên liệu nấu ăn: <i>Trứng + Cơm + Nước tương</i>.<br/>
+                                        - Nấu thành cháo lỏng ➔ món <b>Cháo Trứng</b> (nhạc Ballad nhẹ nhàng).<br/>
+                                        - Bật lửa lớn đảo thật nhanh ➔ món <b>Cơm Chiên Trứng</b> (nhạc Rock dồn dập).<br/>
+                                        - Mang đi nướng ➔ món <b>Bánh Cơm Trứng</b> (nhạc Disco quẩy tưng bừng).<br/>
+                                        <b>Trong Âm Nhạc:</b> 4 hợp âm <code>C - Am - F - G</code> chính là 3 nguyên liệu Trứng + Cơm + Nước tương. Rải từng nốt chậm rãi nhẹ nhàng (tìng... tính... tang...) ➔ Tình yêu buồn thảm. Đập dồn dập (RẮM... RẮM... RẮM...) ➔ Nhạc Rock cực ngầu!<br/>
+                                        👉 <i>Nghĩa là: Hợp âm giống nhau, nhưng TỐC ĐỘ và CÁCH ĐẬP NHỊP khác nhau sẽ tạo ra dòng nhạc hoàn toàn khác nhau!</i>
+                                    </div>
+                                </div>
+
+                                <!-- MAGIC 2 -->
+                                <div style="background: white; padding: 18px; border-radius: 16px; border: 1.5px solid #d8b4fe;">
+                                    <h4 style="margin: 0 0 6px 0; color: #7e22ce; font-size: 1.1rem; font-weight: 800;">🎨 Ma thuật 2: Cách xếp nốt (Voicing)</h4>
+                                    <div style="font-size: 0.95rem; color: #475569; line-height: 1.6;">
+                                        <b>Ví dụ đời thường:</b> Giả sử bạn sơn một căn phòng bằng 3 màu: <i>Xanh - Đỏ - Vàng</i>.<br/>
+                                        - Sơn màu Đỏ dưới sàn, Xanh trên tường, Vàng trên trần ➔ Căn phòng ấm áp.<br/>
+                                        - Đảo ngược: Sơn màu Vàng dưới sàn, Đỏ trên trần ➔ Căn phòng rực rỡ, lạ mắt.<br/>
+                                        <b>Trong Âm Nhạc:</b> Hợp âm Đô Trưởng (C) gồm 3 nốt: C - E - G.<br/>
+                                        - Bấm 3 nốt này ở vùng phím trầm (bên trái đàn) ➔ U uất, trầm ấm như tiếng sấm xa.<br/>
+                                        - Bấm 3 nốt này ở vùng phím cao (bên phải đàn) ➔ Trong trẻo, lấp lánh như tiếng chuông gió.<br/>
+                                        👉 <i>Nghĩa là: Cùng là tên hợp âm Đô Trưởng, nhưng BẤM Ở VỊ TRÍ CAO HOẶC TRẦM trên phím đàn sẽ cho ra những màu sắc âm thanh khác hẳn nhau!</i>
+                                    </div>
+                                </div>
+
+                                <!-- MAGIC 3 -->
+                                <div style="background: white; padding: 18px; border-radius: 16px; border: 1.5px solid #d8b4fe;">
+                                    <h4 style="margin: 0 0 6px 0; color: #7e22ce; font-size: 1.1rem; font-weight: 800;">📖 Ma thuật 3: Vòng Hợp Âm (Chord Progression)</h4>
+                                    <div style="font-size: 0.95rem; color: #475569; line-height: 1.6;">
+                                        <b>Ví dụ đời thường:</b> Hãy tưởng tượng 4 hợp âm C, Am, F, G giống như 4 sự kiện trong một bộ phim:<br/>
+                                        <code>C = Gặp gỡ</code> | <code>Am = Yêu nhau</code> | <code>F = Hiểu lầm</code> | <code>G = Cãi nhau</code><br/>
+                                        - <b>Phim 1 (Thứ tự: C ➔ Am ➔ F ➔ G):</b> Gặp gỡ ➔ Yêu nhau ➔ Hiểu lầm ➔ Cãi nhau (Kết phim căng thẳng, chờ tập tiếp theo).<br/>
+                                        - <b>Phim 2 (Đổi thứ tự: F ➔ G ➔ Am ➔ C):</b> Hiểu lầm ➔ Cãi nhau ➔ Yêu nhau ➔ Gặp gỡ lại (Kết phim cực kỳ viên mãn, có hậu).<br/>
+                                        👉 <i>Trong Âm Nhạc: Chỉ cần bạn THAY ĐỔI THỨ TỰ BẮT ĐẦU VÀ KẾT THÚC của 4 hợp âm đó, bộ não người nghe sẽ trải qua một hành trình cảm xúc hoàn toàn mới!</i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="background: linear-gradient(135deg, #7e22ce, #6b21a8); color: white; padding: 16px 20px; border-radius: 16px; font-weight: 700; text-align: center; box-shadow: 0 6px 16px rgba(126,34,206,0.3);">
+                                🎯 <b>TÓM LẠI:</b> Chỉ với 120 Hợp âm làm gốc, người chơi đàn giống như một <b>Đạo Diễn</b>: Họ thay đổi Điệu nhảy (Rhythm), thay đổi Độ cao thấp (Voicing), và thay đổi Thứ tự câu chuyện (Progression) để biến 120 hợp âm đó thành hàng triệu bài hát không bao giờ đụng hàng trên thế giới!
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                htmlContent = subTabHeader + `
+                    <div style="background: white; padding: 32px; border-radius: 24px; border: 2px solid #e2e8f0; line-height: 1.8; color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <!-- HEADER -->
+                        <div style="background: linear-gradient(135deg, #06b6d4, #0284c7); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(6,182,212,0.3);">
+                            <span style="background: #e0f2fe; color: #0369a1; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎓 BẢNG TRA CỨU HỢP ÂM THEO 3 LEVELS</span>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">10 Loại Hợp Âm theo 3 Levels (120 Hợp Âm)</h2>
+                            <p style="margin: 6px 0 0 0; color: #e0f2fe; font-weight: 600; font-size: 1rem;">Phân bổ trọn bộ 120 Hợp âm cho 12 nốt gốc (36 Lvl 1 + 48 Lvl 2 + 36 Lvl 3)</p>
+                        </div>
+
+                        <!-- BANNER 2 PLAYBACK MODES -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
+                            <h4 style="margin: 0 0 8px 0; color: #7e22ce; font-size: 1.15rem; font-weight: 800;">💡 2 Chế Độ Luyện Tai Hợp Âm (Chord Test):</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #d8b4fe;">
+                                    <b>🎹 Block Chord (Đập Hòa Âm):</b> Đập tất cả các nốt vang lên cùng một lúc ➔ Thử thách tai phân tích màu sắc & không khí hòa âm tổng thể.
+                                </div>
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #d8b4fe;">
+                                    <b>🎸 Arpeggio (Rải Từng Nốt):</b> Rải từng nốt lần lượt từ dưới lên ➔ Giúp tai dễ dàng rà soát từng bậc nốt nhạc.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LEVEL 1 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 22px; border-radius: 18px; border: 2px solid #fef08a;">
+                            <h4 style="margin: 0 0 14px 0; color: #a16207; font-size: 1.2rem; font-weight: 800;">☀️ LEVEL 1: Cụm Hợp Âm Cơ Bản (36 Hợp Âm = 12 Nốt Gốc × 3 Loại)</h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                    <b>☀️ 12 Hợp Âm Trưởng (Major):</b> C, C#, D, D#, E, F, F#, G, G#, A, A#, B ➔ Cảm xúc Vui vẻ, Sáng sủa, Hào hùng. Công thức: <code>1 - 3 - 5</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                    <b>🌧️ 12 Hợp Âm Thứ (Minor):</b> Cm, C#m, Dm, D#m, Em, Fm, F#m, Gm, G#m, Am, A#m, Bm ➔ Cảm xúc Buồn bã, U uất, Tối tăm. Công thức: <code>1 - ♭3 - 5</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                    <b>🎋 12 Hợp Âm Treo (Sus2 / Sus4):</b> Csus, Dsus, Esus, Fsus, Gsus, Asus, Bsus... ➔ Cảm xúc Lơ lửng, Trung tính. Công thức: <code>1 - 4 - 5</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LEVEL 2 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 22px; border-radius: 18px; border: 2px solid #bfdbfe;">
+                            <h4 style="margin: 0 0 14px 0; color: #1d4ed8; font-size: 1.2rem; font-weight: 800;">🌿 LEVEL 2: Cụm Hợp Âm Gia Vị & Hợp Âm 7 (48 Hợp Âm = 12 Nốt Gốc × 4 Loại)</h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
+                                    <b>⚡ 12 Hợp Âm Giảm (dim):</b> Cdim, Ddim, Edim, Fdim, Gdim, Adim... ➔ Cực kỳ căng thẳng, rùng rợn. Công thức: <code>1 - ♭3 - ♭5</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
+                                    <b>🌌 12 Hợp Âm Tăng (aug):</b> Caug, Daug, Eaug, Faug, Gaug, Aaug... ➔ Huyền bí, mộng mơ, lơ lửng. Công thức: <code>1 - 3 - ♯5</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
+                                    <b>🎷 12 Hợp Âm 7 Át (7 - Dominant 7):</b> C7, D7, E7, F7, G7, A7, B7... ➔ Căng thẳng vừa phải, bụi bặm Blues/Funk. Công thức: <code>1 - 3 - 5 - ♭7</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #93c5fd;">
+                                    <b>✨ 12 Hợp Âm 7 Trưởng / 7 Thứ (Maj7 / m7):</b> CMaj7, DMaj7 / Cm7, Dm7... ➔ Sang trọng, thư thái, bay bổng. Công thức: <code>1 - 3 - 5 - 7</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LEVEL 3 -->
+                        <div style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
+                            <h4 style="margin: 0 0 14px 0; color: #7e22ce; font-size: 1.2rem; font-weight: 800;">🎷 LEVEL 3: Cụm Hợp Âm Phức Tạp & Đảo Thế (36 Hợp Âm = 12 Nốt Gốc × 3 Loại)</h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>💎 12 Hợp Âm Mở Rộng (Add9 / 9th):</b> Cadd9, Dadd9, C9, D9, E9... ➔ Mở rộng hiện đại, lấp lánh. Công thức: <code>1 - 3 - 5 - 9</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>🧠 12 Hợp Âm Giảm 7 / Nửa Giảm (dim7 / m7♭5):</b> Cm7b5, Cdim7, Dm7b5... ➔ Hại não, bí ẩn Jazz. Công thức: <code>1 - ♭3 - ♭5 - ♭7</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>🔄 12 Hợp Âm Đảo Thế (Inversions: C/E, C/G...):</b> C/E, C/G, D/F#, G/B... ➔ Thay đổi nốt Bass trầm dưới đáy. Công thức: <code>3 - 5 - 8</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         cardBody.innerHTML = htmlContent;
