@@ -283,8 +283,13 @@
         { abc: 'C,', name: 'Đô (C,)', noteOnly: 'C' }
     ];
 
-    // Khóa Fa Level 1 (Dễ): Các nốt trong khuông Fa & Đô (C, D, E, F, G, A, B, C D E F G A B)
+    // Khóa Fa Level 1 (Dễ): Từ E,, đến C, rồi tới C (13 nốt: E,, F,, G,, A,, B,, C, D, E, F, G, A, B, C)
     const BASS_NOTES_LVL1 = [
+        { abc: 'E,,', name: 'Mi (E,,)', noteOnly: 'E' },
+        { abc: 'F,,', name: 'Pha (F,,)', noteOnly: 'F' },
+        { abc: 'G,,', name: 'Son (G,,)', noteOnly: 'G' },
+        { abc: 'A,,', name: 'La (A,,)', noteOnly: 'A' },
+        { abc: 'B,,', name: 'Si (B,,)', noteOnly: 'B' },
         { abc: 'C,', name: 'Đô (C,)', noteOnly: 'C' },
         { abc: 'D,', name: 'Rê (D,)', noteOnly: 'D' },
         { abc: 'E,', name: 'Mi (E,)', noteOnly: 'E' },
@@ -292,7 +297,11 @@
         { abc: 'G,', name: 'Son (G,)', noteOnly: 'G' },
         { abc: 'A,', name: 'La (A,)', noteOnly: 'A' },
         { abc: 'B,', name: 'Si (B,)', noteOnly: 'B' },
-        { abc: 'C', name: 'Đô (C)', noteOnly: 'C' },
+        { abc: 'C', name: 'Đô (C)', noteOnly: 'C' }
+    ];
+
+    // Khóa Fa Level 2 (Vừa): Từ D đến B (6 nốt dòng kẻ phụ trên: D E F G A B)
+    const BASS_NOTES_LVL2 = [
         { abc: 'D', name: 'Rê (D)', noteOnly: 'D' },
         { abc: 'E', name: 'Mi (E)', noteOnly: 'E' },
         { abc: 'F', name: 'Pha (F)', noteOnly: 'F' },
@@ -301,26 +310,14 @@
         { abc: 'B', name: 'Si (B)', noteOnly: 'B' }
     ];
 
-    // Khóa Fa Level 2 (Vừa): Dòng kẻ phụ phía trên Khóa Fa (c d e f g a b)
-    const BASS_NOTES_LVL2 = [
-        { abc: 'c', name: 'Đô (c)', noteOnly: 'C' },
-        { abc: 'd', name: 'Rê (d)', noteOnly: 'D' },
-        { abc: 'e', name: 'Mi (e)', noteOnly: 'E' },
-        { abc: 'f', name: 'Pha (f)', noteOnly: 'F' },
-        { abc: 'g', name: 'Son (g)', noteOnly: 'G' },
-        { abc: 'a', name: 'La (a)', noteOnly: 'A' },
-        { abc: 'b', name: 'Si (b)', noteOnly: 'B' }
-    ];
-
-    // Khóa Fa Level 3 (Khó): Dòng kẻ phụ phẩy đôi phía dưới Khóa Fa (B,, A,, G,, F,, E,, D,, C,,)
+    // Khóa Fa Level 3 (Khó): D,, hạ xuống 6 nốt (6 nốt rất trầm: D,, C,, B,,, A,,, G,,, F,,,)
     const BASS_NOTES_LVL3 = [
-        { abc: 'B,,', name: 'Si (B,,)', noteOnly: 'B' },
-        { abc: 'A,,', name: 'La (A,,)', noteOnly: 'A' },
-        { abc: 'G,,', name: 'Son (G,,)', noteOnly: 'G' },
-        { abc: 'F,,', name: 'Pha (F,,)', noteOnly: 'F' },
-        { abc: 'E,,', name: 'Mi (E,,)', noteOnly: 'E' },
         { abc: 'D,,', name: 'Rê (D,,)', noteOnly: 'D' },
-        { abc: 'C,,', name: 'Đô (C,,)', noteOnly: 'C' }
+        { abc: 'C,,', name: 'Đô (C,,)', noteOnly: 'C' },
+        { abc: 'B,,,', name: 'Si (B,,,)', noteOnly: 'B' },
+        { abc: 'A,,,', name: 'La (A,,,)', noteOnly: 'A' },
+        { abc: 'G,,,', name: 'Son (G,,,)', noteOnly: 'G' },
+        { abc: 'F,,,', name: 'Pha (F,,,)', noteOnly: 'F' }
     ];
 
     const NOTE_COLOR_MAP = {
@@ -715,19 +712,19 @@
 
                     <!-- DEMO 4: KHÓA FA LEVEL 1 -->
                     <div style="margin: 22px 0; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 20px; border-radius: 16px; border: 2px solid #bfdbfe;">
-                        <h4 style="margin: 0 0 10px 0; color: #1d4ed8; font-size: 1.15rem; font-weight: 800;">𝄢 4. Khóa Fa — Level 1 (Dễ: 14 nốt C, D, E, F, G, A, B, C D E F G A B):</h4>
+                        <h4 style="margin: 0 0 10px 0; color: #1d4ed8; font-size: 1.15rem; font-weight: 800;">𝄢 4. Khóa Fa — Level 1 (Dễ: 13 nốt từ E,, đến C):</h4>
                         <div id="theory-bass-lvl1-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #93c5fd;"></div>
                     </div>
 
                     <!-- DEMO 5: KHÓA FA LEVEL 2 -->
                     <div style="margin: 22px 0; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 20px; border-radius: 16px; border: 2px solid #bbf7d0;">
-                        <h4 style="margin: 0 0 10px 0; color: #15803d; font-size: 1.15rem; font-weight: 800;">𝄢 5. Khóa Fa — Level 2 (Vừa: Dòng phụ phía trên c d e f g a b):</h4>
+                        <h4 style="margin: 0 0 10px 0; color: #15803d; font-size: 1.15rem; font-weight: 800;">𝄢 5. Khóa Fa — Level 2 (Vừa: 6 nốt D đến B trên dòng phụ):</h4>
                         <div id="theory-bass-lvl2-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #4ade80;"></div>
                     </div>
 
                     <!-- DEMO 6: KHÓA FA LEVEL 3 -->
                     <div style="margin: 22px 0; background: linear-gradient(135deg, #fff7ed, #ffedd5); padding: 20px; border-radius: 16px; border: 2px solid #fed7aa;">
-                        <h4 style="margin: 0 0 10px 0; color: #c2410c; font-size: 1.15rem; font-weight: 800;">𝄢 6. Khóa Fa — Level 3 (Khó: Dòng phụ phẩy đôi B,, A,, G,, F,, E,, D,, C,,):</h4>
+                        <h4 style="margin: 0 0 10px 0; color: #c2410c; font-size: 1.15rem; font-weight: 800;">𝄢 6. Khóa Fa — Level 3 (Khó: 6 nốt D,, hạ xuống trầm F,,,):</h4>
                         <div id="theory-bass-lvl3-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #fb923c;"></div>
                     </div>
                 </div>
@@ -786,9 +783,9 @@
             const trebleLvl2Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nc' d' e' f' | g' a' b' |\nw: Đô(c') Rê(d') Mi(e') Pha(f') | Son(g') La(a') Si(b')`;
             const trebleLvl3Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nC, D, E, F, | G, A, B, |\nw: Đô(C,) Rê(D,) Mi(E,) Pha(F,) | Son(G,) La(A,) Si(B,)`;
 
-            const bassLvl1Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=bass\nC, D, E, F, | G, A, B, C | D E F G | A B |\nw: Đô(C,) Rê(D,) Mi(E,) Pha(F,) | Son(G,) La(A,) Si(B,) Đô(C) | Rê(D) Mi(E) Pha(F) Son(G) | La(A) Si(B)`;
-            const bassLvl2Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=bass\nc d e f | g a b |\nw: Đô(c) Rê(d) Mi(e) Pha(f) | Son(g) La(a) Si(b)`;
-            const bassLvl3Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=bass\nC,, D,, E,, F,, | G,, A,, B,, |\nw: Đô(C,,) Rê(D,,) Mi(E,,) Pha(F,,) | Son(G,,) La(A,,) Si(B,,)`;
+            const bassLvl1Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=bass\nE,, F,, G,, A,, | B,, C, D, E, | F, G, A, B, | C |\nw: Mi(E,,) Pha(F,,) Son(G,,) La(A,,) | Si(B,,) Đô(C,) Rê(D,) Mi(E,) | Pha(F,) Son(G,) La(A,) Si(B,) | Đô(C)`;
+            const bassLvl2Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=bass\nD E F G | A B |\nw: Rê(D) Mi(E) Pha(F) Son(G) | La(A) Si(B)`;
+            const bassLvl3Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=bass\nD,, C,, B,,, A,,, | G,,, F,,, |\nw: Rê(D,,) Đô(C,,) Si(B,,,) La(A,,,) | Son(G,,,) Pha(F,,,)`;
 
             renderTheoryAbcHelper('theory-treble-lvl1-paper', trebleLvl1Abc);
             renderTheoryAbcHelper('theory-treble-lvl2-paper', trebleLvl2Abc);
@@ -997,9 +994,9 @@
             { id: 'sol-1', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 1, lvlTitle: 'Level 1 (Dễ - C D E F G A B c d e f g a b)', pool: TREBLE_NOTES_LVL1, bg: 'linear-gradient(135deg, #fff1f2, #fff7ed)', border: '#fecdd3', text: '#be123c' },
             { id: 'sol-2', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 2, lvlTitle: 'Level 2 (Vừa - Dòng kẻ phụ trên c\' đến b\')', pool: TREBLE_NOTES_LVL2, bg: 'linear-gradient(135deg, #fefce8, #fff7ed)', border: '#fef08a', text: '#a16207' },
             { id: 'sol-3', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 3, lvlTitle: 'Level 3 (Khó - Dòng phụ trầm B, A, G, F, E, D, C,)', pool: TREBLE_NOTES_LVL3, bg: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', border: '#e9d5ff', text: '#7e22ce' },
-            { id: 'fa-1',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 1, lvlTitle: 'Level 1 (Dễ - C, D, E, F, G, A, B, C D E F G A B)', pool: BASS_NOTES_LVL1,   bg: 'linear-gradient(135deg, #eff6ff, #dbeafe)', border: '#bfdbfe', text: '#1d4ed8' },
-            { id: 'fa-2',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 2, lvlTitle: 'Level 2 (Vừa - Dòng phụ trên c d e f g a b)', pool: BASS_NOTES_LVL2,   bg: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', border: '#bbf7d0', text: '#15803d' },
-            { id: 'fa-3',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 3, lvlTitle: 'Level 3 (Khó - Dòng phụ trầm B,, A,, G,, F,, E,, D,, C,,)', pool: BASS_NOTES_LVL3,   bg: 'linear-gradient(135deg, #fff7ed, #ffedd5)', border: '#fed7aa', text: '#c2410c' }
+            { id: 'fa-1',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 1, lvlTitle: 'Level 1 (Dễ - 13 nốt từ E,, đến C)', pool: BASS_NOTES_LVL1,   bg: 'linear-gradient(135deg, #eff6ff, #dbeafe)', border: '#bfdbfe', text: '#1d4ed8' },
+            { id: 'fa-2',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 2, lvlTitle: 'Level 2 (Vừa - 6 nốt D đến B trên dòng phụ)', pool: BASS_NOTES_LVL2,   bg: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', border: '#bbf7d0', text: '#15803d' },
+            { id: 'fa-3',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 3, lvlTitle: 'Level 3 (Khó - 6 nốt D,, hạ xuống trầm F,,,)', pool: BASS_NOTES_LVL3,   bg: 'linear-gradient(135deg, #fff7ed, #ffedd5)', border: '#fed7aa', text: '#c2410c' }
         ];
 
         let sectionsHTML = '';
