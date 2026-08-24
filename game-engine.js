@@ -1305,77 +1305,250 @@
                 htmlContent = theoryHTML;
             }
         } else if (gameId === 'scale') {
-            htmlContent = `
-                <div style="background: white; padding: 32px; border-radius: 24px; border: 2px solid #e2e8f0; line-height: 1.8; color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-                    <!-- HEADER -->
-                    <div style="background: linear-gradient(135deg, #eab308, #ca8a04); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(234,179,8,0.3);">
-                        <span style="background: #fef08a; color: #713f12; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎓 GIÁO TRÌNH LÝ THUYẾT ÂM GIAI</span>
-                        <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">Cẩm Nang Lý Thuyết Âm Giai (Scales Guide — 3 Levels)</h2>
-                        <p style="margin: 6px 0 0 0; color: #fefce8; font-weight: 600; font-size: 1rem;">Kho vật liệu cảm xúc trong âm nhạc từ Trưởng, Thứ đến Blues và các Điệu thức (Modes)</p>
-                    </div>
+            if (!window.GameState.scaleTheorySubTab) {
+                window.GameState.scaleTheorySubTab = 'guide';
+            }
+            const subTab = window.GameState.scaleTheorySubTab;
 
-                    <!-- BANNER 2 PLAYBACK MODES -->
-                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 22px; border-radius: 18px; border: 2px solid #bfdbfe;">
-                        <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 1.15rem; font-weight: 800;">💡 2 Chế Độ Luyện Tai Âm Giai:</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
-                            <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
-                                <b>📖 Chế Độ Học (Scale Run):</b> Máy phát lần lượt từng nốt từ thấp lên cao (hoặc từ cao xuống thấp) để bạn ghi nhớ màu sắc tổng thể.
-                            </div>
-                            <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
-                                <b>🎸 Chế Độ Thực Chiến (Melody/Lick):</b> Máy không chạy lần lượt nữa mà bốc các nốt tạo thành câu giai điệu ngắn 3s (Lick) vô cùng cuốn hút và thực tế!
-                            </div>
-                        </div>
-                    </div>
+            window.switchScaleTheorySubTab = function(tabKey) {
+                window.GameState.scaleTheorySubTab = tabKey;
+                renderGameUI();
+            };
 
-                    <!-- LEVEL 1 -->
-                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 22px; border-radius: 18px; border: 2px solid #fef08a;">
-                        <h4 style="margin: 0 0 14px 0; color: #a16207; font-size: 1.2rem; font-weight: 800;">☀️ Level 1 (Người mới bắt đầu): Màu Sắc Cơ Bản & Cực Đoan</h4>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
-                                <b>☀️ Major Scale (Âm giai Trưởng):</b> Cảm xúc Vui vẻ, Sáng sủa, Hào hùng, Trọn vẹn. Công thức: <code>1 2 3 4 5 6 7 8</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
-                                <b>🌧️ Natural Minor Scale (Âm giai Thứ tự nhiên):</b> Cảm xúc Buồn bã, Da diết, Tối tăm. Công thức: <code>1 2 ♭3 4 5 ♭6 ♭7 8</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
-                                <b>🎋 Major Pentatonic (Ngũ cung Trưởng):</b> Đậm chất nhạc Dân ca, Á Đông (Việt Nam, Trung Quốc). Thiếu nửa cung nên rất thoáng. Công thức: <code>1 2 3 5 6 8</code>
-                            </div>
-                        </div>
-                    </div>
+            const activeStyle = 'background: linear-gradient(135deg, #eab308, #ca8a04); color: white; border: none; font-weight: 800; padding: 10px 22px; border-radius: 20px; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.35); cursor: pointer; transition: all 0.2s;';
+            const inactiveStyle = 'background: white; color: #475569; border: 2px solid #cbd5e1; font-weight: 700; padding: 10px 22px; border-radius: 20px; cursor: pointer; transition: all 0.2s;';
 
-                    <!-- LEVEL 2 -->
-                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 22px; border-radius: 18px; border: 2px solid #bbf7d0;">
-                        <h4 style="margin: 0 0 14px 0; color: #15803d; font-size: 1.2rem; font-weight: 800;">🌿 Level 2 (Trung cấp): Sắc Thái Văn Hóa & Cổ Điển</h4>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #86efac;">
-                                <b>🏜️ Harmonic Minor (Thứ Hòa âm):</b> Đậm chất sa mạc Ai Cập, Ba Tư, Trung Đông ma mị. Công thức: <code>1 2 ♭3 4 5 ♭6 7 8</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #86efac;">
-                                <b>🎻 Melodic Minor (Thứ Giai điệu):</b> Đoạn đầu buồn (Thứ), đoạn kết vút lên sáng rực rỡ (Trưởng). Phổ biến trong nhạc Cổ điển. Công thức: <code>1 2 ♭3 4 5 6 7 8</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #86efac;">
-                                <b>🎸 Minor Pentatonic (Ngũ cung Thứ):</b> Gai góc, mạnh mẽ. Thang âm quốc dân của các bài Solo Guitar Rock/Pop. Công thức: <code>1 ♭3 4 5 ♭7 8</code>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- LEVEL 3 -->
-                    <div style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
-                        <h4 style="margin: 0 0 14px 0; color: #7e22ce; font-size: 1.2rem; font-weight: 800;">🎷 Level 3 (Khó / Cao cấp): Nhạc Jazz, Blues và các Mode</h4>
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
-                                <b>🎷 Blues Scale:</b> Ngũ cung Thứ + "nốt chói" (Blue note). Nghe lả lướt, bụi bặm, đường phố đặc trưng Blues/Jazz. Công thức: <code>1 ♭3 4 ♭5 5 ♭7 8</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
-                                <b>✨ Dorian Mode:</b> Âm giai Thứ nâng cấp sáng sủa hơn. Bồng bềnh, thần tiên (Phim viễn tưởng, Celtic). Công thức: <code>1 2 ♭3 4 5 6 ♭7 8</code>
-                            </div>
-                            <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
-                                <b>🕶️ Mixolydian Mode:</b> Âm giai Trưởng làm tối 1 nốt (♭7). Vui nhưng có chút bụi bặm, lười biếng. Công thức: <code>1 2 3 4 5 6 ♭7 8</code>
-                            </div>
-                        </div>
-                    </div>
+            const subTabHeader = `
+                <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                    <button onclick="window.switchScaleTheorySubTab('guide')" style="${subTab === 'guide' ? activeStyle : inactiveStyle}">
+                        📘 5 Bài Học Cốt Lõi Âm Giai & Vòng Bậc 5
+                    </button>
+                    <button onclick="window.switchScaleTheorySubTab('formulas')" style="${subTab === 'formulas' ? activeStyle : inactiveStyle}">
+                        🎼 9 Loại Âm Giai theo 3 Levels & Công Thức
+                    </button>
                 </div>
             `;
+
+            if (subTab === 'guide') {
+                htmlContent = subTabHeader + `
+                    <div style="background: white; padding: 32px; border-radius: 24px; border: 2px solid #e2e8f0; line-height: 1.8; color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <!-- MASTER HEADER -->
+                        <div style="background: linear-gradient(135deg, #eab308, #ca8a04); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(234,179,8,0.3);">
+                            <span style="background: #fef08a; color: #713f12; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎓 GIÁO TRÌNH LÝ THUYẾT NỀN TẢNG</span>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">5 Bài Học Cốt Lõi Âm Giai, Giọng Song Song & Vòng Bậc 5</h2>
+                            <p style="margin: 6px 0 0 0; color: #fefce8; font-weight: 600; font-size: 1rem;">Chìa khóa giải mã bản đồ hợp âm, cảm âm thần tốc và nghệ thuật chuyển giọng đỉnh cao</p>
+                        </div>
+
+                        <!-- SECTION 1 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 24px; border-radius: 20px; border: 2px solid #fde047;">
+                            <h3 style="margin-top: 0; color: #a16207; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                1. Tại Sao Bắt Buộc Phải Học Scale?
+                            </h3>
+                            <p style="font-size: 1.02rem; color: #475569; font-weight: 600; font-style: italic; background: white; padding: 12px 16px; border-radius: 12px; border-left: 4px solid #ca8a04;">
+                                "Nếu nốt nhạc là 'chữ cái', thì Scale chính là 'bảng chữ cái' tạo nên toàn bộ ngôn ngữ âm nhạc."
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 16px;">
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #fef08a;">
+                                    <b style="color: #854d0e; font-size: 1.05rem;">🗺️ Bản đồ định vị Hợp Âm:</b> Khi biết một bài hát dùng Scale nào, bạn lập tức biết trước <b>7 hợp âm gia đình</b> của nó. Việc đệm hát trở thành trò chơi trắc nghiệm <i>"chọn 1 trong 7"</i> thay vì mò mẫm hàng trăm hợp âm rời rạc.
+                                </div>
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #fef08a;">
+                                    <b style="color: #854d0e; font-size: 1.05rem;">🛡️ Kim bài miễn tử khi Solo (Improvisation):</b> Chỉ cần tay bạn chạy đúng các nốt trong khuôn Scale của bài hát, bạn đánh ngẫu hứng nốt nào cũng sẽ thuận tai và <b>không bao giờ bị "phô"</b>.
+                                </div>
+                                <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #fef08a;">
+                                    <b style="color: #854d0e; font-size: 1.05rem;">⚡ Tốc độ dò nốt (Cảm âm) nhanh gấp 10 lần:</b> Trên đàn có 12 phím (7 trắng, 5 đen). Nếu không biết Scale, bạn phải "thử sai" cả 12 phím. Nhưng khi biết bài hát ở Đô Trưởng (chỉ dùng 7 phím trắng), não bạn sẽ tự động loại bỏ 5 phím đen (nốt thừa) ra khỏi đầu. Việc thu hẹp phạm vi giúp bạn mò giai điệu nhanh như chớp.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 24px; border-radius: 20px; border: 2px solid #bfdbfe;">
+                            <h3 style="margin-top: 0; color: #1d4ed8; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                2. Bí Ẩn Của Giọng Song Song (Relative Keys)
+                            </h3>
+                            <p style="font-size: 1rem; color: #1e3a8a; font-weight: 600;">
+                                Giọng song song là một cặp gồm <b>1 Giọng Trưởng và 1 Giọng Thứ</b> dùng chung 100% các nốt nhạc (chung hóa biểu / dấu thăng giáng).
+                            </p>
+                            <div style="background: white; padding: 18px; border-radius: 14px; border: 1.5px solid #93c5fd; margin-top: 14px;">
+                                <div style="font-weight: 800; color: #1e40af; margin-bottom: 8px;">💡 Ví dụ điển hình:</div>
+                                <div style="font-size: 0.98rem; color: #334155;">
+                                    <b>Đô Trưởng (C Major)</b> và <b>La Thứ (A Minor)</b> đều sử dụng chung trọn bộ 7 phím trắng: <code>C - D - E - F - G - A - B</code>.
+                                </div>
+                                <div style="margin-top: 12px; background: #eff6ff; padding: 12px; border-radius: 10px; font-weight: 700; color: #1d4ed8;">
+                                    🎯 <b>Cách tìm nhanh:</b> Từ giọng Trưởng <b>lùi xuống 3 phím đàn</b> (tính cả phím đen) sẽ ra giọng Thứ song song! (Ví dụ: C lùi 3 phím ➔ B ➔ B♭ ➔ A = <b>Am</b>).
+                                </div>
+                                <div style="margin-top: 12px; font-size: 0.95rem; color: #475569;">
+                                    <b>🎁 Lợi ích:</b> Thay vì phải học 24 bộ nốt cho 24 Giọng, bạn chỉ cần học 12 bộ. Hai giọng này cực kỳ dễ "chuyển tông" qua lại mượt mà (Ví dụ: Đoạn đầu buồn hát La thứ, đoạn sau điệp khúc bùng nổ vút sang Đô trưởng).
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 3 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 24px; border-radius: 20px; border: 2px solid #bbf7d0;">
+                            <h3 style="margin-top: 0; color: #15803d; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                3. Cùng Nốt, Cùng Hợp Âm, Vậy Đô Trưởng Khác La Thứ Ở Chỗ Nào?
+                            </h3>
+                            <p style="font-size: 1rem; color: #166534; font-weight: 600;">
+                                Sự khác biệt không nằm ở nguyên liệu (nốt nhạc), mà nằm ở việc <b>Ai là nhân vật chính (Nốt Chủ / Tonal Center)</b> và <b>Lực hút của vòng hợp âm</b>!
+                            </p>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 16px;">
+                                <div style="background: white; padding: 18px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                    <h4 style="margin: 0 0 8px 0; color: #15803d; font-size: 1.1rem; font-weight: 800;">☀️ Lấy Đô (C) làm nhà:</h4>
+                                    <p style="margin: 0; font-size: 0.95rem; color: #334155;">
+                                        Toàn bộ giai điệu xoay quanh nốt Đô. Khi kết thúc ở nốt Đô, người nghe thấy trọn vẹn, vui vẻ, hào hùng. Vòng hợp âm xoay quanh các hợp âm sáng tươi: <b>C, F, G</b>.
+                                    </p>
+                                </div>
+                                <div style="background: white; padding: 18px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                    <h4 style="margin: 0 0 8px 0; color: #166534; font-size: 1.1rem; font-weight: 800;">🌧️ Lấy La (Am) làm nhà:</h4>
+                                    <p style="margin: 0; font-size: 0.95rem; color: #334155;">
+                                        Toàn bộ giai điệu xoay quanh nốt La. Khi kết thúc ở nốt La, cảm giác mang lại là sự da diết, buồn bã, u tối. Vòng hợp âm xoay quanh các hợp âm trầm buồn: <b>Am, Dm, Em</b>.
+                                    </p>
+                                </div>
+                            </div>
+                            <div style="margin-top: 16px; background: #dcfce7; padding: 14px; border-radius: 12px; font-weight: 700; color: #14532d; border: 1px dashed #22c55e;">
+                                💡 <b>Tóm lại:</b> Cùng một dàn diễn viên (7 hợp âm), nhưng đạo diễn giao vai chính cho ai thì bộ phim sẽ mang màu sắc của người đó!
+                            </div>
+                        </div>
+
+                        <!-- SECTION 4 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 24px; border-radius: 20px; border: 2px solid #e9d5ff;">
+                            <h3 style="margin-top: 0; color: #7e22ce; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                4. Vòng Bậc 5 (The Circle of Fifths) — Chiếc Đồng Hồ Định Vị
+                            </h3>
+                            <p style="font-size: 1rem; color: #6b21a8; font-weight: 600;">
+                                Hãy tưởng tượng Vòng Bậc 5 đơn giản là một <b>chiếc đồng hồ treo tường 12 số</b> đại diện cho 12 Giọng:
+                            </p>
+                            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>🕛 12 giờ (Đô Trưởng / C):</b> Điểm xuất phát "sạch sẽ" nhất, không có dấu thăng/giáng nào (0).
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>🕐 Đi xuôi chiều kim đồng hồ (Đếm lên 5):</b> Mỗi lần nhích 1 giờ, bạn <b>cộng thêm 1 dấu Thăng (#)</b>. (1h là Sol Trưởng có 1#, 2h là Rê Trưởng có 2#...).
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>🕚 Đi ngược chiều kim đồng hồ:</b> Mỗi lần lùi 1 giờ, bạn <b>cộng thêm 1 dấu Giáng (♭)</b>. (11h là Fa Trưởng có 1♭, 10h là Si giáng Trưởng có 2♭...).
+                                </div>
+                            </div>
+                            <div style="margin-top: 16px; background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #c084fc;">
+                                <b style="color: #6b21a8;">🪄 Tác dụng "Thần Thánh" của Vòng Bậc 5:</b> Nó là bản đồ giúp nhạc sĩ chuyển giọng (Modulate). Những giọng nằm cạnh nhau trên mặt đồng hồ (như 12h và 1h) dùng chung tới <b>6/7 nốt nhạc</b>. Khi ca sĩ chuyển tông giữa các giọng "hàng xóm" này, tai người nghe sẽ thấy vô cùng êm ái. Ngược lại, nếu chuyển gắt từ 12h nhảy thẳng xuống 6h, sự khác biệt quá lớn về nốt sẽ khiến bài hát nghe cực kỳ chói tai và giật cục.
+                            </div>
+                        </div>
+
+                        <!-- SECTION 5 -->
+                        <div style="background: linear-gradient(135deg, #fff1f2, #fff7ed); padding: 24px; border-radius: 20px; border: 2px solid #fecdd3;">
+                            <h3 style="margin-top: 0; color: #be123c; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                                5. 3 Cấp Độ Chuyển Giọng Trong Âm Nhạc (Modulation & Transposition)
+                            </h3>
+                            <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">
+                                <div style="background: white; padding: 18px; border-radius: 16px; border: 1.5px solid #fda4af;">
+                                    <div style="font-weight: 800; color: #be123c; font-size: 1.1rem; margin-bottom: 6px;">
+                                        🛠️ Loại 1: Transpose (Dịch giọng cơ học) — <span style="background: #ffe4e6; color: #9f1239; padding: 2px 10px; border-radius: 10px; font-size: 0.85rem;">Cấp Độ Thợ</span>
+                                    </div>
+                                    <div style="font-size: 0.95rem; color: #475569; line-height: 1.6;">
+                                        <b>Bản chất:</b> Dịch lên/xuống cho phù hợp với cữ giọng ca sĩ. Bê nguyên xi cái khuôn đúc đi chỗ khác (Trưởng giữ nguyên Trưởng, Thứ giữ nguyên Thứ).<br/>
+                                        <b>Cảm xúc:</b> Không thay đổi. Bài hát chỉ nghe cao hơn hoặc trầm hơn.<br/>
+                                        <b>Đẳng cấp:</b> Đây là kỹ năng sinh tồn cơ bản của mọi nhạc công đệm hát.
+                                    </div>
+                                </div>
+
+                                <div style="background: white; padding: 18px; border-radius: 16px; border: 1.5px solid #fda4af;">
+                                    <div style="font-weight: 800; color: #be123c; font-size: 1.1rem; margin-bottom: 6px;">
+                                        🎨 Loại 2: Modulation (Chuyển giọng / Chuyển điệu) — <span style="background: #ffe4e6; color: #9f1239; padding: 2px 10px; border-radius: 10px; font-size: 0.85rem;">Cấp Độ Tác Giả</span>
+                                    </div>
+                                    <div style="font-size: 0.95rem; color: #475569; line-height: 1.6;">
+                                        <b>Bản chất:</b> Đang đánh ở giọng này, dùng thủ thuật hòa âm để "lái" bài hát sang một giọng khác ngay lúc đang hát để tạo sự bất ngờ, tương phản.<br/>
+                                        <b>Chiêu 1 (Giọng song song):</b> Hát Đoạn 1 ở giọng La thứ (thủ thỉ, buồn). Đến Điệp khúc, lái sang Đô Trưởng (bừng sáng, hy vọng).<br/>
+                                        <b>Chiêu 2 (Lên tông cuối bài):</b> Đang hát điệp khúc Đô Trưởng, đến lần hát lại điệp khúc cuối cùng, band nhạc đẩy vọt lên Rê Trưởng. Cảm xúc bùng nổ, rùng mình!<br/>
+                                        <b>Đẳng cấp:</b> Đây là thủ pháp tạo cao trào của các Nhạc sĩ sáng tác.
+                                    </div>
+                                </div>
+
+                                <div style="background: white; padding: 18px; border-radius: 16px; border: 1.5px solid #fda4af;">
+                                    <div style="font-weight: 800; color: #be123c; font-size: 1.1rem; margin-bottom: 6px;">
+                                        🧙‍♂️ Loại 3: Reharmonization / Modal Interchange (Biến tấu / Đổi hệ) — <span style="background: #ffe4e6; color: #9f1239; padding: 2px 10px; border-radius: 10px; font-size: 0.85rem;">Cấp Độ Phù Thủy Phối Khí</span>
+                                    </div>
+                                    <div style="font-size: 0.95rem; color: #475569; line-height: 1.6;">
+                                        <b>Bản chất:</b> Đổi khuôn đúc, bẻ từ Trưởng sang Thứ để sáng tạo mới hoàn toàn. Lấy giai điệu bài hát cũ, đập bỏ dàn hợp âm gốc. Ép một giai điệu Trưởng vui vẻ phải chạy trên nền hợp âm Thứ u tối.<br/>
+                                        <b>Ví dụ:</b> Lấy bài <i>Happy Birthday</i> hoặc <i>Kìa con bướm vàng</i>, ép nó vào khuôn Thứ. Bài hát lập tức biến thành nhạc phim kinh dị, ma mị, gây ám ảnh! (Hoặc ngược lại, lấy một bài thất tình bi đát bẻ sang Trưởng, nó biến thành một bài hát chill chill, tích cực).<br/>
+                                        <b>Đẳng cấp:</b> Đây là "ma thuật" sáng tạo của các Nhà Sản xuất âm nhạc chuyên nghiệp.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                htmlContent = subTabHeader + `
+                    <div style="background: white; padding: 32px; border-radius: 24px; border: 2px solid #e2e8f0; line-height: 1.8; color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                        <!-- HEADER -->
+                        <div style="background: linear-gradient(135deg, #eab308, #ca8a04); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(234,179,8,0.3);">
+                            <span style="background: #fef08a; color: #713f12; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎓 GIÁO TRÌNH LÝ THUYẾT ÂM GIAI</span>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">Cẩm Nang Lý Thuyết Âm Giai (Scales Guide — 3 Levels)</h2>
+                            <p style="margin: 6px 0 0 0; color: #fefce8; font-weight: 600; font-size: 1rem;">Kho vật liệu cảm xúc trong âm nhạc từ Trưởng, Thứ đến Blues và các Điệu thức (Modes)</p>
+                        </div>
+
+                        <!-- BANNER 2 PLAYBACK MODES -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 22px; border-radius: 18px; border: 2px solid #bfdbfe;">
+                            <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 1.15rem; font-weight: 800;">💡 2 Chế Độ Luyện Tai Âm Giai:</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px;">
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
+                                    <b>📖 Chế Độ Học (Scale Run):</b> Máy phát lần lượt từng nốt từ thấp lên cao (hoặc từ cao xuống thấp) để bạn ghi nhớ màu sắc tổng thể.
+                                </div>
+                                <div style="background: white; padding: 14px; border-radius: 12px; border: 1.5px solid #93c5fd;">
+                                    <b>🎸 Chế Độ Thực Chiến (Melody/Lick):</b> Máy không chạy lần lượt nữa mà bốc các nốt tạo thành câu giai điệu ngắn 3s (Lick) vô cùng cuốn hút và thực tế!
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LEVEL 1 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 22px; border-radius: 18px; border: 2px solid #fef08a;">
+                            <h4 style="margin: 0 0 14px 0; color: #a16207; font-size: 1.2rem; font-weight: 800;">☀️ Level 1 (Người mới bắt đầu): Màu Sắc Cơ Bản & Cực Đoan</h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                    <b>☀️ Major Scale (Âm giai Trưởng):</b> Cảm xúc Vui vẻ, Sáng sủa, Hào hùng, Trọn vẹn. Công thức: <code>1 2 3 4 5 6 7 8</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                    <b>🌧️ Natural Minor Scale (Âm giai Thứ tự nhiên):</b> Cảm xúc Buồn bã, Da diết, Tối tăm. Công thức: <code>1 2 ♭3 4 5 ♭6 ♭7 8</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #fde047;">
+                                    <b>🎋 Major Pentatonic (Ngũ cung Trưởng):</b> Đậm chất nhạc Dân ca, Á Đông (Việt Nam, Trung Quốc). Thiếu nửa cung nên rất thoáng. Công thức: <code>1 2 3 5 6 8</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LEVEL 2 -->
+                        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 22px; border-radius: 18px; border: 2px solid #bbf7d0;">
+                            <h4 style="margin: 0 0 14px 0; color: #15803d; font-size: 1.2rem; font-weight: 800;">🌿 Level 2 (Trung cấp): Sắc Thái Văn Hóa & Cổ Điển</h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                    <b>🏜️ Harmonic Minor (Thứ Hòa âm):</b> Đậm chất sa mạc Ai Cập, Ba Tư, Trung Đông ma mị. Công thức: <code>1 2 ♭3 4 5 ♭6 7 8</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                    <b>🎻 Melodic Minor (Thứ Giai điệu):</b> Đoạn đầu buồn (Thứ), đoạn kết vút lên sáng rực rỡ (Trưởng). Phổ biến trong nhạc Cổ điển. Công thức: <code>1 2 ♭3 4 5 6 7 8</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #86efac;">
+                                    <b>🎸 Minor Pentatonic (Ngũ cung Thứ):</b> Gai góc, mạnh mẽ. Thang âm quốc dân của các bài Solo Guitar Rock/Pop. Công thức: <code>1 ♭3 4 5 ♭7 8</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- LEVEL 3 -->
+                        <div style="background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 18px; border: 2px solid #e9d5ff;">
+                            <h4 style="margin: 0 0 14px 0; color: #7e22ce; font-size: 1.2rem; font-weight: 800;">🎷 Level 3 (Khó / Cao cấp): Nhạc Jazz, Blues và các Mode</h4>
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>🎷 Blues Scale:</b> Ngũ cung Thứ + "nốt chói" (Blue note). Nghe lả lướt, bụi bặm, đường phố đặc trưng Blues/Jazz. Công thức: <code>1 ♭3 4 ♭5 5 ♭7 8</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>✨ Dorian Mode:</b> Âm giai Thứ nâng cấp sáng sủa hơn. Bồng bềnh, thần tiên (Phim viễn tưởng, Celtic). Công thức: <code>1 2 ♭3 4 5 6 ♭7 8</code>
+                                </div>
+                                <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #d8b4fe;">
+                                    <b>🕶️ Mixolydian Mode:</b> Âm giai Trưởng làm tối 1 nốt (♭7). Vui nhưng có chút bụi bặm, lười biếng. Công thức: <code>1 2 3 4 5 6 ♭7 8</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
         } else if (gameId === 'chord') {
             htmlContent = `
                 <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
