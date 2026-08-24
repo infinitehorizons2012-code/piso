@@ -243,7 +243,7 @@
     }
 
     // --- GAME 1: LEDGER LINES ---
-    // Level 1 (Dễ): Nốt hoa ABCDEFG
+    // Khóa Sol Level 1 (Dễ): Các nốt trong khuông & Đô trung tâm (C D E F G A B c d e f g a b)
     const TREBLE_NOTES_LVL1 = [
         { abc: 'C', name: 'Đô (C)', noteOnly: 'C' },
         { abc: 'D', name: 'Rê (D)', noteOnly: 'D' },
@@ -251,11 +251,7 @@
         { abc: 'F', name: 'Pha (F)', noteOnly: 'F' },
         { abc: 'G', name: 'Son (G)', noteOnly: 'G' },
         { abc: 'A', name: 'La (A)', noteOnly: 'A' },
-        { abc: 'B', name: 'Si (B)', noteOnly: 'B' }
-    ];
-
-    // Level 2 (Vừa / Trung bình): Nốt thường abcdefg
-    const TREBLE_NOTES_LVL2 = [
+        { abc: 'B', name: 'Si (B)', noteOnly: 'B' },
         { abc: 'c', name: 'Đô (c)', noteOnly: 'C' },
         { abc: 'd', name: 'Rê (d)', noteOnly: 'D' },
         { abc: 'e', name: 'Mi (e)', noteOnly: 'E' },
@@ -265,19 +261,26 @@
         { abc: 'b', name: 'Si (b)', noteOnly: 'B' }
     ];
 
-    // Level 3 (Khó): Nốt trầm (G,, A,, B,) hoặc nốt rất cao (c', d', e', f', g', a', b', c'')
-    const TREBLE_NOTES_LVL3 = [
-        { abc: 'G,', name: 'Son (G,)', noteOnly: 'G' },
-        { abc: 'A,', name: 'La (A,)', noteOnly: 'A' },
-        { abc: 'B,', name: 'Si (B,)', noteOnly: 'B' },
+    // Khóa Sol Level 2 (Vừa): Dòng kẻ phụ phía trên (c' d' e' f' g' a' b')
+    const TREBLE_NOTES_LVL2 = [
         { abc: "c'", name: 'Đô (c\')', noteOnly: 'C' },
         { abc: "d'", name: 'Rê (d\')', noteOnly: 'D' },
         { abc: "e'", name: 'Mi (e\')', noteOnly: 'E' },
         { abc: "f'", name: 'Pha (f\')', noteOnly: 'F' },
         { abc: "g'", name: 'Son (g\')', noteOnly: 'G' },
         { abc: "a'", name: 'La (a\')', noteOnly: 'A' },
-        { abc: "b'", name: 'Si (b\')', noteOnly: 'B' },
-        { abc: "c''", name: 'Đô (c\'\')', noteOnly: 'C' }
+        { abc: "b'", name: 'Si (b\')', noteOnly: 'B' }
+    ];
+
+    // Khóa Sol Level 3 (Khó): Dòng kẻ phụ phía dưới (B, A, G, F, E, D, C,)
+    const TREBLE_NOTES_LVL3 = [
+        { abc: 'B,', name: 'Si (B,)', noteOnly: 'B' },
+        { abc: 'A,', name: 'La (A,)', noteOnly: 'A' },
+        { abc: 'G,', name: 'Son (G,)', noteOnly: 'G' },
+        { abc: 'F,', name: 'Pha (F,)', noteOnly: 'F' },
+        { abc: 'E,', name: 'Mi (E,)', noteOnly: 'E' },
+        { abc: 'D,', name: 'Rê (D,)', noteOnly: 'D' },
+        { abc: 'C,', name: 'Đô (C,)', noteOnly: 'C' }
     ];
 
     // Khóa Fa Level 1 (Dễ): Nốt có phẩy C, D, E, F, G, A, B, (Nằm chính giữa 5 dòng kẻ của Khóa Fa - C3 đến B3)
@@ -950,9 +953,9 @@
 
         // Sections configuration
         const sections = [
-            { id: 'sol-1', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 1, lvlTitle: 'Level 1 (Dễ - Trong khuông)', pool: TREBLE_NOTES_LVL1, bg: 'linear-gradient(135deg, #fff1f2, #fff7ed)', border: '#fecdd3', text: '#be123c' },
-            { id: 'sol-2', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 2, lvlTitle: 'Level 2 (Vừa - Nốt thường)', pool: TREBLE_NOTES_LVL2, bg: 'linear-gradient(135deg, #fefce8, #fff7ed)', border: '#fef08a', text: '#a16207' },
-            { id: 'sol-3', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 3, lvlTitle: 'Level 3 (Khó - Dòng kẻ phụ)', pool: TREBLE_NOTES_LVL3, bg: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', border: '#e9d5ff', text: '#7e22ce' },
+            { id: 'sol-1', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 1, lvlTitle: 'Level 1 (Dễ - C D E F G A B c d e f g a b)', pool: TREBLE_NOTES_LVL1, bg: 'linear-gradient(135deg, #fff1f2, #fff7ed)', border: '#fecdd3', text: '#be123c' },
+            { id: 'sol-2', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 2, lvlTitle: 'Level 2 (Vừa - Dòng kẻ phụ trên c\' đến b\')', pool: TREBLE_NOTES_LVL2, bg: 'linear-gradient(135deg, #fefce8, #fff7ed)', border: '#fef08a', text: '#a16207' },
+            { id: 'sol-3', clef: 'sol', clefTitle: '🎼 Khóa Sol', lvl: 3, lvlTitle: 'Level 3 (Khó - Dòng phụ trầm B, A, G, F, E, D, C,)', pool: TREBLE_NOTES_LVL3, bg: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', border: '#e9d5ff', text: '#7e22ce' },
             { id: 'fa-1',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 1, lvlTitle: 'Level 1 (Dễ - Trong khuông)', pool: BASS_NOTES_LVL1,   bg: 'linear-gradient(135deg, #eff6ff, #dbeafe)', border: '#bfdbfe', text: '#1d4ed8' },
             { id: 'fa-2',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 2, lvlTitle: 'Level 2 (Vừa - Dòng kẻ phụ trên)', pool: BASS_NOTES_LVL2,   bg: 'linear-gradient(135deg, #f0fdf4, #dcfce7)', border: '#bbf7d0', text: '#15803d' },
             { id: 'fa-3',  clef: 'fa',  clefTitle: '𝄢 Khóa Fa',  lvl: 3, lvlTitle: 'Level 3 (Khó - Phẩy đôi & cao)', pool: BASS_NOTES_LVL3,   bg: 'linear-gradient(135deg, #fff7ed, #ffedd5)', border: '#fed7aa', text: '#c2410c' }
