@@ -1643,7 +1643,14 @@
                 `;
             }
         } else if (gameId === 'chord') {
-            const chordSubTab = window.GameState.chordTheorySubTab || 'guide';
+            if (!window.GameState.chordTheorySubTab) {
+                window.GameState.chordTheorySubTab = 'guide';
+            }
+            window.switchChordTheorySubTab = function(tabKey) {
+                window.GameState.chordTheorySubTab = tabKey;
+                renderGameUI();
+            };
+            const chordSubTab = window.GameState.chordTheorySubTab;
 
             const guideStyle = chordSubTab === 'guide'
                 ? 'background: linear-gradient(135deg, #a855f7, #7e22ce); color: white; border: none; font-weight: 800; padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 12px rgba(168,85,247,0.35); cursor: pointer;'
