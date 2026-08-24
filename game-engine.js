@@ -912,8 +912,6 @@
                 });
             }
         }, 60);
-
-        playNoteByName(currentNote.abc, 0.4);
     }
 
     window.playFlashcardNoteSound = function() {
