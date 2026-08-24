@@ -387,8 +387,6 @@
                 });
             }
         }, 50);
-
-        playNoteByName(target.abc, 0.4);
     }
 
     function getNoteDisplayName(note) {
@@ -413,7 +411,6 @@
             window.GameState.score += 10;
             window.GameState.streak += 1;
             feedback.innerHTML = `<span style="color: #22c55e;">🎉 Chính xác! Đó là nốt ${q.name}</span>`;
-            playNoteByName(q.abc, 0.6);
             setTimeout(() => {
                 renderGameUI();
             }, 800);
