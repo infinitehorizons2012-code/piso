@@ -686,18 +686,30 @@
         if (gameId === 'ledger') {
             htmlContent = `
                 <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">📖 Lý Thuyết Dòng Kẻ Phụ & Tên Nốt Nhạc</h3>
-                    <p style="font-size: 1rem; color: #475569;">Khuông nhạc gồm 5 dòng kẻ chính. Dưới đây là vị trí và tên gọi từng nốt nhạc trên <b>Khóa Sol</b> và <b>Khóa Fa</b>:</p>
+                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">📖 Lý Thuyết Dòng Kẻ Phụ & Tên Nốt Nhạc (Theo Level)</h3>
+                    <p style="font-size: 1rem; color: #475569;">Dưới đây là vị trí và tên gọi từng nốt nhạc trên <b>Khóa Sol (3 Level)</b> và <b>Khóa Fa</b>:</p>
                     
-                    <!-- DEMO 1: KHÓA SOL -->
+                    <!-- DEMO 1: KHÓA SOL LEVEL 1 -->
                     <div style="margin: 22px 0; background: linear-gradient(135deg, #fff1f2, #fff7ed); padding: 20px; border-radius: 16px; border: 2px solid #fecdd3;">
-                        <h4 style="margin: 0 0 10px 0; color: #e11d48; font-size: 1.15rem; font-weight: 800;">🎼 1. Vị Trí Các Nốt Trên Khóa Sol (Treble Clef):</h4>
-                        <div id="theory-treble-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #fda4af;"></div>
+                        <h4 style="margin: 0 0 10px 0; color: #e11d48; font-size: 1.15rem; font-weight: 800;">🎼 1. Khóa Sol — Level 1 (Dễ: 14 nốt C D E F G A B c d e f g a b):</h4>
+                        <div id="theory-treble-lvl1-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #fda4af;"></div>
                     </div>
 
-                    <!-- DEMO 2: KHÓA FA -->
+                    <!-- DEMO 2: KHÓA SOL LEVEL 2 -->
+                    <div style="margin: 22px 0; background: linear-gradient(135deg, #fefce8, #fff7ed); padding: 20px; border-radius: 16px; border: 2px solid #fef08a;">
+                        <h4 style="margin: 0 0 10px 0; color: #a16207; font-size: 1.15rem; font-weight: 800;">🎼 2. Khóa Sol — Level 2 (Vừa: Dòng phụ phía trên c' d' e' f' g' a' b'):</h4>
+                        <div id="theory-treble-lvl2-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #facc15;"></div>
+                    </div>
+
+                    <!-- DEMO 3: KHÓA SOL LEVEL 3 -->
+                    <div style="margin: 22px 0; background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 20px; border-radius: 16px; border: 2px solid #e9d5ff;">
+                        <h4 style="margin: 0 0 10px 0; color: #7e22ce; font-size: 1.15rem; font-weight: 800;">🎼 3. Khóa Sol — Level 3 (Khó: Dòng phụ trầm B, A, G, F, E, D, C,):</h4>
+                        <div id="theory-treble-lvl3-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #c084fc;"></div>
+                    </div>
+
+                    <!-- DEMO 4: KHÓA FA -->
                     <div style="margin: 22px 0; background: linear-gradient(135deg, #eff6ff, #f0fdf4); padding: 20px; border-radius: 16px; border: 2px solid #bfdbfe;">
-                        <h4 style="margin: 0 0 10px 0; color: #1d4ed8; font-size: 1.15rem; font-weight: 800;">𝄢 2. Vị Trí Các Nốt Trên Khóa Fa (Bass Clef):</h4>
+                        <h4 style="margin: 0 0 10px 0; color: #1d4ed8; font-size: 1.15rem; font-weight: 800;">𝄢 4. Khóa Fa (Bass Clef — C, D, E, F, G, A, B, C):</h4>
                         <div id="theory-bass-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #93c5fd;"></div>
                     </div>
                 </div>
@@ -752,15 +764,20 @@
 
         // Render Sheet Music Demos
         if (gameId === 'ledger') {
-            const trebleAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nC D E F | G A B c |\nw: "Đô(C)" "Rê(D)" "Mi(E)" "Pha(F)" "Son(G)" "La(A)" "Si(B)" "Đô(c)"`;
-            const bassAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=bass\nC, D, E, F, | G, A, B, C |\nw: "Đô(C,)" "Rê(D,)" "Mi(E,)" "Pha(F,)" "Son(G,)" "La(A,)" "Si(B,)" "Đô(C)"`;
-            renderTheoryAbcHelper('theory-treble-paper', trebleAbc);
+            const trebleLvl1Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nC D E F | G A B c | d e f g | a b |\nw: Đô(C) Rê(D) Mi(E) Pha(F) | Son(G) La(A) Si(B) Đô(c) | Rê(d) Mi(e) Pha(f) Son(g) | La(a) Si(b)`;
+            const trebleLvl2Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nc' d' e' f' | g' a' b' |\nw: Đô(c') Rê(d') Mi(e') Pha(f') | Son(g') La(a') Si(b')`;
+            const trebleLvl3Abc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nC, D, E, F, | G, A, B, |\nw: Đô(C,) Rê(D,) Mi(E,) Pha(F,) | Son(G,) La(A,) Si(B,)`;
+            const bassAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=bass\nC, D, E, F, | G, A, B, C |\nw: Đô(C,) Rê(D,) Mi(E,) Pha(F,) | Son(G,) La(A,) Si(B,) Đô(C)`;
+
+            renderTheoryAbcHelper('theory-treble-lvl1-paper', trebleLvl1Abc);
+            renderTheoryAbcHelper('theory-treble-lvl2-paper', trebleLvl2Abc);
+            renderTheoryAbcHelper('theory-treble-lvl3-paper', trebleLvl3Abc);
             renderTheoryAbcHelper('theory-bass-paper', bassAbc);
         } else if (gameId === 'rhythm') {
-            const rhythmAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nc c2 c/2 c/2 c4 |\nw: "Nốt_Đen(1phách)" "Trắng(2phách)" "Móc_đơn(1/2)" "Móc_đơn(1/2)" "Tròn(4phách)"`;
+            const rhythmAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nc c2 c/2 c/2 c4 |\nw: Nốt_Đen(1phách) Trắng(2phách) Móc_đơn(1/2) Móc_đơn(1/2) Tròn(4phách)`;
             renderTheoryAbcHelper('theory-rhythm-paper', rhythmAbc);
         } else if (gameId === 'interval') {
-            const intervalAbc = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n[CE] [CG] [Cc] |\nw: "Quãng_3_Trưởng" "Quãng_5_Đúng" "Quãng_8_(Octave)"`;
+            const intervalAbc = `X:1\nM:4/4\nL:1/2\nK:C clef=treble\n[CE] [CG] [Cc] |\nw: Quãng_3_Trưởng Quãng_5_Đúng Quãng_8_(Octave)`;
             renderTheoryAbcHelper('theory-interval-paper', intervalAbc);
         } else if (gameId === 'scale') {
             const scaleAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nC D E F | G A B c |\nw: C D E F G A B c`;
