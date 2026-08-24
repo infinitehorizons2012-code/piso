@@ -1516,12 +1516,236 @@
         renderGameUI();
     };
 
-    window.shuffleFlashcards = function() {
-        const pool = getFlashcardPool();
-        window.GameState.flashcardIndex = Math.floor(Math.random() * pool.length);
-        window.GameState.flashcardFlipped = false;
+    // --- CHROMATIC ROOTS (12 GIỌNG) ---
+    const CHROMATIC_ROOTS = [
+        { midi: 60, name: 'Đô', abc: 'C' },
+        { midi: 61, name: 'Đô♯/Rê♭', abc: 'C#' },
+        { midi: 62, name: 'Rê', abc: 'D' },
+        { midi: 63, name: 'Rê♯/Mi♭', abc: 'Eb' },
+        { midi: 64, name: 'Mi', abc: 'E' },
+        { midi: 65, name: 'Pha', abc: 'F' },
+        { midi: 66, name: 'Pha♯/Son♭', abc: 'F#' },
+        { midi: 67, name: 'Son', abc: 'G' },
+        { midi: 68, name: 'Son♯/La♭', abc: 'Ab' },
+        { midi: 69, name: 'La', abc: 'A' },
+        { midi: 70, name: 'La♯/Si♭', abc: 'Bb' },
+        { midi: 71, name: 'Si', abc: 'B' }
+    ];
+
+    function getGranularScaleCards(level) {
+        const baseScales = getScalePool(level);
+        const cards = [];
+        const filter = window.GameState.scaleFlashcardFilter || 'ALL';
+
+        baseScales.forEach(scale => {
+            if (filter !== 'ALL' && filter !== scale.id) return;
+
+            CHROMATIC_ROOTS.forEach(root => {
+                const sampleKey = `${scale.id}_${root.midi}`;
+                const playedMidis = scale.intervals.map(i => root.midi + i);
+                const notesText = playedMidis.map(m => formatMidiNoteName(m)).join(' - ');
+
+                cards.push({
+                    scaleId: scale.id,
+                    scaleName: scale.name,
+                    scaleIcon: scale.icon,
+                    scaleDesc: scale.desc,
+                    rootMidi: root.midi,
+                    rootName: root.name,
+                    sampleKey: sampleKey,
+                    playedMidis: playedMidis,
+                    notesText: notesText
+                });
+            });
+        });
+        return cards;
+    }
+
+    function generateScaleQuestion(cardBody) {
+        const lvl = window.GameState.level || 1;
+        const pool = getScalePool(lvl);
+        const allPool = [...SCALE_LEVELS.lvl1, ...SCALE_LEVELS.lvl2, ...SCALE_LEVELS.lvl3];
+
+        const target = pool[Math.floor(Math.random() * pool.length)];
+
+        let otherScales = pool.filter(x => x.id !== target.id);
+        if (otherScales.length < 2) {
+            otherScales = allPool.filter(x => x.id !== target.id);
+        }
+        otherScales.sort(() => Math.random() - 0.5);
+        const options = [target, otherScales[0], otherScales[1]];
+        options.sort(() => Math.random() - 0.5);
+
+        // Pick 1 of 12 Chromatic Roots
+        const rootObj = CHROMATIC_ROOTS[Math.floor(Math.random() * CHROMATIC_ROOTS.length)];
+        const rootMidi = rootObj.midi;
+        const mode = window.GameState.scalePlaybackMode || 'run';
+
+        window.GameState.currentQuestion = { target, rootMidi, mode, options };
+
+        const modeBtnStyle = (m) => mode === m
+            ? 'background: linear-gradient(135deg, #eab308, #ca8a04); color: white; border: none; font-weight: 800; padding: 8px 18px; border-radius: 20px; box-shadow: 0 4px 12px rgba(234, 179, 8, 0.35); cursor: pointer;'
+            : 'background: white; color: #475569; border: 2px solid #cbd5e1; font-weight: 700; padding: 8px 18px; border-radius: 20px; cursor: pointer;';
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <!-- Playback Mode Switcher -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; background: #fefce8; padding: 12px; border-radius: 16px; border: 1px solid #fef08a;">
+                    <span style="font-weight: 800; color: #713f12; font-size: 0.95rem;">🎧 Chế Độ Luyện Âm Giai:</span>
+                    <button onclick="window.setScalePlaybackMode('run')" style="${modeBtnStyle('run')}">📖 Chế Độ Học (Scale Run)</button>
+                    <button onclick="window.setScalePlaybackMode('lick')" style="${modeBtnStyle('lick')}">🎸 Chế Độ Thực Chiến (Melody/Lick)</button>
+                </div>
+
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎹 Luyện Tai Âm Giai (Scale Match) — Level ${lvl}:</h3>
+                <p style="color: #64748b; font-size: 0.95rem; margin-top: -5px;">
+                    ${mode === 'run' ? 'Nghe chuỗi nốt chạy lần lượt và đoán loại Âm Giai:' : 'Nghe câu giai điệu thực chiến (Melody / Lick) 3 giây & chọn loại Âm Giai phù hợp:'}
+                </p>
+                
+                <button onclick="window.playScaleQuestionSound()" style="font-size: 1.2rem; padding: 16px 36px; border-radius: 30px; background: linear-gradient(135deg, #eab308, #d97706); color: white; border: none; cursor: pointer; font-weight: 800; margin: 10px 0 20px 0; box-shadow: 0 8px 20px rgba(234, 179, 8, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px) scale(1.03)'" onmouseout="this.style.transform='none'">
+                    🔊 Nghe Âm Giai ${mode === 'run' ? '(Scale Run)' : '(Câu Giai Điệu Lick)'}
+                </button>
+
+                <div id="game-feedback" style="min-height: 36px; font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;"></div>
+
+                <!-- Exactly 3 Multiple Choice Options -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; max-width: 780px; margin: 10px auto 0 auto;">
+                    ${options.map((item) => `
+                        <button onclick="window.checkScaleAnswer('${item.id}')" style="padding: 20px 16px; border-radius: 20px; border: 3px solid #fef08a; background: linear-gradient(135deg, #ffffff, #fefce8); font-weight: 800; font-size: 1.08rem; cursor: pointer; color: #854d0e; box-shadow: 0 6px 16px rgba(234,179,8,0.15); transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px;" onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='#eab308';" onmouseout="this.style.transform='none'; this.style.borderColor='#fef08a';">
+                            <span style="font-size: 1.4rem;">${item.icon} ${item.name}</span>
+                            <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">${item.desc}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    window.setScaleFlashcardFilter = function(filterId) {
+        window.GameState.scaleFlashcardFilter = filterId;
+        window.GameState.scaleFlashcardIndex = 0;
         renderGameUI();
     };
+
+    window.toggleScaleFlashcardFlip = function() {
+        window.GameState.scaleFlashcardFlipped = !window.GameState.scaleFlashcardFlipped;
+        const inner = document.getElementById('flashcard-scale-inner');
+        if (inner) {
+            inner.style.transform = window.GameState.scaleFlashcardFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
+        }
+    };
+
+    window.nextScaleFlashcard = function() {
+        const pool = getGranularScaleCards(window.GameState.level || 1);
+        window.GameState.scaleFlashcardIndex = (window.GameState.scaleFlashcardIndex + 1) % pool.length;
+        window.GameState.scaleFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.prevScaleFlashcard = function() {
+        const pool = getGranularScaleCards(window.GameState.level || 1);
+        window.GameState.scaleFlashcardIndex = (window.GameState.scaleFlashcardIndex - 1 + pool.length) % pool.length;
+        window.GameState.scaleFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.shuffleScaleFlashcards = function() {
+        const pool = getGranularScaleCards(window.GameState.level || 1);
+        window.GameState.scaleFlashcardIndex = Math.floor(Math.random() * pool.length);
+        window.GameState.scaleFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.playScaleFlashcardSound = function(event) {
+        if (event) event.stopPropagation();
+        const pool = getGranularScaleCards(window.GameState.level || 1);
+        if (!pool || pool.length === 0) return;
+        if (window.GameState.scaleFlashcardIndex >= pool.length) {
+            window.GameState.scaleFlashcardIndex = 0;
+        }
+        const card = pool[window.GameState.scaleFlashcardIndex];
+        playSequence(card.playedMidis, 0.32);
+    };
+
+    function renderScaleFlashcardsView() {
+        const cardBody = document.getElementById('game-card-body');
+        if (!cardBody) return;
+
+        const lvl = window.GameState.level || 1;
+        const baseScales = getScalePool(lvl);
+        const granularPool = getGranularScaleCards(lvl);
+        if (window.GameState.scaleFlashcardIndex >= granularPool.length) {
+            window.GameState.scaleFlashcardIndex = 0;
+        }
+
+        const currentCard = granularPool[window.GameState.scaleFlashcardIndex];
+        const currentFilter = window.GameState.scaleFlashcardFilter || 'ALL';
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;">🎴 Thẻ Học Âm Giai Theo 12 Giọng (12-Key Scale Flashcards)</h3>
+                <p style="margin: 0 0 16px 0; color: #64748b; font-size: 0.95rem;">Mỗi loại Âm Giai gồm **đủ 12 thẻ cho 12 Giọng cromatica**. Tổng ${granularPool.length} thẻ!</p>
+
+                <!-- Filter Tabs -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 8px; margin-bottom: 22px; flex-wrap: wrap; background: #fefce8; padding: 10px 14px; border-radius: 16px; border: 1px solid #fef08a;">
+                    <button onclick="window.setScaleFlashcardFilter('ALL')" style="padding: 6px 14px; border-radius: 16px; font-weight: 800; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; ${currentFilter === 'ALL' ? 'background: #ca8a04; color: white; border: none; box-shadow: 0 3px 8px rgba(202,138,4,0.3);' : 'background: white; color: #475569; border: 1.5px solid #cbd5e1;'}">🌐 Tất Cả Thẻ</button>
+                    ${baseScales.map(sc => `
+                        <button onclick="window.setScaleFlashcardFilter('${sc.id}')" style="padding: 6px 12px; border-radius: 16px; font-weight: 800; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; ${currentFilter === sc.id ? 'background: #ca8a04; color: white; border: none; box-shadow: 0 3px 8px rgba(202,138,4,0.3);' : 'background: white; color: #475569; border: 1.5px solid #cbd5e1;'}">${sc.icon} ${sc.name} (12 Thẻ)</button>
+                    `).join('')}
+                </div>
+
+                <!-- 3D Flip Card Container -->
+                <div onclick="window.toggleScaleFlashcardFlip()" style="perspective: 1000px; width: 100%; max-width: 520px; margin: 0 auto 22px auto; height: 330px; cursor: pointer;">
+                    <div id="flashcard-scale-inner" style="position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; ${window.GameState.scaleFlashcardFlipped ? 'transform: rotateY(180deg);' : ''}">
+                        
+                        <!-- CARD FRONT -->
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #ffffff, #fefce8); border-radius: 24px; border: 3.5px solid #fde047; box-shadow: 0 12px 32px rgba(234,179,8,0.15); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #fef08a; padding-bottom: 10px;">
+                                <span style="font-size: 0.85rem; font-weight: 800; background: #fef08a; color: #713f12; padding: 4px 12px; border-radius: 12px;">🎼 Giọng ${currentCard.rootName}</span>
+                                <span style="font-size: 0.9rem; font-weight: 800; color: #a16207;">Thẻ ${window.GameState.scaleFlashcardIndex + 1} / ${granularPool.length}</span>
+                            </div>
+
+                            <div style="margin: 14px 0;">
+                                <div style="font-size: 3rem; margin-bottom: 6px;">${currentCard.scaleIcon}</div>
+                                <h3 style="margin: 0; color: #1e293b; font-size: 1.45rem; font-weight: 800;">${currentCard.scaleName}</h3>
+                                <p style="margin: 6px 0 0 0; color: #854d0e; font-weight: 700; font-size: 1.05rem;">Giọng ${currentCard.rootName}</p>
+                            </div>
+
+                            <button onclick="window.playScaleFlashcardSound(event)" style="padding: 14px 24px; border-radius: 20px; background: linear-gradient(135deg, #eab308, #ca8a04); color: white; border: none; font-weight: 800; font-size: 1.05rem; cursor: pointer; box-shadow: 0 6px 16px rgba(234,179,8,0.35); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='none'">
+                                🔊 Nghe Chuỗi Nốt (${currentCard.rootName})
+                            </button>
+
+                            <div style="font-size: 0.8rem; color: #94a3b8; font-style: italic;">(Bấm vào thẻ để lật xem nốt nhạc & chi tiết)</div>
+                        </div>
+
+                        <!-- CARD BACK -->
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); background: linear-gradient(135deg, #fefce8, #fef9c3); border-radius: 24px; border: 3.5px solid #eab308; box-shadow: 0 12px 32px rgba(234,179,8,0.2); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #fde047; padding-bottom: 10px;">
+                                <span style="font-size: 0.95rem; font-weight: 800; color: #713f12;">💡 Chi Tiết Âm Giai</span>
+                                <span style="font-size: 0.85rem; font-weight: 800; color: #a16207;">Giọng ${currentCard.rootName}</span>
+                            </div>
+
+                            <div style="text-align: left; background: white; padding: 16px; border-radius: 16px; border: 1.5px solid #fde047; margin: 10px 0;">
+                                <div style="font-weight: 800; color: #713f12; font-size: 1.05rem; margin-bottom: 6px;">${currentCard.scaleIcon} ${currentCard.scaleName}</div>
+                                <div style="font-size: 0.92rem; color: #475569; margin-bottom: 10px;"><b>Đặc điểm:</b> ${currentCard.scaleDesc}</div>
+                                <div style="font-size: 0.95rem; color: #854d0e; font-weight: 800; background: #fefce8; padding: 10px; border-radius: 10px; border: 1px dashed #eab308;">
+                                    🎵 <b>Chuỗi Nốt Chơi:</b><br/>${currentCard.notesText}
+                                </div>
+                            </div>
+
+                            <div style="font-size: 0.8rem; color: #94a3b8; font-style: italic;">(Bấm lần nữa để lật lại mặt trước)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div style="display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap;">
+                    <button onclick="window.prevScaleFlashcard()" style="padding: 12px 24px; border-radius: 16px; background: white; border: 2px solid #cbd5e1; color: #334155; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">⬅️ Thẻ Trước</button>
+                    <button onclick="window.shuffleScaleFlashcards()" style="padding: 12px 24px; border-radius: 16px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 12px rgba(245,158,11,0.3);">🔀 Ngẫu Nhiên</button>
+                    <button onclick="window.nextScaleFlashcard()" style="padding: 12px 24px; border-radius: 16px; background: white; border: 2px solid #cbd5e1; color: #334155; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.04);">Thẻ Tiếp ➡️</button>
+                </div>
+            </div>
+        `;
+    }
 
     window.nextIntervalFlashcard = function() {
         const pool = getGranularIntervalCards(window.GameState.level || 1);
@@ -1913,13 +2137,138 @@
         }
     };
 
+    function renderFlashcardView() {
+        if (window.GameState.activeGame === 'interval') {
+            renderIntervalFlashcardsView();
+        } else if (window.GameState.activeGame === 'scale') {
+            renderScaleFlashcardsView();
+        } else {
+            renderNoteFlashcardsView();
+        }
+    }
+
     // --- 7. VISUAL COMPREHENSIVE PROGRESS REPORT DASHBOARD ---
     function renderProgressReportView() {
         if (window.GameState.activeGame === 'interval') {
             renderIntervalProgressReportView();
+        } else if (window.GameState.activeGame === 'scale') {
+            renderScaleProgressReportView();
         } else {
             renderNoteProgressReportView();
         }
+    }
+
+    function renderScaleProgressReportView() {
+        const cardBody = document.getElementById('game-card-body');
+        if (!cardBody) return;
+
+        const lvl = window.GameState.level || 1;
+        const pool = getScalePool(lvl);
+        const activeUser = window.getActiveChildUser ? window.getActiveChildUser() : null;
+        const userNameStr = activeUser ? activeUser.childName : 'Bé (Chưa đăng nhập)';
+        const userId = activeUser ? activeUser.id : 'guest';
+        const storageKey = `scale_samples_progress_${userId}`;
+        const userProgress = JSON.parse(localStorage.getItem(storageKey) || '{}');
+
+        // Total max per scale = 12 roots × 6pt = 72pt
+        const MAX_PER_SCALE = 12 * 6; // 72pt
+        const totalMax = pool.length * MAX_PER_SCALE;
+        let totalEarned = 0;
+
+        let scaleCardsHTML = pool.map(scale => {
+            let scaleEarned = 0;
+
+            let microCardsHTML = CHROMATIC_ROOTS.map(root => {
+                const sampleKey = `${scale.id}_${root.midi}`;
+                const p = userProgress[sampleKey] || { stage: 'unseen', score: 0, streak: 0 };
+                scaleEarned += (p.score || 0);
+
+                let stageIcon = '⚪';
+                let stageColor = '#94a3b8';
+                let bg = '#f8fafc';
+                let border = '#e2e8f0';
+
+                if (p.stage === 'seed') {
+                    stageIcon = '🌱'; stageColor = '#b45309'; bg = '#fef3c7'; border = '#fde047';
+                } else if (p.stage === 'sprout') {
+                    stageIcon = '🌿'; stageColor = '#15803d'; bg = '#dcfce7'; border = '#86efac';
+                } else if (p.stage === 'tree') {
+                    stageIcon = '🌳'; stageColor = '#166534'; bg = '#bbf7d0'; border = '#4ade80';
+                } else if (p.stage === 'flower') {
+                    stageIcon = '🌸'; stageColor = '#be185d'; bg = '#fce7f3'; border = '#f472b6';
+                }
+
+                return `
+                    <div style="background: ${bg}; border: 1.5px solid ${border}; border-radius: 10px; padding: 8px 4px; text-align: center; font-size: 0.8rem; font-weight: 800; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 3px;">
+                        <span style="color: #334155; font-size: 0.78rem;">Giọng ${root.name}</span>
+                        <span style="font-size: 1.1rem; margin: 2px 0;">${stageIcon}</span>
+                        <span style="color: ${stageColor}; font-size: 0.75rem;">${p.score || 0}/6pt</span>
+                    </div>
+                `;
+            }).join('');
+
+            totalEarned += scaleEarned;
+            const scalePercentage = Math.round((scaleEarned / MAX_PER_SCALE) * 100);
+
+            return `
+                <div style="background: white; border-radius: 20px; border: 2px solid #e2e8f0; padding: 20px; box-shadow: 0 6px 16px rgba(0,0,0,0.04); margin-bottom: 22px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; border-bottom: 2px dashed #fde047; padding-bottom: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-size: 2rem;">${scale.icon}</span>
+                            <div>
+                                <h4 style="margin: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">${scale.name} (Đủ 12 Giọng Cromatica)</h4>
+                                <p style="margin: 2px 0 0 0; font-size: 0.88rem; color: #64748b; font-weight: 600;">${scale.desc}</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 1.2rem; font-weight: 800; color: #ca8a04;">${scaleEarned} / ${MAX_PER_SCALE} pt</span>
+                            <span style="font-size: 0.88rem; font-weight: 700; color: #64748b; margin-left: 8px;">(${scalePercentage}%)</span>
+                        </div>
+                    </div>
+
+                    <!-- 12 Micro Cards Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 8px; margin-top: 10px;">
+                        ${microCardsHTML}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        const percentage = totalMax > 0 ? Math.round((totalEarned / totalMax) * 100) : 0;
+        const lvlTitle = lvl === 1 ? 'Level 1 (3 Âm Giai × 12 Giọng = 36 Mẫu)' : (lvl === 2 ? 'Level 2 (3 Âm Giai × 12 Giọng = 36 Mẫu)' : 'Level 3 (3 Âm Giai × 12 Giọng = 36 Mẫu)');
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 24px; border: 2px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <!-- MASTER HEADER BANNER -->
+                <div style="background: linear-gradient(135deg, #eab308, #ca8a04); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(234,179,8,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <span style="background: #fef08a; color: #713f12; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">📊 BÁO CÁO TIẾN ĐỘ 12 GIỌNG / ÂM GIAI</span>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.6rem; font-weight: 800;">Hành Trình Âm Giai 12 Giọng — ${userNameStr}</h2>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #fef08a;">${percentage}%</div>
+                            <div style="font-size: 0.9rem; color: #fefce8; font-weight: 700;">Tiến Độ ${lvlTitle}</div>
+                        </div>
+                    </div>
+
+                    <!-- Master Progress Bar -->
+                    <div style="width: 100%; height: 20px; background: rgba(255,255,255,0.2); border-radius: 12px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.3); margin-bottom: 12px;">
+                        <div style="width: ${percentage}%; height: 100%; background: linear-gradient(90deg, #fef08a, #4ade80); border-radius: 12px; transition: width 0.6s;"></div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #fefce8; font-weight: 700; flex-wrap: wrap; gap: 8px;">
+                        <span>🏆 Điểm Tích Lũy Level: <b style="color: #fef08a;">${totalEarned} / ${totalMax} pt</b> (Mỗi Giọng tối đa 6pt)</span>
+                        <span>🌱 Hạt (0pt) ➔ 🌿 Mầm (1pt) ➔ 🌳 Cây (3pt) ➔ 🌸 Hoa (6pt)</span>
+                    </div>
+                </div>
+
+                <!-- Scale Sections Grid -->
+                <div>
+                    ${scaleCardsHTML}
+                </div>
+            </div>
+        `;
     }
 
     function renderNoteProgressReportView() {
