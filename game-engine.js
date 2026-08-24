@@ -923,23 +923,20 @@
     // --- GAME 5: CHORD MATCH ---
     const CHORD_LEVELS = {
         lvl1: [
-            { id: 'major', icon: '☀️', name: 'Hợp Âm Trưởng (Major Triad)', desc: 'Vui vẻ, sáng sủa, hào hùng', semitones: [0, 4, 7], formula: '1 - 3 - 5', abc: '[C E G]' },
-            { id: 'minor', icon: '🌧️', name: 'Hợp Âm Thứ (Minor Triad)', desc: 'Buồn bã, u uất, tối tăm', semitones: [0, 3, 7], formula: '1 - ♭3 - 5', abc: '[C _E G]' },
-            { id: 'sus4', icon: '🎋', name: 'Hợp Âm Sus4 (Sus4 Triad)', desc: 'Lơ lửng, trung tính, chờ giải quyết', semitones: [0, 5, 7], formula: '1 - 4 - 5', abc: '[C F G]' },
-            { id: 'sus2', icon: '🍃', name: 'Hợp Âm Sus2 (Sus2 Triad)', desc: 'Lơ lửng, nhẹ nhàng, mênh mang', semitones: [0, 2, 7], formula: '1 - 2 - 5', abc: '[C D G]' }
+            { id: 'major', icon: '☀️', name: 'Hợp Âm Trưởng (Major)', desc: 'Vui vẻ, sáng sủa, hào hùng (C, C#, D, D#, E, F, F#, G, G#, A, A#, B)', semitones: [0, 4, 7], formula: '1 - 3 - 5', abc: '[C E G]' },
+            { id: 'minor', icon: '🌧️', name: 'Hợp Âm Thứ (Minor)', desc: 'Buồn bã, u uất, tối tăm (Cm, C#m, Dm, D#m, Em, Fm, F#m...)', semitones: [0, 3, 7], formula: '1 - ♭3 - 5', abc: '[C _E G]' },
+            { id: 'sus', icon: '🎋', name: 'Hợp Âm Treo (Sus2 / Sus4)', desc: 'Lơ lửng, trung tính, chờ giải quyết (Csus, Dsus, Esus...)', semitones: [0, 5, 7], formula: '1 - 4 - 5', abc: '[C F G]' }
         ],
         lvl2: [
-            { id: 'dim', icon: '⚡', name: 'Hợp Âm Giảm (Diminished - dim)', desc: 'Cực kỳ căng thẳng, rùng rợn, giật gân (Kinh dị)', semitones: [0, 3, 6], formula: '1 - ♭3 - ♭5', abc: '[C _E _G]' },
-            { id: 'aug', icon: '🌌', name: 'Hợp Âm Tăng (Augmented - aug)', desc: 'Huyền bí, mộng mơ, lơ lửng giấc mơ', semitones: [0, 4, 8], formula: '1 - 3 - ♯5', abc: '[C E ^G]' },
-            { id: 'dom7', icon: '🎷', name: 'Hợp Âm 7 Át (Dominant 7 - C7)', desc: 'Căng thẳng vừa phải, bụi bặm, lả lướt (Blues/Funk)', semitones: [0, 4, 7, 10], formula: '1 - 3 - 5 - ♭7', abc: '[C E G _B]' },
-            { id: 'maj7', icon: '✨', name: 'Hợp Âm 7 Trưởng (Major 7 - Maj7)', desc: 'Sang trọng, thư thái, bay bổng (Lo-fi / Pop)', semitones: [0, 4, 7, 11], formula: '1 - 3 - 5 - 7', abc: '[C E G B]' }
+            { id: 'dim', icon: '⚡', name: 'Hợp Âm Giảm (dim)', desc: 'Cực kỳ căng thẳng, rùng rợn, giật gân (Cdim, Ddim, Edim...)', semitones: [0, 3, 6], formula: '1 - ♭3 - ♭5', abc: '[C _E _G]' },
+            { id: 'aug', icon: '🌌', name: 'Hợp Âm Tăng (aug)', desc: 'Huyền bí, mộng mơ, lơ lửng giấc mơ (Caug, Daug, Eaug...)', semitones: [0, 4, 8], formula: '1 - 3 - ♯5', abc: '[C E ^G]' },
+            { id: 'dom7', icon: '🎷', name: 'Hợp Âm 7 Át (7 - Dominant 7)', desc: 'Căng thẳng vừa phải, bụi bặm, lả lướt (C7, D7, E7, G7, A7...)', semitones: [0, 4, 7, 10], formula: '1 - 3 - 5 - ♭7', abc: '[C E G _B]' },
+            { id: 'maj7_m7', icon: '✨', name: 'Hợp Âm 7 Trưởng / 7 Thứ (Maj7 / m7)', desc: 'Sang trọng, thư thái, bay bổng (CMaj7, DMaj7 / Cm7, Dm7...)', semitones: [0, 4, 7, 11], formula: '1 - 3 - 5 - 7', abc: '[C E G B]' }
         ],
         lvl3: [
-            { id: 'add9', icon: '💎', name: 'Hợp Âm Add9 (Cadd9)', desc: 'Mở rộng hiện đại, lấp lánh, ngập tràn cảm xúc', semitones: [0, 4, 7, 14], formula: '1 - 3 - 5 - 9', abc: '[C E G d]' },
-            { id: 'm7b5', icon: '🧠', name: 'Hợp Âm Nửa Giảm (m7♭5 / Half-Diminished)', desc: 'Hại não, bí ẩn, da diết đặc trưng Jazz', semitones: [0, 3, 6, 10], formula: '1 - ♭3 - ♭5 - ♭7', abc: '[C _E _G _B]' },
-            { id: 'dim7', icon: '🕸️', name: 'Hợp Âm Giảm 7 (dim7 / Full Diminished 7)', desc: 'Kịch tính tối thượng, mâu thuẫn tột cùng', semitones: [0, 3, 6, 9], formula: '1 - ♭3 - ♭5 - ♭♭7', abc: '[C _E _G A]' },
-            { id: 'inv1', icon: '🔄', name: 'Đảo Thế 1 (1st Inversion - C/E)', desc: 'Nốt Bass ở đáy là Nốt Bậc 3 (Mi ở đáy)', semitones: [4, 7, 12], formula: '3 - 5 - 8', abc: '[E G c]' },
-            { id: 'inv2', icon: '🔀', name: 'Đảo Thế 2 (2nd Inversion - C/G)', desc: 'Nốt Bass ở đáy là Nốt Bậc 5 (Sol ở đáy)', semitones: [7, 12, 16], formula: '5 - 8 - 10', abc: '[G c e]' }
+            { id: 'add9', icon: '💎', name: 'Hợp Âm Mở Rộng (Add9 / 9th)', desc: 'Mở rộng hiện đại, lấp lánh (Cadd9, Dadd9, C9...)', semitones: [0, 4, 7, 14], formula: '1 - 3 - 5 - 9', abc: '[C E G d]' },
+            { id: 'dim7_m7b5', icon: '🧠', name: 'Hợp Âm Giảm 7 / Nửa Giảm (dim7 / m7♭5)', desc: 'Hại não, bí ẩn, kịch tính đặc trưng Jazz (Cm7b5, Cdim7...)', semitones: [0, 3, 6, 10], formula: '1 - ♭3 - ♭5 - ♭7', abc: '[C _E _G _B]' },
+            { id: 'inversion', icon: '🔄', name: 'Hợp Âm Đảo Thế (Inversions: C/E, C/G...)', desc: 'Đổi nốt Bass ở đáy (C/E, C/G, D/F#, G/B...)', semitones: [4, 7, 12], formula: '3 - 5 - 8', abc: '[E G c]' }
         ]
     };
 
@@ -2836,7 +2833,7 @@
         });
 
         const percentage = totalMax > 0 ? Math.round((totalEarned / totalMax) * 100) : 0;
-        const lvlTitle = lvl === 1 ? 'Level 1 (4 Hợp Âm × 12 Giọng = 48 Mẫu)' : (lvl === 2 ? 'Level 2 (4 Hợp Âm × 12 Giọng = 48 Mẫu)' : 'Level 3 (5 Hợp Âm × 12 Giọng = 60 Mẫu)');
+        const lvlTitle = lvl === 1 ? 'Level 1 (3 Loại Cấu Trúc × 12 Giọng = 36 Hợp Âm)' : (lvl === 2 ? 'Level 2 (4 Loại Cấu Trúc × 12 Giọng = 48 Hợp Âm)' : 'Level 3 (3 Loại Cấu Trúc × 12 Giọng = 36 Hợp Âm)');
 
         cardBody.innerHTML = `
             <div style="background: white; padding: 28px; border-radius: 24px; border: 2px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
