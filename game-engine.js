@@ -538,7 +538,8 @@
         const lvl = window.GameState.level || 1;
         const pool = getIntervalPool(lvl);
         const target = pool[Math.floor(Math.random() * pool.length)];
-        const rootMidi = 60 + Math.floor(Math.random() * 7); // Random C4 to G4 root
+        const NATURAL_ROOTS = [60, 62, 64, 65, 67, 69, 71]; // 7 nốt tự nhiên C, D, E, F, G, A, B
+        const rootMidi = NATURAL_ROOTS[Math.floor(Math.random() * NATURAL_ROOTS.length)];
         window.GameState.currentQuestion = { target, rootMidi, pool };
 
         const mode = window.GameState.intervalMode || 'asc';
@@ -832,6 +833,17 @@
             let theoryHTML = `
                 <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
                     <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Chi Tiết Từng Quãng Âm (Ear Training Intervals)</h3>
+                    
+                    <!-- 21 AUDIO MATERIALS PEDAGOGICAL BANNER -->
+                    <div style="margin: 16px 0 24px 0; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 18px 22px; border-radius: 16px; border: 2px solid #86efac; color: #166534;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 1.12rem; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                            💡 Tư Duy Ma Trận 21 Âm Thanh Nguyên Liệu / Quãng:
+                        </h4>
+                        <p style="margin: 0; font-size: 0.96rem; line-height: 1.6; font-weight: 600; color: #15803d;">
+                            Với <b>7 nốt nhạc cơ bản</b> (Đô, Rê, Mi, Pha, Son, La, Si) làm nốt gốc, khi kết hợp cùng <b>3 hướng nghe</b> (📈 Nghe Lên, 📉 Nghe Xuống, 🎹 Nghe Song Song) ➔ Mỗi Quãng Âm được nạp tổng cộng <b>21 biến thể âm thanh nguyên liệu độc lập</b>! Giúp não bộ người học cảm nhận sâu bản chất màu sắc Quãng chứ không bị học vẹt 1 nốt cố định.
+                        </p>
+                    </div>
+
                     <p style="font-size: 1rem; color: #475569;">Dưới đây là định nghĩa, tính chất cảm xúc và khuông nhạc chi tiết của <b>từng Quãng Âm</b> theo 3 Level:</p>
             `;
 
