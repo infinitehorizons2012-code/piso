@@ -2855,9 +2855,9 @@
                         <div style="width: ${percentage}%; height: 100%; background: linear-gradient(90deg, #facc15, #4ade80); border-radius: 12px; transition: width 0.6s;"></div>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #f3e8ff; font-weight: 700;">
-                        <span>Tích lũy: ${totalEarned} / ${totalMax} pt</span>
-                        <span>${pool.length * 12} Thẻ Học Hợp Âm</span>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #f3e8ff; font-weight: 700; flex-wrap: wrap; gap: 8px;">
+                        <span>🏆 Tích lũy: <b>${totalEarned} / ${totalMax} pt</b> (Mỗi hợp âm đạt hoa 🌸 = 6pt)</span>
+                        <span>🎴 ${pool.length * 12} Thẻ Học (${lvl === 1 ? 'Level 1: 36 Hợp Âm' : (lvl === 2 ? 'Level 2: 48 Hợp Âm' : 'Level 3: 36 Hợp Âm)')}</span>
                     </div>
                 </div>
 
