@@ -538,12 +538,25 @@
     function generateIntervalQuestion(cardBody) {
         const lvl = window.GameState.level || 1;
         const pool = getIntervalPool(lvl);
+        const allPool = getIntervalPool(3); // All 12 intervals for distractors if needed
+
         const target = pool[Math.floor(Math.random() * pool.length)];
+
+        // Select 2 wrong distractors to form exactly 3 multiple choice options
+        let otherIntervals = pool.filter(x => x.id !== target.id);
+        if (otherIntervals.length < 2) {
+            otherIntervals = allPool.filter(x => x.id !== target.id);
+        }
+        
+        otherIntervals.sort(() => Math.random() - 0.5);
+        const options = [target, otherIntervals[0], otherIntervals[1]];
+        options.sort(() => Math.random() - 0.5);
+
         const NATURAL_ROOTS = [60, 62, 64, 65, 67, 69, 71]; // 7 nốt tự nhiên C, D, E, F, G, A, B
         const rootMidi = NATURAL_ROOTS[Math.floor(Math.random() * NATURAL_ROOTS.length)];
-        window.GameState.currentQuestion = { target, rootMidi, pool };
-
         const mode = window.GameState.intervalMode || 'asc';
+
+        window.GameState.currentQuestion = { target, rootMidi, mode, options };
 
         const modeBtnStyle = (m) => mode === m
             ? 'background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; font-weight: 800; padding: 8px 18px; border-radius: 20px; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); cursor: pointer;'
@@ -559,8 +572,8 @@
                     <button onclick="window.setIntervalMode('harm')" style="${modeBtnStyle('harm')}">🎹 Cùng Lúc (Harmonic)</button>
                 </div>
 
-                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎵 Luyện Tai Nghe Quãng Âm — Level ${lvl} (${pool.length} Quãng):</h3>
-                <p style="color: #64748b; font-size: 0.95rem; margin-top: -5px;">Nhấn vào nút dưới đây để nghe âm thanh quãng nhạc:</p>
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🎵 Luyện Tai Nghe Quãng Âm — Level ${lvl}:</h3>
+                <p style="color: #64748b; font-size: 0.95rem; margin-top: -5px;">Nhấn vào nút dưới đây để nghe âm thanh quãng nhạc và chọn <b>1 trong 3 đáp án</b>:</p>
                 
                 <button onclick="window.playIntervalQuestionSound()" style="font-size: 1.2rem; padding: 16px 36px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 10px 0 20px 0; box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px) scale(1.03)'" onmouseout="this.style.transform='none'">
                     🔊 Nghe Quãng Âm
@@ -568,11 +581,12 @@
 
                 <div id="game-feedback" style="min-height: 36px; font-weight: 800; font-size: 1.2rem; margin-bottom: 15px;"></div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 10px;">
-                    ${pool.map((item) => `
-                        <button onclick="window.checkIntervalAnswer('${item.id}')" style="padding: 16px 14px; border-radius: 16px; border: 2.5px solid #bfdbfe; background: linear-gradient(135deg, #eff6ff, #dbeafe); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #1d4ed8; box-shadow: 0 4px 12px rgba(59,130,246,0.15); transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
-                            <span style="font-size: 1.25rem;">${item.icon} ${item.name}</span>
-                            <span style="font-size: 0.82rem; font-weight: 600; color: #475569;">${item.desc}</span>
+                <!-- Exactly 3 Multiple Choice Options -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; max-width: 760px; margin: 10px auto 0 auto;">
+                    ${options.map((item) => `
+                        <button onclick="window.checkIntervalAnswer('${item.id}')" style="padding: 20px 16px; border-radius: 20px; border: 3px solid #bfdbfe; background: linear-gradient(135deg, #ffffff, #eff6ff); font-weight: 800; font-size: 1.08rem; cursor: pointer; color: #1d4ed8; box-shadow: 0 6px 16px rgba(59,130,246,0.15); transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px;" onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='#3b82f6';" onmouseout="this.style.transform='none'; this.style.borderColor='#bfdbfe';">
+                            <span style="font-size: 1.4rem;">${item.icon} ${item.name}</span>
+                            <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">${item.desc}</span>
                         </button>
                     `).join('')}
                 </div>
