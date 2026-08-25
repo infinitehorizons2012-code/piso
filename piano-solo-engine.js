@@ -7,6 +7,54 @@
     let isPlayingSong = false;
     let activePlaybackTimers = [];
 
+    // Real Acoustic Grand Piano Soundfont Sample Engine Cache (FluidR3_GM / Steinway Soundfont)
+    const soundfontCache = {};
+    const soundfontLoadingMap = {};
+    const SOUNDFONT_BASE_URL = 'https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@gh-pages/FluidR3_GM/acoustic_grand_piano-mp3/';
+    const notesInOctaveFlats = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+    function midiToSoundfontFileName(midi) {
+        const noteIdx = midi % 12;
+        const octave = Math.floor(midi / 12) - 1;
+        const noteName = notesInOctaveFlats[noteIdx];
+        return `${noteName}${octave}.mp3`;
+    }
+
+    async function loadSoundfontSample(midi) {
+        if (soundfontCache[midi]) return soundfontCache[midi];
+        if (soundfontLoadingMap[midi]) return soundfontLoadingMap[midi];
+
+        const fileName = midiToSoundfontFileName(midi);
+        const url = SOUNDFONT_BASE_URL + fileName;
+
+        const promise = (async () => {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const arrayBuffer = await response.arrayBuffer();
+                const ctx = getAudioContext();
+                const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+                soundfontCache[midi] = audioBuffer;
+                return audioBuffer;
+            } catch (err) {
+                console.warn(`Failed loading Soundfont sample for MIDI ${midi} (${fileName}):`, err);
+                return null;
+            } finally {
+                delete soundfontLoadingMap[midi];
+            }
+        })();
+
+        soundfontLoadingMap[midi] = promise;
+        return promise;
+    }
+
+    function preloadCommonSoundfontSamples() {
+        // Pre-cache Octaves 3, 4, 5 (MIDI 48 to 84) for instant response
+        for (let midi = 48; midi <= 84; midi++) {
+            loadSoundfontSample(midi);
+        }
+    }
+
     // 8 Classical & Modern Piano Solo Pieces (ABC Format with Grand Staff %%score {1 2})
     const PIANO_SOLO_SONGS = {
         fur_elise: {
@@ -86,23 +134,48 @@
         return audioCtx;
     }
 
-    // Play Acoustic Piano Tone with Overtones & Decay Envelope
-    // Warm Acoustic Piano Synthesizer (Smoothed 5ms attack envelope & lowpass filter to eliminate all pops/clicks)
-    window.playPianoSoloTone = function(freq, duration = 1.8, velocity = 0.8) {
+    // Play High-Definition Acoustic Grand Piano (Soundfont Audio Sample with Natural Resonance & Smooth Envelope)
+    window.playPianoSoloTone = function(freq, duration = 1.8, velocity = 0.8, midi = null) {
         try {
             const ctx = getAudioContext();
             const now = ctx.currentTime;
 
-            // Master Gain for Note
-            const noteGain = ctx.createGain();
+            if (midi === null && freq) {
+                midi = Math.round(69 + 12 * Math.log2(freq / 440));
+            }
 
-            // Lowpass Filter for warm acoustic timber & eliminating harsh high-end clicks
+            // 1. PLAY REAL RECORDED ACOUSTIC GRAND PIANO SAMPLE IF CACHED
+            if (midi && soundfontCache[midi]) {
+                const source = ctx.createBufferSource();
+                source.buffer = soundfontCache[midi];
+
+                const gainNode = ctx.createGain();
+                const decaySec = sustainPedal ? Math.max(2.8, duration * 2.2) : Math.max(1.0, duration * 1.3);
+
+                gainNode.gain.setValueAtTime(0.0001, now);
+                gainNode.gain.linearRampToValueAtTime(1.0 * velocity, now + 0.003); // Smooth 3ms attack
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, now + decaySec);
+
+                source.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                source.start(now);
+                source.stop(now + decaySec + 0.1);
+                return;
+            }
+
+            // Trigger background pre-fetch if not cached yet
+            if (midi) {
+                loadSoundfontSample(midi);
+            }
+
+            // 2. PHYSICAL MODELING SYNTHESIZER FALLBACK (Smooth 5ms envelope + Overtones)
+            const noteGain = ctx.createGain();
             const filter = ctx.createBiquadFilter();
             filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(Math.min(3200, freq * 4), now);
-            filter.Q.setValueAtTime(1.0, now);
+            filter.frequency.setValueAtTime(Math.min(3500, freq * 4.5), now);
+            filter.Q.setValueAtTime(0.8, now);
 
-            // Fundamental Oscillator (Sine + Triangle blend for warm piano body)
             const oscFundamental = ctx.createOscillator();
             oscFundamental.type = 'sine';
             oscFundamental.frequency.setValueAtTime(freq, now);
@@ -111,42 +184,50 @@
             oscWarmth.type = 'triangle';
             oscWarmth.frequency.setValueAtTime(freq, now);
 
-            // 2nd Harmonic (Brightness)
             const oscHarmonic2 = ctx.createOscillator();
             oscHarmonic2.type = 'sine';
-            oscHarmonic2.frequency.setValueAtTime(freq * 2, now);
+            oscHarmonic2.frequency.setValueAtTime(freq * 2.001, now);
 
-            // Gains per component
+            const oscHarmonic3 = ctx.createOscillator();
+            oscHarmonic3.type = 'sine';
+            oscHarmonic3.frequency.setValueAtTime(freq * 3.003, now);
+
             const gFund = ctx.createGain();
             const gWarm = ctx.createGain();
             const gHarm2 = ctx.createGain();
+            const gHarm3 = ctx.createGain();
 
-            const decay = sustainPedal ? duration * 2.5 : Math.max(0.6, duration);
+            const decay = sustainPedal ? duration * 2.5 : Math.max(0.7, duration);
 
-            // ATTACK ENVELOPE: 6ms smooth linear ramp from 0.0001 eliminates any popping/clicking ("bụp bụp")!
             gFund.gain.setValueAtTime(0.0001, now);
-            gFund.gain.linearRampToValueAtTime(0.6 * velocity, now + 0.006);
+            gFund.gain.linearRampToValueAtTime(0.65 * velocity, now + 0.005);
             gFund.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
             gWarm.gain.setValueAtTime(0.0001, now);
-            gWarm.gain.linearRampToValueAtTime(0.25 * velocity, now + 0.006);
-            gWarm.gain.exponentialRampToValueAtTime(0.0001, now + decay * 0.8);
+            gWarm.gain.linearRampToValueAtTime(0.25 * velocity, now + 0.005);
+            gWarm.gain.exponentialRampToValueAtTime(0.0001, now + decay * 0.85);
 
             gHarm2.gain.setValueAtTime(0.0001, now);
-            gHarm2.gain.linearRampToValueAtTime(0.12 * velocity, now + 0.006);
+            gHarm2.gain.linearRampToValueAtTime(0.12 * velocity, now + 0.005);
             gHarm2.gain.exponentialRampToValueAtTime(0.0001, now + decay * 0.5);
 
+            gHarm3.gain.setValueAtTime(0.0001, now);
+            gHarm3.gain.linearRampToValueAtTime(0.05 * velocity, now + 0.005);
+            gHarm3.gain.exponentialRampToValueAtTime(0.0001, now + decay * 0.3);
+
             noteGain.gain.setValueAtTime(0.0001, now);
-            noteGain.gain.linearRampToValueAtTime(1.0, now + 0.005);
+            noteGain.gain.linearRampToValueAtTime(1.0, now + 0.004);
             noteGain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
             oscFundamental.connect(gFund);
             oscWarmth.connect(gWarm);
             oscHarmonic2.connect(gHarm2);
+            oscHarmonic3.connect(gHarm3);
 
             gFund.connect(filter);
             gWarm.connect(filter);
             gHarm2.connect(filter);
+            gHarm3.connect(filter);
 
             filter.connect(noteGain);
             noteGain.connect(ctx.destination);
@@ -154,10 +235,12 @@
             oscFundamental.start(now);
             oscWarmth.start(now);
             oscHarmonic2.start(now);
+            oscHarmonic3.start(now);
 
             oscFundamental.stop(now + decay + 0.05);
             oscWarmth.stop(now + decay + 0.05);
             oscHarmonic2.stop(now + decay + 0.05);
+            oscHarmonic3.stop(now + decay + 0.05);
         } catch (e) {
             console.warn('Audio play error:', e);
         }
@@ -186,12 +269,10 @@
             const fullName = `${noteName}${octave}`;
             const isBlack = noteName.includes('#');
 
-            // Skip black keys in outer loop because they are nested inside their preceding white key parent!
             if (isBlack) continue;
 
             const isLeftHandRange = (midi < 60);
 
-            // Find key binding for white key
             let keyBindStr = '';
             for (const [k, v] of Object.entries(KEY_BOARD_MAP)) {
                 if (v.midi === midi) {
@@ -239,7 +320,6 @@
                 window.triggerPianoKey(midi, 400, isLeftHandRange ? 'left' : 'right');
             });
 
-            // CHECK IF NEXT NOTE IS A BLACK KEY AND NEST IT INSIDE THIS WHITE KEY
             if (midi + 1 <= endMidi) {
                 const nextNoteName = notesInOctave[(midi + 1) % 12];
                 if (nextNoteName.includes('#')) {
@@ -306,14 +386,13 @@
     window.triggerPianoKey = function(midi, durMs = 400, hand = null) {
         const freq = window.midiToFreq(midi);
         const durSec = Math.max(0.3, durMs / 1000);
-        window.playPianoSoloTone(freq, durSec, 0.85);
+        window.playPianoSoloTone(freq, durSec, 0.85, midi);
 
         const keyElem = document.getElementById(`piano-key-${midi}`);
         if (keyElem) {
             const isBlack = keyElem.classList.contains('black-key');
             const isLeft = (hand === 'left') || (midi < 60);
 
-            // Left Hand = Royal Blue/Cyan (#0284c7), Right Hand = Rose/Gold (#e11d48 / #fde047)
             const activeColor = isLeft ? '#0284c7' : (isBlack ? '#f43f5e' : '#fde047');
             const glowShadow = isLeft ? '0 0 14px #0284c7' : '0 0 14px #e11d48';
 
@@ -404,7 +483,6 @@
         }
     };
 
-    // Helper: Converts Pitch object from abcjs to absolute MIDI Note Number
     function pitchToMidi(pitchObj, keySig = 'C') {
         if (!pitchObj || typeof pitchObj.pitch !== 'number') return 60;
         const step = pitchObj.pitch;
@@ -437,7 +515,6 @@
         return midi;
     }
 
-    // DYNAMIC PARSER: Parses current ABC Notation string directly from editor into exact note events across ALL lines & measures
     function parseAbcToNoteEvents(abcCode) {
         const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
         if (!abcRenderer || !abcRenderer.parseOnly) {
@@ -514,10 +591,8 @@
         const textarea = document.getElementById('piano-solo-abc-editor');
         const abcCode = textarea ? textarea.value : (PIANO_SOLO_SONGS.fur_elise.abc);
 
-        // Render sheet first to guarantee 100% sync
         window.renderPianoSoloSheet(abcCode);
 
-        // Extract exact note events from the ABC notation
         const noteEvents = parseAbcToNoteEvents(abcCode);
 
         if (noteEvents.length === 0) {
@@ -526,11 +601,8 @@
         }
 
         isPlayingSong = true;
-        const btnPlay1 = document.getElementById('btn-play-piano-solo');
-        const btnPlay2 = document.getElementById('btn-play-sheet-abc');
-        const textStr = `🔄 Đang Phát (${noteEvents.length} Nốt ABC)...`;
-        if (btnPlay1) btnPlay1.innerHTML = textStr;
-        if (btnPlay2) btnPlay2.innerHTML = textStr;
+        const btnPlay = document.getElementById('btn-play-sheet-abc');
+        if (btnPlay) btnPlay.innerHTML = `🔄 Đang Phát (${noteEvents.length} Nốt ABC Soundfont)...`;
 
         let maxEndMs = 0;
 
@@ -557,16 +629,15 @@
         activePlaybackTimers.forEach(t => clearTimeout(t));
         activePlaybackTimers = [];
 
-        const btnPlay1 = document.getElementById('btn-play-piano-solo');
-        const btnPlay2 = document.getElementById('btn-play-sheet-abc');
-        if (btnPlay1) btnPlay1.innerHTML = '▶️ Bắt Đầu Độc Tấu';
-        if (btnPlay2) btnPlay2.innerHTML = '▶️ Nghe Độc Tấu Sheet ABC Này';
+        const btnPlay = document.getElementById('btn-play-sheet-abc');
+        if (btnPlay) btnPlay.innerHTML = '▶️ Nghe Độc Tấu Sheet ABC Này';
     };
 
     window.initPianoSoloView = function() {
         setTimeout(() => {
             window.renderVirtualPianoKeyboard();
             window.loadPianoSoloSong('fur_elise');
+            preloadCommonSoundfontSamples();
         }, 50);
     };
 })();
