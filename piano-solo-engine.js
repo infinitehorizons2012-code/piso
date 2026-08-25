@@ -1429,9 +1429,6 @@
                   <div style="display: flex; align-items: center; gap: 10px;">
                     <span style="background: #16a34a; color: white; font-weight: 800; padding: 4px 14px; border-radius: 12px; font-size: 0.9rem;">🎹 ${lineObj.title} - KHÓA SOL & KHÓA FA (2 TAY)</span>
                   </div>
-                  <button onclick="window.playWeek1LineAudio(${idx})" style="padding: 8px 16px; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
-                    ▶️ Nghe Thử Dòng Này
-                  </button>
                 </div>
 
                 <div id="week1-step2-paper-${idx}" style="background: #f8fafc; border-radius: 14px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 14px; min-height: 160px;"></div>
