@@ -1240,18 +1240,13 @@
                       </div>
 
                       <div style="margin-bottom: 8px;">
-                        <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.78rem; margin-bottom: 3px;">🥁 Tiết Tấu Tay Trái (Khoanh đỏ 1):</label>
+                        <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.78rem; margin-bottom: 3px;">🥁 Tiết Tấu Tay Trái:</label>
                         <input type="text" value="${cfg.rhythmText || '1 đơn - 2 đơn - 3 đen'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'rhythmText', this.value)" placeholder="Ví dụ: 1 đơn - 2 đơn - 3 đen..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #f43f5e; font-weight: 700; font-size: 0.82rem; color: #881337; outline: none; background: #fff1f2;">
                       </div>
 
-                      <div style="margin-bottom: 8px;">
-                        <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">🎼 Quãng / Bậc Nốt Đệm (Khoanh đỏ 2):</label>
-                        <input type="text" value="${cfg.intervalText || '1 - 3 - 5'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'intervalText', this.value)" placeholder="Ví dụ: 1 - 3 - 5 hoặc 3 - 3 - 5..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-weight: 700; font-size: 0.82rem; color: #0369a1; outline: none; background: #f0f9ff;">
-                      </div>
-
                       <div>
-                        <label style="display: block; font-weight: 700; color: #6d28d9; font-size: 0.78rem; margin-bottom: 3px;">🖐️ Thế Ngón Tay (Số ngón 1-2-3-4-5):</label>
-                        <input type="text" value="${cfg.fingeringText || '1 3 5'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'fingeringText', this.value)" placeholder="Ví dụ: 1 3 5 hoặc 1-2-3-5..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #8b5cf6; font-weight: 700; font-size: 0.82rem; color: #5b21b6; outline: none; background: #f5f3ff;">
+                        <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">🎼 Quãng / Bậc Nốt Đệm:</label>
+                        <input type="text" value="${cfg.intervalText || '1 - 3 - 5'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'intervalText', this.value)" placeholder="Ví dụ: 1 - 3 - 5 hoặc 3 - 3 - 5..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-weight: 700; font-size: 0.82rem; color: #0369a1; outline: none; background: #f0f9ff;">
                       </div>
                     </div>
                 `;
