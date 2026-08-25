@@ -3874,13 +3874,17 @@
                         <span style="font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 8px; ${stageBadgeStyle}">${p.score || 0}/6pt</span>
                     </div>
                     <div style="font-weight: 800; color: #0284c7; font-size: 0.95rem; margin: 4px 0;">${card.code}: ${card.title}</div>
+                    
+                    <!-- REAL ABC STAFF NOTATION MINI RENDER CONTAINER -->
+                    <div id="progress-abc-${card.code}" style="min-height: 75px; display: flex; justify-content: center; align-items: center; background: #f8fafc; border-radius: 12px; border: 1px solid #cbd5e1; margin: 6px 0; padding: 4px;"></div>
+
                     <div style="font-size: 0.78rem; color: #475569; font-weight: 700;">🎼 ${card.notation} | ${card.countText}</div>
                 </div>
             `;
         }).join('');
 
         const percentage = Math.round((totalEarned / totalMax) * 100) || 0;
-        const lvlTitle = lvl === 1 ? '☀️ Level 1 (Nhập Môn — 7 Thẻ)' : (lvl === 2 ? '🌿 Level 2 (Trung Cấp — 9 Thẻ)' : '🎷 Level 3 (Cao Cấp — 7 Thẻ)');
+        const lvlTitle = lvl === 1 ? '☀️ Level 1 (Nhập Môn — 8 Thẻ)' : (lvl === 2 ? '🌿 Level 2 (Trung Cấp — 9 Thẻ)' : '🎷 Level 3 (Cao Cấp — 7 Thẻ)');
 
         cardBody.innerHTML = `
             <div style="background: white; padding: 28px; border-radius: 24px; border: 2px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
@@ -3889,7 +3893,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
                         <div>
                             <span style="background: #e0f2fe; color: #0369a1; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">📊 BÁO CÁO TIẾN ĐỘ THẺ TIẾT TẤU (RHYTHM MATCH)</span>
-                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.65rem; font-weight: 800;">Bảng Ma Trận 23 Thẻ Tiết Tấu — ${userNameStr}</h2>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.65rem; font-weight: 800;">Bảng Ma Trận 24 Thẻ Tiết Tấu — ${userNameStr}</h2>
                             <p style="margin: 4px 0 0 0; color: #e0f2fe; font-weight: 600; font-size: 0.95rem;">${lvlTitle} — Làm bài test để nâng stage từ 🌱 Hạt ➔ 🌸 Hoa!</p>
                         </div>
                         <div style="text-align: right;">
@@ -3905,11 +3909,33 @@
                 </div>
 
                 <!-- Micro Cards Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
                     ${microCardsHTML}
                 </div>
             </div>
         `;
+
+        // Render staff notes for each progress card via abcjs
+        setTimeout(() => {
+            const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+            if (!abcRenderer) return;
+
+            flashcardsPool.forEach(card => {
+                const elemId = `progress-abc-${card.code}`;
+                const elem = document.getElementById(elemId);
+                if (elem) {
+                    elem.innerHTML = '';
+                    abcRenderer.renderAbc(elemId, card.abc, {
+                        responsive: 'resize',
+                        scale: 1.0,
+                        staffwidth: 200,
+                        paddingtop: 2,
+                        paddingbottom: 2,
+                        add_classes: true
+                    });
+                }
+            });
+        }, 60);
     }
 
     function renderFlashcardView() {
