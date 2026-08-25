@@ -923,6 +923,7 @@
             let lyricParts = [];
 
             lines.forEach(l => {
+                if (l.startsWith('%')) return;
                 if (l.startsWith('w:')) {
                     lyricParts.push(l.replace(/^w:/, '').trim());
                 } else {
