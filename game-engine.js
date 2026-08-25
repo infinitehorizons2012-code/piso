@@ -3632,33 +3632,33 @@
     // --- 23 GRANULAR RHYTHM KNOWLEDGE-UNIT FLASHCARDS ---
     const RHYTHM_FLASHCARDS = {
         lvl1: [
-            { code: 'FC-01', title: '🎺 Nhịp 2/4 (March - Hành khúc 1-2)', desc: '2 phách trong 1 ô nhịp. Phách 1 mạnh, phách 2 nhẹ (Một - Hai, Một - Hai).', countText: 'Đếm: "1 - 2"', notation: '2/4 (Hành khúc)', soundType: 'time_sig_24', icon: '🎺' },
-            { code: 'FC-02', title: '💃 Nhịp 3/4 (Waltz - Dìu dặt 1-2-3)', desc: '3 phách trong 1 ô nhịp. Phách 1 mạnh, phách 2 & 3 nhẹ (Bùm - chát - chát).', countText: 'Đếm: "1 - 2 - 3"', notation: '3/4 (Waltz)', soundType: 'time_sig_34', icon: '💃' },
-            { code: 'FC-03', title: '🎤 Nhịp 4/4 (Pop - Nhịp 4 phách quốc dân)', desc: '4 phách trong 1 ô nhịp. Phách 1 mạnh, phách 2 nhẹ, phách 3 vừa, phách 4 nhẹ.', countText: 'Đếm: "1 - 2 - 3 - 4"', notation: '4/4 (Pop/Rock)', soundType: 'time_sig_44', icon: '🎤' },
-            { code: 'FC-04', title: '🍇 GRAPE (Nốt đen ♩ - 1 phách tròn)', desc: 'Nốt đen (Quarter note) có giá trị tròn 1 phách.', countText: 'Đếm: "1"', notation: '♩ (Nốt đen)', soundType: 'pattern_grape', icon: '🍇' },
-            { code: 'FC-05', title: '🍋 LE-MON (2 móc đơn ♫ - 1 &)', desc: '2 nốt móc đơn (Eighth notes) chia đều 1 phách thành 2 nửa.', countText: 'Đếm: "1 &"', notation: '♫ (2 móc đơn)', soundType: 'pattern_lemon', icon: '🍋' },
-            { code: 'FC-06', title: '🍉 WA-TER-ME-LON (4 móc kép ♬♬ - 1 e & a)', desc: '4 nốt móc kép (Sixteenth notes) chia nhỏ 1 phách thành 4 phần bằng nhau.', countText: 'Đếm: "1 e & a"', notation: '♬♬ (4 móc kép)', soundType: 'pattern_watermelon', icon: '🍉' },
-            { code: 'FC-07', title: '🍊 O-RANGE (Móc kép + Móc đơn chấm - 1 e)', desc: '1 nốt móc kép ở đầu (1/4 phách) + 1 nốt móc đơn chấm dôi phía sau (3/4 phách).', countText: 'Đếm: "1 e..."', notation: '♬ 🎵. (Móc kép + Móc đơn chấm)', soundType: 'pattern_orange', icon: '🍊' }
+            { code: 'FC-01', title: '🎺 Nhịp 2/4 (March - Hành khúc 1-2)', desc: '2 phách trong 1 ô nhịp. Phách 1 mạnh, phách 2 nhẹ (Một - Hai, Một - Hai).', countText: 'Đếm: "1 - 2"', notation: 'Nhịp 2/4 (2 phách/ô)', abc: 'X:1\nM:2/4\nL:1/4\nK:C clef=perc\nc c |', soundType: 'time_sig_24', icon: '🎺' },
+            { code: 'FC-02', title: '💃 Nhịp 3/4 (Waltz - Dìu dặt 1-2-3)', desc: '3 phách trong 1 ô nhịp. Phách 1 mạnh, phách 2 & 3 nhẹ (Bùm - chát - chát).', countText: 'Đếm: "1 - 2 - 3"', notation: 'Nhịp 3/4 (3 phách/ô)', abc: 'X:1\nM:3/4\nL:1/4\nK:C clef=perc\nc c c |', soundType: 'time_sig_34', icon: '💃' },
+            { code: 'FC-03', title: '🎤 Nhịp 4/4 (Pop - Nhịp 4 phách quốc dân)', desc: '4 phách trong 1 ô nhịp. Phách 1 mạnh, phách 2 nhẹ, phách 3 vừa, phách 4 nhẹ.', countText: 'Đếm: "1 - 2 - 3 - 4"', notation: 'Nhịp 4/4 (4 phách/ô)', abc: 'X:1\nM:4/4\nL:1/4\nK:C clef=perc\nc c c c |', soundType: 'time_sig_44', icon: '🎤' },
+            { code: 'FC-04', title: '🍇 GRAPE (Nốt đen ♩ - 1 phách tròn)', desc: 'Nốt đen (Quarter note) có giá trị tròn 1 phách.', countText: 'Đếm: "1"', notation: '♩ (1 Nốt Đen)', abc: 'X:1\nM:1/4\nL:1/4\nK:C clef=perc\nc |', soundType: 'pattern_grape', icon: '🍇' },
+            { code: 'FC-05', title: '🍋 LE-MON (2 nốt móc đơn chung beam)', desc: '2 nốt móc đơn (Eighth notes) dính chùm chung 1 vạch ngang (beam), chia đều 1 phách làm 2 nửa.', countText: 'Đếm: "1 &"', notation: '♫ (2 nốt móc đơn chung beam)', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\ncc |', soundType: 'pattern_lemon', icon: '🍋' },
+            { code: 'FC-06', title: '🍉 WA-TER-ME-LON (4 nốt móc kép chung double beam)', desc: '4 nốt móc kép (Sixteenth notes) dính chùm chung 2 vạch ngang (double beam) nối liền cả 4 nốt, chia nhỏ 1 phách làm 4 phần bằng nhau.', countText: 'Đếm: "1 e & a"', notation: '4 móc kép chung double beam', abc: 'X:1\nM:1/4\nL:1/16\nK:C clef=perc\ncccc |', soundType: 'pattern_watermelon', icon: '🍉' },
+            { code: 'FC-07', title: '🍊 O-RANGE (Móc kép + Móc đơn chấm)', desc: '1 nốt móc kép ở đầu (1/4 phách) + 1 nốt móc đơn chấm dôi phía sau (3/4 phách).', countText: 'Đếm: "1 e..."', notation: 'Móc kép + Móc đơn chấm dôi', abc: 'X:1\nM:1/4\nL:1/16\nK:C clef=perc\nc c3 |', soundType: 'pattern_orange', icon: '🍊' }
         ],
         lvl2: [
-            { code: 'FC-08', title: '🫐 BLUE-BER-RY (1 móc đơn + 2 móc kép - 1 & a)', desc: '1 nốt móc đơn ở đầu (1/2 phách) + 2 nốt móc kép nối đằng sau (1/4 + 1/4).', countText: 'Đếm: "1 & a"', notation: '🎵♬ (1 móc đơn + 2 móc kép)', soundType: 'pattern_blueberry', icon: '🫐' },
-            { code: 'FC-09', title: '🥥 CO-CO-NUT (2 móc kép + 1 móc đơn - 1 e &)', desc: '2 nốt móc kép ở đầu (1/4 + 1/4) + 1 nốt móc đơn nối đằng sau (1/2).', countText: 'Đếm: "1 e &"', notation: '♬🎵 (2 móc kép + 1 móc đơn)', soundType: 'pattern_coconut', icon: '🥥' },
-            { code: 'FC-10', title: '🥒 CU-CUM-BER (1 móc kép - 1 móc đơn - 1 móc kép)', desc: 'Tiết tấu đảo phách: 1 móc kép (1/4) + 1 móc đơn ở giữa (1/2) + 1 móc kép (1/4).', countText: 'Đếm: "1 e a"', notation: '♬🎵♬ (Móc kép - Đơn - Kép)', soundType: 'pattern_cucumber', icon: '🥒' },
-            { code: 'FC-11', title: '🫚 GIN-GER (2 phách: Đen chấm + Móc đơn)', desc: 'Nốt đen chấm dôi ngân dài 1.5 phách + nốt móc đơn nảy 0.5 phách ở cuối phách 2.', countText: 'Đếm: "1 . 2 &"', notation: '♩. 🎵 (2 phách)', soundType: 'pattern_ginger', icon: '🫚' },
-            { code: 'FC-12', title: '🥕 CA-RROT (2 phách: Móc đơn + Đen chấm)', desc: 'Nốt móc đơn nảy 0.5 phách ở đầu + nốt đen chấm dôi ngân 1.5 phách vắt qua phách 2.', countText: 'Đếm: "1 & 2 ."', notation: '🎵 ♩. (2 phách)', soundType: 'pattern_carrot', icon: '🥕' },
-            { code: 'FC-13', title: '🌊 Điệu Slow Rock (6/8 sóng biển 1-2-3-4-5-6)', desc: 'Nhịp 6/8 rải chùm 3 nốt dạt dào như làn sóng biển nhấp nhô.', countText: 'Đếm: "1-2-3 4-5-6"', notation: 'Nhịp 6/8 Slow Rock', soundType: 'genre_slowrock', icon: '🌊' },
-            { code: 'FC-14', title: '🎼 Điệu Ballad (Tỉa rải thong thả)', desc: 'Trống tỉa rải nhẹ nhàng, mượt mà, hòa quyện với giai điệu Pop Ballad.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Pop Ballad', soundType: 'genre_ballad', icon: '🎼' },
-            { code: 'FC-15', title: '🕺 Điệu Disco (Trống dập 4-on-the-floor)', desc: 'Trống Kick đập dồn dập 4 nốt liên tục + Hi-hat mở chát chát sôi động.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Disco / Dance Beat', soundType: 'genre_disco', icon: '🕺' },
-            { code: 'FC-16', title: '💃 Điệu Bolero (Lắc lư trữ tình)', desc: 'Tiết tấu rumba/bolero trữ tình, da diết, thân thuộc với nhạc Việt.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Bolero / Rumba', soundType: 'genre_bolero', icon: '💃' }
+            { code: 'FC-08', title: '🫐 BLUE-BER-RY (1 móc đơn + 2 móc kép)', desc: '1 nốt móc đơn ở đầu (1/2 phách) + 2 nốt móc kép nối đằng sau (1/4 + 1/4) chung beam.', countText: 'Đếm: "1 & a"', notation: '1 móc đơn + 2 móc kép chung beam', abc: 'X:1\nM:1/4\nL:1/16\nK:C clef=perc\nc2 cc |', soundType: 'pattern_blueberry', icon: '🫐' },
+            { code: 'FC-09', title: '🥥 CO-CO-NUT (2 móc kép + 1 móc đơn)', desc: '2 nốt móc kép ở đầu (1/4 + 1/4) + 1 nốt móc đơn nối đằng sau (1/2) chung beam.', countText: 'Đếm: "1 e &"', notation: '2 móc kép + 1 móc đơn chung beam', abc: 'X:1\nM:1/4\nL:1/16\nK:C clef=perc\nccc2 |', soundType: 'pattern_coconut', icon: '🥥' },
+            { code: 'FC-10', title: '🥒 CU-CUM-BER (1 móc kép - 1 móc đơn - 1 móc kép)', desc: 'Tiết tấu đảo phách: 1 móc kép (1/4) + 1 móc đơn ở giữa (1/2) + 1 móc kép (1/4).', countText: 'Đếm: "1 e a"', notation: 'Móc kép - Móc đơn - Móc kép', abc: 'X:1\nM:1/4\nL:1/16\nK:C clef=perc\nc c2 c |', soundType: 'pattern_cucumber', icon: '🥒' },
+            { code: 'FC-11', title: '🫚 GIN-GER (2 phách: Đen chấm + Móc đơn)', desc: 'Nốt đen chấm dôi ngân dài 1.5 phách + nốt móc đơn nảy 0.5 phách ở cuối phách 2.', countText: 'Đếm: "1 . 2 &"', notation: '♩. 🎵 (Đen chấm + Móc đơn)', abc: 'X:1\nM:2/4\nL:1/8\nK:C clef=perc\nc3 c |', soundType: 'pattern_ginger', icon: '🫚' },
+            { code: 'FC-12', title: '🥕 CA-RROT (2 phách: Móc đơn + Đen chấm)', desc: 'Nốt móc đơn nảy 0.5 phách ở đầu + nốt đen chấm dôi ngân 1.5 phách vắt qua phách 2.', countText: 'Đếm: "1 & 2 ."', notation: '🎵 ♩. (Móc đơn + Đen chấm)', abc: 'X:1\nM:2/4\nL:1/8\nK:C clef=perc\nc c3 |', soundType: 'pattern_carrot', icon: '🥕' },
+            { code: 'FC-13', title: '🌊 Điệu Slow Rock (6/8 sóng biển 1-2-3-4-5-6)', desc: 'Nhịp 6/8 rải chùm 3 nốt dạt dào như làn sóng biển nhấp nhô.', countText: 'Đếm: "1-2-3 4-5-6"', notation: 'Nhịp 6/8 (2 chùm 3)', abc: 'X:1\nM:6/8\nL:1/8\nK:C clef=perc\nccc ccc |', soundType: 'genre_slowrock', icon: '🌊' },
+            { code: 'FC-14', title: '🎼 Điệu Ballad (Tỉa rải thong thả)', desc: 'Trống tỉa rải nhẹ nhàng, mượt mà, hòa quyện với giai điệu Pop Ballad.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Pop Ballad Beat', abc: 'X:1\nM:4/4\nL:1/8\nK:C clef=perc\ncc cc cc cc |', soundType: 'genre_ballad', icon: '🎼' },
+            { code: 'FC-15', title: '🕺 Điệu Disco (Trống dập 4-on-the-floor)', desc: 'Trống Kick đập dồn dập 4 nốt liên tục + Hi-hat mở chát chát sôi động.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Disco 4-on-the-floor', abc: 'X:1\nM:4/4\nL:1/4\nK:C clef=perc\nc c c c |', soundType: 'genre_disco', icon: '🕺' },
+            { code: 'FC-16', title: '💃 Điệu Bolero (Lắc lư trữ tình)', desc: 'Tiết tấu rumba/bolero trữ tình, da diết, thân thuộc với nhạc Việt.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Bolero / Rumba Beat', abc: 'X:1\nM:4/4\nL:1/8\nK:C clef=perc\nc c c2 c c c2 |', soundType: 'genre_bolero', icon: '💃' }
         ],
         lvl3: [
-            { code: 'FC-17', title: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba 1 phách)', desc: 'Chùm 3 nốt liên ba (Triplet) chia 1 phách làm 3 phần đều nhau hoàn hảo.', countText: 'Đếm: "1-thị-trưởng / 1-2-3"', notation: '(3♫ (Chùm 3 Liên ba)', soundType: 'pattern_triplet', icon: '🍌' },
-            { code: 'FC-18', title: '🥑 A-VO-CA-DO (Chùm 3 móc kép + 1 móc đơn)', desc: '3 nốt móc kép chạy dồn dập ở đầu + 1 nốt móc đơn lót phía sau.', countText: 'Đếm: "1 e & - a"', notation: '♬♬🎵 (3 kép + 1 đơn)', soundType: 'pattern_avocado', icon: '🥑' },
-            { code: 'FC-19', title: '🍠 SWEET-PO-TA-TO (1 móc đơn + Chùm 3 móc kép)', desc: '1 nốt móc đơn đứng ở đầu + 3 nốt móc kép dồn dập lót phía sau.', countText: 'Đếm: "1 - e & a"', notation: '🎵♬♬ (1 đơn + 3 kép)', soundType: 'pattern_potato', icon: '🍠' },
-            { code: 'FC-20', title: '🍍 PINE-AP-PLE 2 Phách (Chùm 3 nốt đen 2 phách)', desc: 'Chùm 3 nốt đen (Quarter note triplets) dồn đều trong không gian 2 phách.', countText: 'Đếm: "1 - 2 - 3 (trên 2 phách)"', notation: '(3♩♩♩ (Chùm 3 đen)', soundType: 'pattern_triplet_2beat', icon: '🍍' },
-            { code: 'FC-21', title: '🌴 Điệu Reggae / Funk (Giật phách ngược Off-beat)', desc: 'Nhấn mạnh phách ngược (Off-beat phách 2 & 4), giật tưng bừng phóng khoáng.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Reggae / Funk Off-beat', soundType: 'genre_reggae', icon: '🌴' },
-            { code: 'FC-22', title: '🎷 Điệu Swing / Shuffle (Nhịp nhún nhảy Jazz)', desc: 'Chia cặp phách theo tỉ lệ dẹt 2:1 (dài - ngắn), nhún nhảy lả lướt Jazz/Blues.', countText: 'Đếm: "1--a 2--a"', notation: 'Swing / Shuffle 8th', soundType: 'genre_swing', icon: '🎷' },
-            { code: 'FC-23', title: '🌊 Điệu Bossa Nova (Điệu Latin tinh tế)', desc: 'Hòa quyện tiết tấu Samba Brazil giật nhẹ tinh tế với hòa âm Jazz lãng mạn.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Bossa Nova Latin', soundType: 'genre_bossa', icon: '🌊' }
+            { code: 'FC-17', title: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba 1 phách)', desc: 'Chùm 3 nốt liên ba (Triplet) chia 1 phách làm 3 phần đều nhau hoàn hảo.', countText: 'Đếm: "1-2-3 / 1-thị-trưởng"', notation: 'Chùm 3 Liên Ba 1 phách', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\n(3ccc |', soundType: 'pattern_triplet', icon: '🍌' },
+            { code: 'FC-18', title: '🥑 A-VO-CA-DO (Chùm 3 móc kép + 1 móc đơn)', desc: '3 nốt móc kép chạy dồn dập ở đầu + 1 nốt móc đơn lót phía sau.', countText: 'Đếm: "1 e & - a"', notation: '3 móc kép + 1 móc đơn', abc: 'X:1\nM:1/4\nL:1/16\nK:C clef=perc\nccc c2 |', soundType: 'pattern_avocado', icon: '🥑' },
+            { code: 'FC-19', title: '🍠 SWEET-PO-TA-TO (1 móc đơn + Chùm 3 móc kép)', desc: '1 nốt móc đơn đứng ở đầu + 3 nốt móc kép dồn dập lót phía sau.', countText: 'Đếm: "1 - e & a"', notation: '1 móc đơn + 3 móc kép', abc: 'X:1\nM:1/4\nL:1/16\nK:C clef=perc\nc2 ccc |', soundType: 'pattern_potato', icon: '🍠' },
+            { code: 'FC-20', title: '🍍 PINE-AP-PLE 2 Phách (Chùm 3 nốt đen 2 phách)', desc: 'Chùm 3 nốt đen (Quarter note triplets) dồn đều trong không gian 2 phách.', countText: 'Đếm: "1 - 2 - 3 (trên 2 phách)"', notation: 'Chùm 3 Nốt Đen trên 2 phách', abc: 'X:1\nM:2/4\nL:1/4\nK:C clef=perc\n(3c c c |', soundType: 'pattern_triplet_2beat', icon: '🍍' },
+            { code: 'FC-21', title: '🌴 Điệu Reggae / Funk (Giật phách ngược Off-beat)', desc: 'Nhấn mạnh phách ngược (Off-beat phách 2 & 4), giật tưng bừng phóng khoáng.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Reggae / Funk Off-beat', abc: 'X:1\nM:4/4\nL:1/8\nK:C clef=perc\nz c z c z c z c |', soundType: 'genre_reggae', icon: '🌴' },
+            { code: 'FC-22', title: '🎷 Điệu Swing / Shuffle (Nhịp nhún nhảy Jazz)', desc: 'Chia cặp phách theo tỉ lệ dẹt 2:1 (dài - ngắn), nhún nhảy lả lướt Jazz/Blues.', countText: 'Đếm: "1--a 2--a"', notation: 'Swing / Shuffle Triplet 8th', abc: 'X:1\nM:4/4\nL:1/8\nK:C clef=perc\n(3c2c (3c2c (3c2c (3c2c |', soundType: 'genre_swing', icon: '🎷' },
+            { code: 'FC-23', title: '🌊 Điệu Bossa Nova (Điệu Latin tinh tế)', desc: 'Hòa quyện tiết tấu Samba Brazil giật nhẹ tinh tế với hòa âm Jazz lãng mạn.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Bossa Nova Latin Beat', abc: 'X:1\nM:4/4\nL:1/8\nK:C clef=perc\nc2 c c2 c c2 |', soundType: 'genre_bossa', icon: '🌊' }
         ]
     };
 
@@ -3680,29 +3680,29 @@
         cardBody.innerHTML = `
             <div style="background: white; padding: 28px; border-radius: 24px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
                 <h3 style="margin-top: 0; color: #1e293b; font-size: 1.3rem; font-weight: 800;">
-                    🎴 Thẻ Học Tiết Tấu (23 Flashcards Kiến Thức)
+                    🎴 Thẻ Học Tiết Tấu (23 Flashcards Chuẩn Ký Hiệu Nốt)
                 </h3>
                 <p style="margin: 0 0 18px 0; color: #0284c7; font-weight: 700; font-size: 0.95rem;">
-                    Bấm vào thẻ để lật xem ký hiệu nốt nhạc & tiếng đếm phách!
+                    Bấm vào thẻ để lật xem khuông nhạc, vạch nối beam & đếm phách!
                 </p>
 
                 <!-- 3D Flip Container -->
-                <div onclick="window.toggleRhythmFlashcardFlip()" style="perspective: 1000px; width: 100%; max-width: 500px; margin: 0 auto 22px auto; height: 320px; cursor: pointer;">
+                <div onclick="window.toggleRhythmFlashcardFlip()" style="perspective: 1000px; width: 100%; max-width: 500px; margin: 0 auto 22px auto; height: 340px; cursor: pointer;">
                     <div id="flashcard-rhythm-inner" style="position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; ${isFlipped ? 'transform: rotateY(180deg);' : ''}">
                         
                         <!-- Front Face -->
-                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #ecfeff, #cff4fc); border-radius: 24px; border: 3px solid #a5f3fc; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(6,182,212,0.15);">
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #ecfeff, #cff4fc); border-radius: 24px; border: 3px solid #a5f3fc; padding: 22px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(6,182,212,0.15);">
                             <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
                                 <span style="background: #06b6d4; color: white; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">THẺ ${card.code}</span>
                                 <span style="background: white; color: #0284c7; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">Thẻ ${idx + 1} / ${pool.length}</span>
                             </div>
 
-                            <div>
-                                <div style="font-size: 3.8rem; margin-bottom: 6px;">${card.icon}</div>
-                                <h3 style="margin: 0; color: #0e7490; font-size: 1.45rem; font-weight: 800;">${card.title}</h3>
-                                <div style="margin-top: 8px; font-weight: 800; color: #0284c7; background: white; padding: 6px 14px; border-radius: 12px; display: inline-block;">
-                                    ${card.countText}
-                                </div>
+                            <div style="width: 100%;">
+                                <div style="font-size: 3.2rem; margin-bottom: 4px;">${card.icon}</div>
+                                <h3 style="margin: 0; color: #0e7490; font-size: 1.35rem; font-weight: 800;">${card.title}</h3>
+                                
+                                <!-- ABC Staff Notation Render Front -->
+                                <div id="rhythm-abc-paper-front" style="min-height: 90px; display: flex; justify-content: center; align-items: center; background: white; border-radius: 14px; border: 1.5px solid #a5f3fc; margin-top: 10px; padding: 6px;"></div>
                             </div>
 
                             <button onclick="event.stopPropagation(); window.playRhythmFlashcardSound();" style="background: white; border: 2.5px solid #06b6d4; color: #0891b2; font-weight: 800; padding: 8px 20px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
@@ -3711,14 +3711,18 @@
                         </div>
 
                         <!-- Back Face -->
-                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-radius: 24px; border: 3px solid #86efac; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; align-items: center; transform: rotateY(180deg); box-shadow: 0 10px 25px rgba(34,197,94,0.15);">
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-radius: 24px; border: 3px solid #86efac; padding: 22px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; align-items: center; transform: rotateY(180deg); box-shadow: 0 10px 25px rgba(34,197,94,0.15);">
                             <div style="width: 100%; text-align: left;">
-                                <span style="background: #bbf7d0; color: #166534; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">CHI TIẾT TIẾT TẤU</span>
+                                <span style="background: #bbf7d0; color: #166534; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">CHI TIẾT & TIẾNG ĐẾM PHÁCH</span>
                             </div>
 
                             <div style="width: 100%;">
-                                <div style="font-weight: 800; color: #15803d; font-size: 1.2rem; margin-bottom: 6px;">🎼 Ký Hiệu: ${card.notation}</div>
-                                <div style="background: white; padding: 12px; border-radius: 14px; border: 1.5px solid #86efac; color: #166534; font-weight: 700; font-size: 0.98rem; line-height: 1.6;">
+                                <div style="font-weight: 800; color: #15803d; font-size: 1.15rem; margin-bottom: 4px;">⏱️ ${card.countText}</div>
+                                
+                                <!-- ABC Staff Notation Render Back -->
+                                <div id="rhythm-abc-paper-back" style="min-height: 80px; display: flex; justify-content: center; align-items: center; background: white; border-radius: 12px; border: 1.5px solid #86efac; margin-bottom: 8px; padding: 4px;"></div>
+
+                                <div style="background: white; padding: 10px 14px; border-radius: 12px; border: 1.5px solid #86efac; color: #166534; font-weight: 700; font-size: 0.92rem; line-height: 1.5;">
                                     💡 ${card.desc}
                                 </div>
                             </div>
@@ -3739,6 +3743,38 @@
                 </div>
             </div>
         `;
+
+        // Render staff note for Rhythm via abcjs
+        setTimeout(() => {
+            const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+            if (!abcRenderer) return;
+
+            const paperFront = document.getElementById('rhythm-abc-paper-front');
+            if (paperFront) {
+                paperFront.innerHTML = '';
+                abcRenderer.renderAbc('rhythm-abc-paper-front', card.abc, {
+                    responsive: 'resize',
+                    scale: 1.3,
+                    staffwidth: 280,
+                    paddingtop: 5,
+                    paddingbottom: 5,
+                    add_classes: true
+                });
+            }
+
+            const paperBack = document.getElementById('rhythm-abc-paper-back');
+            if (paperBack) {
+                paperBack.innerHTML = '';
+                abcRenderer.renderAbc('rhythm-abc-paper-back', card.abc, {
+                    responsive: 'resize',
+                    scale: 1.2,
+                    staffwidth: 260,
+                    paddingtop: 5,
+                    paddingbottom: 5,
+                    add_classes: true
+                });
+            }
+        }, 60);
     }
 
     window.toggleRhythmFlashcardFlip = function() {
