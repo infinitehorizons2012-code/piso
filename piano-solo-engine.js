@@ -912,22 +912,45 @@
         const snippetHeader = lineObj.snippetHeader || 'M: 2/4\nL: 1/8\nK: C';
         const measures = window.parseLineMeasures(lineObj.abcContent);
 
+        let noteMeasures = [];
+        let customLyricMeasures = [];
         let numberLyrics = [];
         let chordNoteLyrics = [];
 
         measures.forEach((mObj, mIdx) => {
+            const lines = mObj.text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let notesParts = [];
+            let lyricParts = [];
+
+            lines.forEach(l => {
+                if (l.startsWith('w:')) {
+                    lyricParts.push(l.replace(/^w:/, '').trim());
+                } else {
+                    notesParts.push(l);
+                }
+            });
+
+            const mNotesText = notesParts.join(' ');
+            noteMeasures.push(mNotesText);
+
+            if (lyricParts.length > 0) {
+                customLyricMeasures.push(lyricParts.join(' '));
+            } else {
+                customLyricMeasures.push('*');
+            }
+
             const cfg = window.getMeasureConfig(lineIdx, mIdx, mObj.chord);
             const chordKey = cfg.chord || 'C';
             const chordObj = CHORD_NOTE_SOLFEGE_MAP[chordKey] || CHORD_NOTE_SOLFEGE_MAP['C'];
 
             if (cfg.rhythmPattern === 'none' || chordKey === 'None') {
-                const cleanText = mObj.text.replace(/"[^"]*"/g, '').replace(/%[^\n]*/g, '');
+                const cleanText = mNotesText.replace(/"[^"]*"/g, '').replace(/%[^\n]*/g, '');
                 const noteMatches = cleanText.match(/[A-Ga-g][,']?[0-9]*/g) || [];
                 const skips = Array(Math.max(1, noteMatches.length)).fill('*').join(' ');
                 numberLyrics.push(` ${skips} `);
                 chordNoteLyrics.push(` ${skips} `);
             } else {
-                const cleanText = mObj.text.replace(/"[^"]*"/g, '').replace(/%[^\n]*/g, '');
+                const cleanText = mNotesText.replace(/"[^"]*"/g, '').replace(/%[^\n]*/g, '');
                 const noteMatches = cleanText.match(/[A-Ga-g][,']?[0-9]*/g) || [];
                 const noteCount = noteMatches.length;
 
@@ -954,10 +977,14 @@
             }
         });
 
+        const lineNotesAbc = noteMeasures.join(' | ');
+        const hasCustomLyrics = customLyricMeasures.some(m => m !== '*');
+        const customW = hasCustomLyrics ? ('w:' + customLyricMeasures.join(' | ') + '\n') : '';
+
         const w1 = 'w:' + numberLyrics.join('|');
         const w2 = 'w:' + chordNoteLyrics.join('|');
 
-        return `${snippetHeader}\n${lineObj.abcContent}\n${w1}\n${w2}`;
+        return `${snippetHeader}\n${lineNotesAbc}\n${customW}${w1}\n${w2}`;
     }
 
     window.renderWeek1Step1Lines = function() {
