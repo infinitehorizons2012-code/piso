@@ -1492,7 +1492,7 @@
         const lines = window.week1State.parsedLines;
         if (!lines || lines.length === 0) return window.week1State.abcInput;
 
-        const firstLineHeader = lines[0].snippetHeader || 'M:2/4\nL:1/8\nK:C';
+        const firstLineHeader = (lines[0].snippetHeader || 'M:2/4\nL:1/8\nK:C').trim();
         let lineBlocks = [];
 
         lines.forEach((lineObj) => {
@@ -1536,14 +1536,14 @@
             lineBlocks.push(`${trebleLineNotes} |\n${customW ? customW + '\n' : ''}`);
         });
 
-        return `X:1\nT: THẰNG CUỘI (BÀN NHẠC GIAI ĐIỆU BƯỚC 1)\n${firstLineHeader}\n\n${lineBlocks.join('\n')}`;
+        return `X:1\nT: THẰNG CUỘI (BÀN NHẠC GIAI ĐIỆU BƯỚC 1)\n${firstLineHeader}\n${lineBlocks.join('')}`;
     };
 
     window.generateFullSongGrandStaffAbc = function() {
         const lines = window.week1State.parsedLines;
         if (!lines || lines.length === 0) return window.week1State.abcInput;
 
-        const firstLineHeader = lines[0].snippetHeader || 'M:2/4\nL:1/8\nK:C';
+        const firstLineHeader = (lines[0].snippetHeader || 'M:2/4\nL:1/8\nK:C').trim();
         let lineBlocks = [];
 
         lines.forEach((lineObj, lineIdx) => {
@@ -1598,7 +1598,7 @@
             lineBlocks.push(`V:1 clef=treble\n${trebleLineNotes} |\n${customW ? customW + '\n' : ''}V:2 clef=bass\n${bassLineNotes} |`);
         });
 
-        return `X:1\nT: THẰNG CUỘI (2 TAY PIANO SOLO)\n${firstLineHeader}\n%%score {1 | 2}\n\n${lineBlocks.join('\n\n')}`;
+        return `X:1\nT: THẰNG CUỘI (2 TAY PIANO SOLO)\n${firstLineHeader}\n%%score {1 | 2}\n${lineBlocks.join('\n')}`;
     };
 
     window.toggleWeek1MasterScoreModal = function() {
