@@ -892,8 +892,11 @@
             const chordObj = CHORD_NOTE_SOLFEGE_MAP[chordKey] || CHORD_NOTE_SOLFEGE_MAP['C'];
 
             if (cfg.rhythmPattern === 'none' || chordKey === 'None') {
-                numberLyrics.push(' ');
-                chordNoteLyrics.push(' ');
+                const cleanText = mObj.text.replace(/"[^"]*"/g, '').replace(/%[^\n]*/g, '');
+                const noteMatches = cleanText.match(/[A-Ga-g][,']?[0-9]*/g) || [];
+                const skips = Array(Math.max(1, noteMatches.length)).fill('*').join(' ');
+                numberLyrics.push(` ${skips} `);
+                chordNoteLyrics.push(` ${skips} `);
             } else {
                 const cleanText = mObj.text.replace(/"[^"]*"/g, '').replace(/%[^\n]*/g, '');
                 const noteMatches = cleanText.match(/[A-Ga-g][,']?[0-9]*/g) || [];
@@ -901,26 +904,22 @@
 
                 if (cfg.rhythmPattern === '4_beat') {
                     if (noteCount <= 1) {
-                        numberLyrics.push(' 1-2-3-4 ');
-                        chordNoteLyrics.push(` ${chordObj.notes.join('-')}-${chordObj.notes[0]} `);
-                    } else if (noteCount === 2) {
-                        numberLyrics.push(' 1-2-3-4 * ');
-                        chordNoteLyrics.push(` ${chordObj.notes.join('-')}-${chordObj.notes[0]} * `);
+                        numberLyrics.push(' "1 2 3 4" ');
+                        chordNoteLyrics.push(` "${chordObj.notes.join(' ')} ${chordObj.notes[0]}" `);
                     } else {
-                        numberLyrics.push(' 1 2 3 4 ');
-                        chordNoteLyrics.push(` ${chordObj.notes.join(' ')} ${chordObj.notes[0]} `);
+                        const skips = Array(noteCount - 1).fill('*').join(' ');
+                        numberLyrics.push(` "1 2 3 4" ${skips} `);
+                        chordNoteLyrics.push(` "${chordObj.notes.join(' ')} ${chordObj.notes[0]}" ${skips} `);
                     }
                 } else {
                     // Default 3_beat
                     if (noteCount <= 1) {
-                        numberLyrics.push(' 1-2-3 ');
-                        chordNoteLyrics.push(` ${chordObj.notes.join('-')} `);
-                    } else if (noteCount === 2) {
-                        numberLyrics.push(' 1-2-3 * ');
-                        chordNoteLyrics.push(` ${chordObj.notes.join('-')} * `);
+                        numberLyrics.push(' "1 2 3" ');
+                        chordNoteLyrics.push(` "${chordObj.notes.join(' ')}" `);
                     } else {
-                        numberLyrics.push(' 1 2 3 ');
-                        chordNoteLyrics.push(` ${chordObj.notes.join(' ')} `);
+                        const skips = Array(noteCount - 1).fill('*').join(' ');
+                        numberLyrics.push(` "1 2 3" ${skips} `);
+                        chordNoteLyrics.push(` "${chordObj.notes.join(' ')}" ${skips} `);
                     }
                 }
             }
