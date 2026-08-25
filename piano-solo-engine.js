@@ -1488,17 +1488,18 @@
         return `X:1\nT: ${lineObj.title}\n${snippetHeader}\n%%score {1 | 2}\nV:1 clef=treble\n${lineNotesAbc}\n${customW ? customW + '\n' : ''}V:2 clef=bass\n${bassBody}`;
     };
 
-    window.generateFullSongGrandStaffAbc = function() {
+    window.generateFullSongStep1MelodyAbc = function() {
         const lines = window.week1State.parsedLines;
         if (!lines || lines.length === 0) return window.week1State.abcInput;
 
         const firstLineHeader = lines[0].snippetHeader || 'M:2/4\nL:1/8\nK:C';
-        let fullTrebleNotes = [];
-        let fullLyricRows = [];
-        let fullBassNotes = [];
+        let lineBlocks = [];
 
-        lines.forEach((lineObj, lineIdx) => {
+        lines.forEach((lineObj) => {
             const measures = window.parseLineMeasures(lineObj.abcContent);
+            let noteMeasures = [];
+            let lyricRows = [];
+
             measures.forEach((mObj, mIdx) => {
                 const mLines = mObj.text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
                 let mNotes = [];
@@ -1514,37 +1515,90 @@
                     }
                 });
 
-                fullTrebleNotes.push(mNotes.join(' '));
+                noteMeasures.push(mNotes.join(' '));
 
                 mWords.forEach((wStr, rIdx) => {
-                    if (!fullLyricRows[rIdx]) fullLyricRows[rIdx] = [];
-                    const globalMIdx = fullTrebleNotes.length - 1;
-                    fullLyricRows[rIdx][globalMIdx] = wStr;
+                    if (!lyricRows[rIdx]) lyricRows[rIdx] = [];
+                    lyricRows[rIdx][mIdx] = wStr;
+                });
+            });
+
+            const numMeasures = measures.length;
+            lyricRows.forEach(row => {
+                for (let i = 0; i < numMeasures; i++) {
+                    if (!row[i]) row[i] = '*';
+                }
+            });
+
+            const trebleLineNotes = noteMeasures.join(' | ');
+            const customW = lyricRows.map(row => 'w:' + row.join(' | ')).join('\n');
+
+            lineBlocks.push(`${trebleLineNotes} |\n${customW ? customW + '\n' : ''}`);
+        });
+
+        return `X:1\nT: THẰNG CUỘI (BÀN NHẠC GIAI ĐIỆU BƯỚC 1)\n${firstLineHeader}\n\n${lineBlocks.join('\n')}`;
+    };
+
+    window.generateFullSongGrandStaffAbc = function() {
+        const lines = window.week1State.parsedLines;
+        if (!lines || lines.length === 0) return window.week1State.abcInput;
+
+        const firstLineHeader = lines[0].snippetHeader || 'M:2/4\nL:1/8\nK:C';
+        let lineBlocks = [];
+
+        lines.forEach((lineObj, lineIdx) => {
+            const measures = window.parseLineMeasures(lineObj.abcContent);
+            let noteMeasures = [];
+            let lyricRows = [];
+            let bassMeasures = [];
+
+            measures.forEach((mObj, mIdx) => {
+                const mLines = mObj.text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                let mNotes = [];
+                let mWords = [];
+
+                mLines.forEach(l => {
+                    if (l.startsWith('%')) return;
+                    if (/^w[0-9]*:?/i.test(l)) {
+                        const words = l.replace(/^w[0-9]*:?/i, '').trim();
+                        if (words) mWords.push(words);
+                    } else {
+                        mNotes.push(l);
+                    }
+                });
+
+                noteMeasures.push(mNotes.join(' '));
+
+                mWords.forEach((wStr, rIdx) => {
+                    if (!lyricRows[rIdx]) lyricRows[rIdx] = [];
+                    lyricRows[rIdx][mIdx] = wStr;
                 });
 
                 const customBassKey = `${lineIdx}_${mIdx}`;
                 if (window.week1State.step2BassMeasures && window.week1State.step2BassMeasures[customBassKey] !== undefined) {
-                    fullBassNotes.push(` ${window.week1State.step2BassMeasures[customBassKey]} `);
+                    bassMeasures.push(` ${window.week1State.step2BassMeasures[customBassKey]} `);
                 } else {
                     const cfg = window.getMeasureConfig(lineIdx, mIdx, mObj.chord);
                     const bassNotes = window.getBassRhythmNotes(cfg.chord, cfg.rhythmText, cfg.intervalText);
-                    fullBassNotes.push(` ${bassNotes} `);
+                    bassMeasures.push(` ${bassNotes} `);
                 }
             });
+
+            const numMeasures = measures.length;
+            lyricRows.forEach(row => {
+                for (let i = 0; i < numMeasures; i++) {
+                    if (!row[i]) row[i] = '*';
+                }
+            });
+
+            const trebleLineNotes = noteMeasures.join(' | ');
+            const customW = lyricRows.map(row => 'w:' + row.join(' | ')).join('\n');
+            const bassLineNotes = bassMeasures.join(' | ');
+
+            lineBlocks.push(`V:1 clef=treble\n${trebleLineNotes} |\n${customW ? customW + '\n' : ''}V:2 clef=bass\n${bassLineNotes} |`);
         });
 
-        const totalMeasures = fullTrebleNotes.length;
-        fullLyricRows.forEach(row => {
-            for (let i = 0; i < totalMeasures; i++) {
-                if (!row[i]) row[i] = '*';
-            }
-        });
-
-        const trebleBody = fullTrebleNotes.join(' | ');
-        const customW = fullLyricRows.map(row => 'w:' + row.join(' | ')).join('\n');
-        const bassBody = fullBassNotes.join(' | ');
-
-        return `X:1\nT: THẰNG CUỘI (2 TAY PIANO SOLO)\n${firstLineHeader}\n%%score {1 | 2}\nV:1 clef=treble\n${trebleBody}\n${customW ? customW + '\n' : ''}V:2 clef=bass\n${bassBody}`;
+        return `X:1\nT: THẰNG CUỘI (2 TAY PIANO SOLO)\n${firstLineHeader}\n%%score {1 | 2}\n\n${lineBlocks.join('\n\n')}`;
     };
 
     window.toggleWeek1MasterScoreModal = function() {
@@ -1559,7 +1613,7 @@
 
             const masterAbc = (window.week1State.activeStep === 2)
                 ? window.generateFullSongGrandStaffAbc()
-                : window.week1State.abcInput;
+                : window.generateFullSongStep1MelodyAbc();
 
             if (textarea) textarea.value = masterAbc;
 
