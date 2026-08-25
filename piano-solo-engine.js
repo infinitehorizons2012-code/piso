@@ -647,11 +647,19 @@
         }
     };
 
-    // --- WEEK 1 PEDAGOGY ENGINE (LUYỆN PIANO THEO DÒNG CHO TRẺ EM & NHẠC CÔNG) ---
+    // --- WEEK 1 PEDAGOGY ENGINE (LUYỆN PIANO THEO DÒNG CHO TRẺ EM & NHẠC CÔNG - BỘI NGỌC SOLO METHOD) ---
     const WEEK1_PRESETS = {
         thang_cuoi: {
-            title: "Thằng Cuội (Bản Dành Cho Bé)",
-            abc: `X:1\nT: Thằng Cuội (Bản Dành Cho Bé)\nM: 4/4\nL: 1/8\nQ: 1/4=84\nK: C\n% --- DÒNG 1 ---\n"C" G3 A G2 E2 | "C" C3 E G4 | "Am" E3 D C2 A,2 | "Am" A,6 z2 |\n% --- DÒNG 2 ---\n"Am" E3 G A2 c2 | "F" C3 E F4 | "Dm" D3 F E2 D2 | "G" G6 z2 |\n% --- DÒNG 3 ---\n"F" c2 c2 c2 A2 | "G" d3 c B2 G2 | "C" c4 E4 | "C" G6 z2 |`
+            title: "Thằng Cuội (Bội Ngọc Solo Method - Tuần 1)",
+            abc: `X:1\nT: Thằng Cuội (Tuần 1 - Nhịp 2/4)\nM: 2/4\nL: 1/8\nQ: 1/4=70\nK: C\n% --- DÒNG 1 ---\n"C" G3 A | G2 E2 | "C" C3 E | G4 |\n% --- DÒNG 2 ---\n"Am" E3 D | C2 A,2 | "Am" A,4 | z4 |\n% --- DÒNG 3 ---\n"Am" E3 G | A2 c2 | "F" C3 E | F4 |\n% --- DÒNG 4 ---\n"Dm" D3 F | E2 D2 | "G" G4 | z4 |`
+        },
+        proud_of_you: {
+            title: "Proud Of You (Bội Ngọc Solo Method - Tuần 1)",
+            abc: `X:1\nT: Proud Of You (Tuần 1 - Nhịp 2/4)\nM: 2/4\nL: 1/8\nQ: 1/4=72\nK: G\n% --- DÒNG 1 ---\n"G" d2 B2 | "Em" g3 f | "C" e2 d2 | "D" d4 |\n% --- DÒNG 2 ---\n"C" c2 B2 | "Bm" B2 A2 | "Am" A2 G2 | "D" A4 |`
+        },
+        endless_love: {
+            title: "Endless Love (Bội Ngọc Solo Method - Tuần 1)",
+            abc: `X:1\nT: Endless Love (Tuần 1 - Nhịp 2/4)\nM: 2/4\nL: 1/8\nQ: 1/4=65\nK: C\n% --- DÒNG 1 ---\n"C" E2 G2 | "Am" c3 B | "F" A2 c2 | "G" G4 |\n% --- DÒNG 2 ---\n"F" F2 A2 | "G" G2 F2 | "C" E4 | z4 |`
         },
         ban_nhac_cua_be: {
             title: "Bản Nhạc Của Bé (Đô Trưởng C)",
@@ -660,14 +668,6 @@
         fur_elise: {
             title: "Für Elise (Đoạn A Đơn Giản)",
             abc: `X:1\nT: Für Elise\nM: 3/8\nL: 1/16\nQ: 3/8=55\nK: Am\n% --- DÒNG 1 ---\n"Am" e^d eBdc | "Am" A2 z C EA | "E7" B2 z E ^GB |\n% --- DÒNG 2 ---\n"Am" c2 z e ^de | "Am" e^d eBdc | "Am" A2 z C EA |\n% --- DÒNG 3 ---\n"E7" B2 z E cB | "Am" A4 z2 |`
-        },
-        canon_in_d: {
-            title: "Canon in D (Giai Điệu)",
-            abc: `X:1\nT: Canon in D\nM: 4/4\nL: 1/8\nQ: 1/4=76\nK: D\n% --- DÒNG 1 ---\n"D" f2 e2 d2 c2 | "Bm" B2 A2 B2 c2 |\n% --- DÒNG 2 ---\n"G" f2 e2 d2 c2 | "A" B2 A2 B2 c2 |`
-        },
-        nho_oi: {
-            title: "Nhỏ Ơi (Piano Solo)",
-            abc: `X:1\nT: Nhỏ Ơi (Piano Solo)\nM: 3/4\nL: 1/8\nQ: 1/4=84\nK: C\n% --- DÒNG 1 ---\n"C" E2 G2 c2 | "C" e3 d c2 | "G" d2 E2 G2 | "G" B3 A G2 |\n% --- DÒNG 2 ---\n"Am" c2 E2 G2 | "F" A3 G F2 | "C" G2 C2 E2 | "G" D6 |`
         }
     };
 
