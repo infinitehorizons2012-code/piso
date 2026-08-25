@@ -347,7 +347,40 @@
         }
     };
 
-    // DYNAMIC PARSER: Parses current ABC Notation string directly from editor into exact note events with Left/Right hand assignments
+    // Helper: Converts Pitch object from abcjs to absolute MIDI Note Number
+    function pitchToMidi(pitchObj, keySig = 'C') {
+        if (!pitchObj || typeof pitchObj.pitch !== 'number') return 60;
+        const step = pitchObj.pitch;
+        const octave = Math.floor(step / 7);
+        const degree = ((step % 7) + 7) % 7;
+        const diatonicSemitones = [0, 2, 4, 5, 7, 9, 11][degree];
+        let midi = 60 + diatonicSemitones + (octave * 12);
+
+        if (pitchObj.accidental) {
+            if (pitchObj.accidental === 'sharp') midi += 1;
+            else if (pitchObj.accidental === 'flat') midi -= 1;
+            else if (pitchObj.accidental === 'dblsharp') midi += 2;
+            else if (pitchObj.accidental === 'dblflat') midi -= 2;
+        } else {
+            const keyMap = {
+                'G': { 3: 1 }, 'Em': { 3: 1 },
+                'D': { 3: 1, 0: 1 }, 'Bm': { 3: 1, 0: 1 },
+                'A': { 3: 1, 0: 1, 4: 1 }, 'F#m': { 3: 1, 0: 1, 4: 1 },
+                'E': { 3: 1, 0: 1, 4: 1, 1: 1 }, 'C#m': { 3: 1, 0: 1, 4: 1, 1: 1 },
+                'F': { 6: -1 }, 'Dm': { 6: -1 },
+                'Bb': { 6: -1, 2: -1 }, 'Gm': { 6: -1, 2: -1 },
+                'Eb': { 6: -1, 2: -1, 5: -1 }, 'Cm': { 6: -1, 2: -1, 5: -1 },
+                'Ab': { 6: -1, 2: -1, 5: -1, 1: -1 }, 'Fm': { 6: -1, 2: -1, 5: -1, 1: -1 }
+            };
+            const activeKey = keyMap[keySig];
+            if (activeKey && activeKey[degree] !== undefined) {
+                midi += activeKey[degree];
+            }
+        }
+        return midi;
+    }
+
+    // DYNAMIC PARSER: Parses current ABC Notation string directly from editor into exact note events across ALL lines & measures
     function parseAbcToNoteEvents(abcCode) {
         const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
         if (!abcRenderer || !abcRenderer.parseOnly) {
@@ -359,39 +392,50 @@
             if (!parsed || parsed.length === 0) return [];
 
             const tune = parsed[0];
-            let tempoBpm = 100;
+            let tempoBpm = 90;
             if (tune.metaText && tune.metaText.tempo) {
-                tempoBpm = tune.metaText.tempo.bpm || 100;
+                tempoBpm = tune.metaText.tempo.bpm || 90;
+            } else {
+                const matchQ = abcCode.match(/Q:\s*(?:\d\/\d=)?(\d+)/i);
+                if (matchQ) tempoBpm = parseInt(matchQ[1], 10);
             }
 
+            let keySig = 'C';
+            const matchK = abcCode.match(/K:\s*([A-Ga-g][#b]?m?)/);
+            if (matchK) keySig = matchK[1];
+
             const quarterMs = (60000 / tempoBpm);
+            const voiceTimeMap = {};
             const noteEvents = [];
 
             if (tune.lines) {
                 tune.lines.forEach((line) => {
                     if (!line.staff) return;
-                    line.staff.forEach((staff) => {
+                    line.staff.forEach((staff, sIdx) => {
                         const isBassClef = (staff.clef && staff.clef.type === 'bass');
                         if (!staff.voices) return;
                         staff.voices.forEach((voice, vIdx) => {
-                            let currentTime = 0;
+                            const vKey = `${sIdx}_${vIdx}`;
+                            if (voiceTimeMap[vKey] === undefined) {
+                                voiceTimeMap[vKey] = 0;
+                            }
                             const isLeftHand = isBassClef || vIdx === 1;
 
                             voice.forEach((elem) => {
                                 const dur = elem.duration || 0;
                                 if (elem.el_type === 'note' && elem.pitches) {
                                     elem.pitches.forEach((p) => {
-                                        const midi = p.pitch + 60;
+                                        const midi = pitchToMidi(p, keySig);
                                         const noteHand = isLeftHand || midi < 60 ? 'left' : 'right';
                                         noteEvents.push({
                                             midi: midi,
                                             hand: noteHand,
-                                            timeMs: Math.round(currentTime * quarterMs * 4),
+                                            timeMs: Math.round(voiceTimeMap[vKey] * quarterMs * 4),
                                             durMs: Math.max(150, Math.round(dur * quarterMs * 4))
                                         });
                                     });
                                 }
-                                currentTime += dur;
+                                voiceTimeMap[vKey] += dur;
                             });
                         });
                     });
