@@ -527,8 +527,10 @@ const panels = ['tab-library', 'tab-write', 'tab-listen', 'tab-game', 'tab-piano
 window.closeAllDropdowns = function() {
     const writeWrapper = document.getElementById('dropdown-write-wrapper');
     const gameWrapper = document.getElementById('dropdown-game-wrapper');
+    const pianoWrapper = document.getElementById('dropdown-piano-wrapper');
     if (writeWrapper) writeWrapper.classList.remove('open');
     if (gameWrapper) gameWrapper.classList.remove('open');
+    if (pianoWrapper) pianoWrapper.classList.remove('open');
 };
 
 window.switchTab = function(activeTabId, activePanelId) {
@@ -545,35 +547,23 @@ window.switchTab = function(activeTabId, activePanelId) {
 
     const writeWrapper = document.getElementById('dropdown-write-wrapper');
     const gameWrapper = document.getElementById('dropdown-game-wrapper');
-    const pianoSoloBtn = document.getElementById('tab-btn-piano-solo');
+    const pianoWrapper = document.getElementById('dropdown-piano-wrapper');
 
     if (activePanelId === 'tab-game') {
         if (gameWrapper) gameWrapper.classList.add('active');
         if (writeWrapper) writeWrapper.classList.remove('active');
-        if (pianoSoloBtn) {
-            pianoSoloBtn.style.background = 'white';
-            pianoSoloBtn.style.color = '#e11d48';
-            pianoSoloBtn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08)';
-        }
+        if (pianoWrapper) pianoWrapper.classList.remove('active');
     } else if (activePanelId === 'tab-piano-solo') {
+        if (pianoWrapper) pianoWrapper.classList.add('active');
         if (writeWrapper) writeWrapper.classList.remove('active');
         if (gameWrapper) gameWrapper.classList.remove('active');
-        if (pianoSoloBtn) {
-            pianoSoloBtn.style.background = 'linear-gradient(135deg, #f43f5e, #e11d48)';
-            pianoSoloBtn.style.color = 'white';
-            pianoSoloBtn.style.boxShadow = '0 4px 12px rgba(244, 63, 94, 0.4)';
-        }
         if (window.initPianoSoloView) {
             window.initPianoSoloView();
         }
     } else {
         if (writeWrapper) writeWrapper.classList.add('active');
         if (gameWrapper) gameWrapper.classList.remove('active');
-        if (pianoSoloBtn) {
-            pianoSoloBtn.style.background = 'white';
-            pianoSoloBtn.style.color = '#e11d48';
-            pianoSoloBtn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08)';
-        }
+        if (pianoWrapper) pianoWrapper.classList.remove('active');
     }
 
     window.closeAllDropdowns();
@@ -582,14 +572,17 @@ window.switchTab = function(activeTabId, activePanelId) {
 document.addEventListener('DOMContentLoaded', () => {
     const writeWrapper = document.getElementById('dropdown-write-wrapper');
     const gameWrapper = document.getElementById('dropdown-game-wrapper');
+    const pianoWrapper = document.getElementById('dropdown-piano-wrapper');
     const writeBtn = document.getElementById('dropdown-write-btn');
     const gameBtn = document.getElementById('dropdown-game-btn');
+    const pianoBtn = document.getElementById('dropdown-piano-btn');
 
     if (writeBtn && writeWrapper) {
         writeBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             writeWrapper.classList.toggle('open');
             if (gameWrapper) gameWrapper.classList.remove('open');
+            if (pianoWrapper) pianoWrapper.classList.remove('open');
         });
     }
 
@@ -598,6 +591,16 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
             gameWrapper.classList.toggle('open');
             if (writeWrapper) writeWrapper.classList.remove('open');
+            if (pianoWrapper) pianoWrapper.classList.remove('open');
+        });
+    }
+
+    if (pianoBtn && pianoWrapper) {
+        pianoBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            pianoWrapper.classList.toggle('open');
+            if (writeWrapper) writeWrapper.classList.remove('open');
+            if (gameWrapper) gameWrapper.classList.remove('open');
         });
     }
 

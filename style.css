@@ -97,23 +97,24 @@ h1 {
   top: -12px;
   left: 0;
   right: 0;
-  height: 12px;
+  height: 16px;
   background: transparent;
 }
 
 .dropdown-menu-content {
   display: none;
   position: absolute;
-  top: calc(100% + 4px);
+  top: 100%;
   right: 0;
   background: white;
-  min-width: 270px;
+  min-width: 280px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.18);
   border-radius: 16px;
   border: 1px solid #e2e8f0;
   z-index: 9999;
   overflow: hidden;
   padding: 8px 0;
+  margin-top: 2px;
   animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
