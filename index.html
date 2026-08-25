@@ -41,6 +41,11 @@
           </div>
         </div>
 
+        <!-- TAB 3: Piano Solo -->
+        <button class="nav-tab-btn" id="tab-btn-piano-solo" onclick="window.switchTab('tab-btn-piano-solo', 'tab-piano-solo')" style="padding: 9px 20px; border-radius: 20px; border: 2px solid #f43f5e; background: white; color: #e11d48; font-weight: 800; cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
+          🎹 Piano Solo
+        </button>
+
         <!-- USER PROFILE HEADER SLOT -->
         <div id="user-profile-header-slot" style="white-space: nowrap; flex-shrink: 0;"></div>
       </nav>
@@ -50,6 +55,88 @@
     <main class="app-container tab-content" id="tab-game" style="display: none;">
       <section class="panel" style="width: 100%; max-width: 950px; margin: 0 auto; padding: 20px;">
         <div id="game-main-content"></div>
+      </section>
+    </main>
+
+    <!-- NEW PIANO SOLO TAB CONTAINER -->
+    <main class="app-container tab-content" id="tab-piano-solo" style="display: none;">
+      <section class="panel" style="width: 100%; max-width: 1100px; margin: 0 auto; padding: 24px; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 2px solid #e2e8f0;">
+        
+        <!-- MASTER HEADER BANNER -->
+        <div style="background: linear-gradient(135deg, #be123c, #881337); color: white; padding: 24px; border-radius: 20px; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(190, 18, 60, 0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <span style="background: #fde047; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎹 PIANO SOLO STUDIO & BÀN PHÍM TƯƠNG TÁC</span>
+            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">Độc Tấu Piano Solo & Luyện Phím Tương Tác</h2>
+            <p style="margin: 4px 0 0 0; color: #fecdd3; font-size: 0.95rem; font-weight: 600;">Thưởng thức các kiệt tác Piano Solo cổ điển & hiện đại chuẩn Đại Khuông Nhạc, gõ phím trực tiếp hoặc bật tính năng Tự Động Độc Tấu!</p>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button onclick="window.togglePianoSustainPedal()" id="btn-piano-pedal" style="padding: 10px 18px; border-radius: 16px; font-weight: 800; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s;">
+              🌊 Pedal Vang: OFF
+            </button>
+            <button onclick="window.togglePianoKeyLabels()" id="btn-piano-labels" style="padding: 10px 18px; border-radius: 16px; font-weight: 800; background: #fde047; color: #431407; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: all 0.2s;">
+              🏷️ Tên Nốt: ON
+            </button>
+          </div>
+        </div>
+
+        <!-- TOP CONTROLS: SONG SELECTOR & SOUND MODES -->
+        <div style="background: #fff1f2; border: 2px solid #fecdd3; border-radius: 18px; padding: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 280px;">
+            <span style="font-weight: 800; color: #9f1239; font-size: 1.05rem; white-space: nowrap;">🎼 Chọn Bản Nhạc Solo:</span>
+            <select id="piano-solo-song-select" onchange="window.loadPianoSoloSong(this.value)" style="flex: 1; padding: 10px 16px; border-radius: 12px; border: 2px solid #fda4af; font-weight: 800; color: #881337; background: white; font-size: 0.98rem; outline: none; cursor: pointer;">
+              <option value="fur_elise">🎹 Für Elise (Thư Gửi Elise) - L. v. Beethoven</option>
+              <option value="canon_in_d">🎶 Canon in D (Piano Solo) - J. Pachelbel</option>
+              <option value="mariage_damour">💍 Mariage d'Amour (Đám Cưới Hoa) - R. Clayderman</option>
+              <option value="river_flows_in_you">🌸 River Flows in You - Yiruma</option>
+              <option value="moonlight_sonata">🌙 Moonlight Sonata (Ánh Trăng) - L. v. Beethoven</option>
+              <option value="sonata_facile">🎼 Sonata Facile in C Major - W. A. Mozart</option>
+              <option value="nho_oi">🇻🇳 Nhỏ Ơi (Piano Solo Trang Nhã)</option>
+              <option value="tinh_don_phuong">🇻🇳 Tình Đơn Phương (Piano Solo Ballad)</option>
+            </select>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button onclick="window.playPianoSoloSong()" id="btn-play-piano-solo" style="padding: 10px 22px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.35); font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+              ▶️ Bắt Đầu Độc Tấu
+            </button>
+            <button onclick="window.stopPianoSoloSong()" id="btn-stop-piano-solo" style="padding: 10px 18px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(239,68,68,0.35); font-size: 1rem;">
+              ⏹️ Dừng
+            </button>
+          </div>
+        </div>
+
+        <!-- VISUAL INTERACTIVE PIANO KEYBOARD -->
+        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #1e293b, #0f172a); padding: 22px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: white;">
+            <span style="font-weight: 800; font-size: 1.1rem; color: #fde047;">🎹 BÀN PHÍM PIANO CẢM ỨNG / BÀN PHÍM MÁY TÍNH (C3 ➔ C6)</span>
+            <span style="font-size: 0.85rem; color: #94a3b8; font-weight: 600;">💡 Dùng Chuột nhấn phím hoặc gõ bàn phím máy tính: Row 1 (Q W E R T Y U...) / Row 2 (Z X C V B N M...)</span>
+          </div>
+
+          <!-- PIANO KEYBOARD WRAPPER -->
+          <div id="piano-solo-keyboard" style="position: relative; display: flex; justify-content: center; height: 180px; user-select: none; padding-bottom: 10px; overflow-x: auto;">
+            <!-- Keys generated dynamically by JS -->
+          </div>
+        </div>
+
+        <!-- SHEET MUSIC DISPLAY CONTAINER (GRAND STAFF) -->
+        <div style="background: white; border-radius: 20px; border: 2px solid #e2e8f0; padding: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; color: #881337; font-size: 1.3rem; font-weight: 800;">🎼 Sheet Nhạc Đại Khuông Nhạc (Grand Staff) & ABC Code Editor</h3>
+            <button onclick="window.togglePianoSoloEditor()" id="btn-toggle-piano-editor" style="padding: 6px 14px; border-radius: 12px; background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1; font-weight: 700; cursor: pointer; font-size: 0.85rem;">
+              ✏️ Bật/Tắt Trình Soạn Thảo ABC
+            </button>
+          </div>
+
+          <!-- ABC SHEET MUSIC PAPER -->
+          <div id="piano-solo-paper" style="min-height: 240px; background: #f8fafc; border-radius: 16px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 16px;"></div>
+
+          <!-- EDITABLE ABC TEXTAREA (COLLAPSIBLE) -->
+          <div id="piano-solo-editor-container" style="display: none; margin-top: 14px;">
+            <label style="display: block; font-weight: 800; color: #475569; margin-bottom: 6px; font-size: 0.9rem;">📝 Chỉnh sửa Mã ABC Trực Tiếp (Có Ngoặc Nhọn {} Cho Piano Grand Staff):</label>
+            <textarea id="piano-solo-abc-editor" oninput="window.renderPianoSoloAbcFromEditor()" style="width: 100%; height: 140px; padding: 12px; border-radius: 12px; border: 1.5px solid #cbd5e1; font-family: monospace; font-size: 0.95rem; outline: none; background: #fafafa; color: #1e293b; line-height: 1.5;"></textarea>
+          </div>
+        </div>
+
       </section>
     </main>
 
@@ -956,6 +1043,8 @@ z2 z2 [Fc]2 z2 |</pre>
     </script>
     <!-- Game Engine Script -->
     <script type="module" src="./game-engine.js"></script>
+    <!-- Piano Solo Engine Script -->
+    <script type="module" src="./piano-solo-engine.js"></script>
     <!-- Main Script -->
     <script type="module" src="/main.js"></script>
   </body>

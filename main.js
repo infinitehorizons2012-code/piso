@@ -522,7 +522,7 @@ imageContainer.addEventListener('drop', (e) => {
 
 
 // --- TAB SWITCHING LOGIC ---
-const panels = ['tab-library', 'tab-write', 'tab-listen', 'tab-game'];
+const panels = ['tab-library', 'tab-write', 'tab-listen', 'tab-game', 'tab-piano-solo'];
 
 window.closeAllDropdowns = function() {
     const writeWrapper = document.getElementById('dropdown-write-wrapper');
@@ -536,7 +536,7 @@ window.switchTab = function(activeTabId, activePanelId) {
         const el = document.getElementById(panelId);
         if (el) {
             if (panelId === activePanelId) {
-                el.style.display = (panelId === 'tab-library' || panelId === 'tab-game') ? 'block' : 'flex';
+                el.style.display = (panelId === 'tab-library' || panelId === 'tab-game' || panelId === 'tab-piano-solo') ? 'block' : 'flex';
             } else {
                 el.style.display = 'none';
             }
@@ -545,13 +545,35 @@ window.switchTab = function(activeTabId, activePanelId) {
 
     const writeWrapper = document.getElementById('dropdown-write-wrapper');
     const gameWrapper = document.getElementById('dropdown-game-wrapper');
+    const pianoSoloBtn = document.getElementById('tab-btn-piano-solo');
 
     if (activePanelId === 'tab-game') {
         if (gameWrapper) gameWrapper.classList.add('active');
         if (writeWrapper) writeWrapper.classList.remove('active');
+        if (pianoSoloBtn) {
+            pianoSoloBtn.style.background = 'white';
+            pianoSoloBtn.style.color = '#e11d48';
+            pianoSoloBtn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08)';
+        }
+    } else if (activePanelId === 'tab-piano-solo') {
+        if (writeWrapper) writeWrapper.classList.remove('active');
+        if (gameWrapper) gameWrapper.classList.remove('active');
+        if (pianoSoloBtn) {
+            pianoSoloBtn.style.background = 'linear-gradient(135deg, #f43f5e, #e11d48)';
+            pianoSoloBtn.style.color = 'white';
+            pianoSoloBtn.style.boxShadow = '0 4px 12px rgba(244, 63, 94, 0.4)';
+        }
+        if (window.initPianoSoloView) {
+            window.initPianoSoloView();
+        }
     } else {
         if (writeWrapper) writeWrapper.classList.add('active');
         if (gameWrapper) gameWrapper.classList.remove('active');
+        if (pianoSoloBtn) {
+            pianoSoloBtn.style.background = 'white';
+            pianoSoloBtn.style.color = '#e11d48';
+            pianoSoloBtn.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08)';
+        }
     }
 
     window.closeAllDropdowns();
