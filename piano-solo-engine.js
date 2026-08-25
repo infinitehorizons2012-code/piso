@@ -694,6 +694,60 @@
         }
     };
 
+    window.getChordIntervalNotes = function(chord, intervalPattern) {
+        const chordDict = {
+            'C': { '1': 'C,', '3': 'E,', '5': 'G,', '8': 'C' },
+            'Am': { '1': 'A,,', '3': 'C,', '5': 'E,', '8': 'A,' },
+            'F': { '1': 'F,,', '3': 'A,,', '5': 'C,', '8': 'F,' },
+            'Dm': { '1': 'D,,', '3': 'F,,', '5': 'A,,', '8': 'D,' },
+            'G': { '1': 'G,,', '3': 'B,,', '5': 'D,', '8': 'G,' },
+            'Em': { '1': 'E,,', '3': 'G,,', '5': 'B,,', '8': 'E,' },
+            'E7': { '1': 'E,,', '3': '^G,,', '5': 'B,,', '8': 'E,' },
+            'Bm': { '1': 'B,,', '3': 'D,', '5': 'F,', '8': 'B,' },
+            'D': { '1': 'D,,', '3': '^F,,', '5': 'A,,', '8': 'D,' }
+        };
+
+        const dict = chordDict[chord] || chordDict['C'];
+        const digits = (intervalPattern || '1-3-5').match(/[1358]/g) || ['1', '3', '5'];
+        return digits.map(d => dict[d] || dict['1']);
+    };
+
+    window.getBassRhythmNotes = function(chord, rhythmText, intervalText) {
+        if (!chord || chord === 'None' || rhythmText === 'none' || rhythmText === 'Nghỉ') {
+            return 'z4';
+        }
+
+        const notes = window.getChordIntervalNotes(chord, intervalText);
+        const n1 = notes[0] || 'C,';
+        const n2 = notes[1] || notes[0] || 'E,';
+        const n3 = notes[2] || notes[1] || 'G,';
+
+        const cleanRhythm = (rhythmText || '').toLowerCase().trim();
+
+        // 1. "1 đơn - 2 đơn - 3 đen" or "1-2-3" or "don_don_den"
+        if (cleanRhythm.includes('don_don_den') || cleanRhythm.includes('3_beat') || (cleanRhythm.includes('đơn') && cleanRhythm.includes('đen')) || cleanRhythm.includes('1-2-3') || cleanRhythm.includes('1 2 3') || cleanRhythm.includes('dd')) {
+            return `${n1} ${n2} ${n3}2`;
+        }
+
+        // 2. "1 đen - 2 đen" or "den_den"
+        if (cleanRhythm.includes('den_den') || cleanRhythm.includes('đen - đen') || cleanRhythm.includes('2 nốt đen') || cleanRhythm.includes('1-2')) {
+            return `${n1}2 ${n3}2`;
+        }
+
+        // 3. "4 nốt đơn" or "bon_don"
+        if (cleanRhythm.includes('bon_don') || cleanRhythm.includes('4_beat') || cleanRhythm.includes('4 nốt đơn') || cleanRhythm.includes('4 đơn')) {
+            return `${n1} ${n2} ${n3} ${n2}`;
+        }
+
+        // 4. "nốt trắng" or "trang"
+        if (cleanRhythm.includes('trang') || cleanRhythm.includes('trắng')) {
+            return `${n1}4`;
+        }
+
+        // Default: 1 đơn - 2 đơn - 3 đen
+        return `${n1} ${n2} ${n3}2`;
+    };
+
     window.getMeasureConfig = function(lineIdx, mIdx, defaultChord) {
         if (!window.week1State.measureConfigs) {
             window.week1State.measureConfigs = {};
@@ -703,8 +757,8 @@
             const isNoChord = (defaultChord === 'None' || !defaultChord);
             window.week1State.measureConfigs[key] = {
                 chord: defaultChord || 'None',
-                rhythmPattern: isNoChord ? 'none' : 'don_don_den',
-                rhythmText: isNoChord ? 'Nghỉ' : 'Đơn Đơn Đen',
+                rhythmText: isNoChord ? 'Nghỉ' : '1 đơn - 2 đơn - 3 đen',
+                intervalText: '1 - 3 - 5',
                 fingeringText: '1 3 5'
             };
         }
@@ -717,7 +771,7 @@
         }
         const key = `${lineIdx}_${mIdx}`;
         if (!window.week1State.measureConfigs[key]) {
-            window.week1State.measureConfigs[key] = { chord: 'C', rhythmPattern: 'don_don_den', rhythmText: 'Đơn Đơn Đen', fingeringText: '1 3 5' };
+            window.week1State.measureConfigs[key] = { chord: 'C', rhythmText: '1 đơn - 2 đơn - 3 đen', intervalText: '1 - 3 - 5', fingeringText: '1 3 5' };
         }
         window.week1State.measureConfigs[key][field] = value;
     };
@@ -1186,13 +1240,18 @@
                       </div>
 
                       <div style="margin-bottom: 8px;">
-                        <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.78rem; margin-bottom: 3px;">🥁 Tiết Tấu Tay Trái (Gõ tiết tấu ô này):</label>
-                        <input type="text" value="${cfg.rhythmText || ''}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'rhythmText', this.value)" placeholder="Ví dụ: Đơn Đơn Đen (1-2-3)..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #f43f5e; font-weight: 700; font-size: 0.82rem; color: #881337; outline: none; background: #fff1f2;">
+                        <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.78rem; margin-bottom: 3px;">🥁 Tiết Tấu Tay Trái (Khoanh đỏ 1):</label>
+                        <input type="text" value="${cfg.rhythmText || '1 đơn - 2 đơn - 3 đen'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'rhythmText', this.value)" placeholder="Ví dụ: 1 đơn - 2 đơn - 3 đen..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #f43f5e; font-weight: 700; font-size: 0.82rem; color: #881337; outline: none; background: #fff1f2;">
+                      </div>
+
+                      <div style="margin-bottom: 8px;">
+                        <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">🎼 Quãng / Bậc Nốt Đệm (Khoanh đỏ 2):</label>
+                        <input type="text" value="${cfg.intervalText || '1 - 3 - 5'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'intervalText', this.value)" placeholder="Ví dụ: 1 - 3 - 5 hoặc 3 - 3 - 5..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-weight: 700; font-size: 0.82rem; color: #0369a1; outline: none; background: #f0f9ff;">
                       </div>
 
                       <div>
                         <label style="display: block; font-weight: 700; color: #6d28d9; font-size: 0.78rem; margin-bottom: 3px;">🖐️ Thế Ngón Tay (Số ngón 1-2-3-4-5):</label>
-                        <input type="text" value="${cfg.fingeringText || ''}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'fingeringText', this.value)" placeholder="Ví dụ: 1 3 5 hoặc 1-2-3-5..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #8b5cf6; font-weight: 700; font-size: 0.82rem; color: #5b21b6; outline: none; background: #f5f3ff;">
+                        <input type="text" value="${cfg.fingeringText || '1 3 5'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'fingeringText', this.value)" placeholder="Ví dụ: 1 3 5 hoặc 1-2-3-5..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #8b5cf6; font-weight: 700; font-size: 0.82rem; color: #5b21b6; outline: none; background: #f5f3ff;">
                       </div>
                     </div>
                 `;
