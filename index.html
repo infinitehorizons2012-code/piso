@@ -69,25 +69,25 @@
     <main class="app-container tab-content" id="tab-piano-solo" style="display: none;">
       <section class="panel" style="width: 100%; max-width: 1100px; margin: 0 auto; padding: 24px; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: 2px solid #e2e8f0;">
         
-        <!-- MASTER HEADER BANNER -->
-        <div style="background: linear-gradient(135deg, #be123c, #881337); color: white; padding: 24px; border-radius: 20px; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(190, 18, 60, 0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-          <div>
-            <span style="background: #fde047; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎹 PIANO SOLO STUDIO & BÀN PHÍM TƯƠNG TÁC</span>
-            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">Độc Tấu Piano Solo & Luyện Phím Tương Tác</h2>
-            <p style="margin: 4px 0 0 0; color: #fecdd3; font-size: 0.95rem; font-weight: 600;">Thưởng thức các kiệt tác Piano Solo cổ điển & hiện đại chuẩn Đại Khuông Nhạc, gõ phím trực tiếp hoặc bật tính năng Tự Động Độc Tấu!</p>
-          </div>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button onclick="window.togglePianoSustainPedal()" id="btn-piano-pedal" style="padding: 10px 18px; border-radius: 16px; font-weight: 800; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s;">
-              🌊 Pedal Vang: OFF
-            </button>
-            <button onclick="window.togglePianoKeyLabels()" id="btn-piano-labels" style="padding: 10px 18px; border-radius: 16px; font-weight: 800; background: #fde047; color: #431407; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: all 0.2s;">
-              🏷️ Tên Nốt: ON
-            </button>
-          </div>
-        </div>
-
         <!-- SUB-TAB 1: INTERACTIVE PIANO & SHEET MUSIC PLAYER -->
         <div id="piano-subcontent-interactive" style="display: block;">
+
+          <!-- MASTER HEADER BANNER -->
+          <div style="background: linear-gradient(135deg, #be123c, #881337); color: white; padding: 24px; border-radius: 20px; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(190, 18, 60, 0.3); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <span style="background: #fde047; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🎹 PIANO SOLO STUDIO & BÀN PHÍM TƯƠNG TÁC</span>
+              <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.7rem; font-weight: 800;">Độc Tấu Piano Solo & Luyện Phím Tương Tác</h2>
+              <p style="margin: 4px 0 0 0; color: #fecdd3; font-size: 0.95rem; font-weight: 600;">Thưởng thức các kiệt tác Piano Solo cổ điển & hiện đại chuẩn Đại Khuông Nhạc, gõ phím trực tiếp hoặc bật tính năng Tự Động Độc Tấu!</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button onclick="window.togglePianoSustainPedal()" id="btn-piano-pedal" style="padding: 10px 18px; border-radius: 16px; font-weight: 800; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s;">
+                🌊 Pedal Vang: OFF
+              </button>
+              <button onclick="window.togglePianoKeyLabels()" id="btn-piano-labels" style="padding: 10px 18px; border-radius: 16px; font-weight: 800; background: #fde047; color: #431407; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: all 0.2s;">
+                🏷️ Tên Nốt: ON
+              </button>
+            </div>
+          </div>
           
           <!-- VISUAL INTERACTIVE PIANO KEYBOARD (5 OCTAVES C2 -> C7) -->
           <div style="margin-bottom: 28px; background: linear-gradient(135deg, #0f172a, #1e293b); padding: 22px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;">
