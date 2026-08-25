@@ -934,8 +934,6 @@
 
         let noteMeasures = [];
         let customLyricMeasures = [];
-        let numberLyrics = [];
-        let chordNoteLyrics = [];
 
         measures.forEach((mObj, mIdx) => {
             const lines = mObj.text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
@@ -960,53 +958,13 @@
             } else {
                 customLyricMeasures.push('*');
             }
-
-            const cfg = window.getMeasureConfig(lineIdx, mIdx, mObj.chord);
-            const chordKey = cfg.chord || 'C';
-            const chordObj = CHORD_NOTE_SOLFEGE_MAP[chordKey] || CHORD_NOTE_SOLFEGE_MAP['C'];
-
-            if (cfg.rhythmPattern === 'none' || chordKey === 'None') {
-                const cleanText = mNotesText.replace(/"[^"]*"/g, '').replace(/%[^\n]*/g, '');
-                const noteMatches = cleanText.match(/[A-Ga-g][,']?[0-9]*/g) || [];
-                const skips = Array(Math.max(1, noteMatches.length)).fill('*').join(' ');
-                numberLyrics.push(` ${skips} `);
-                chordNoteLyrics.push(` ${skips} `);
-            } else {
-                const cleanText = mNotesText.replace(/"[^"]*"/g, '').replace(/%[^\n]*/g, '');
-                const noteMatches = cleanText.match(/[A-Ga-g][,']?[0-9]*/g) || [];
-                const noteCount = noteMatches.length;
-
-                if (cfg.rhythmPattern === '4_beat') {
-                    if (noteCount <= 1) {
-                        numberLyrics.push(' 1~2~3~4 ');
-                        chordNoteLyrics.push(` ${chordObj.notes.join('~')}~${chordObj.notes[0]} `);
-                    } else {
-                        const skips = Array(noteCount - 1).fill('*').join(' ');
-                        numberLyrics.push(` 1~2~3~4 ${skips} `);
-                        chordNoteLyrics.push(` ${chordObj.notes.join('~')}~${chordObj.notes[0]} ${skips} `);
-                    }
-                } else {
-                    // Default 3_beat
-                    if (noteCount <= 1) {
-                        numberLyrics.push(' 1~2~3 ');
-                        chordNoteLyrics.push(` ${chordObj.notes.join('~')} `);
-                    } else {
-                        const skips = Array(noteCount - 1).fill('*').join(' ');
-                        numberLyrics.push(` 1~2~3 ${skips} `);
-                        chordNoteLyrics.push(` ${chordObj.notes.join('~')} ${skips} `);
-                    }
-                }
-            }
         });
 
         const lineNotesAbc = noteMeasures.join(' | ');
         const hasCustomLyrics = customLyricMeasures.some(m => m !== '*');
         const customW = hasCustomLyrics ? ('w:' + customLyricMeasures.join(' | ') + '\n') : '';
 
-        const w1 = 'w:' + numberLyrics.join('|');
-        const w2 = 'w:' + chordNoteLyrics.join('|');
-
-        return `${snippetHeader}\n${lineNotesAbc}\n${customW}${w1}\n${w2}`;
+        return `${snippetHeader}\n${lineNotesAbc}\n${customW}`;
     }
 
     window.renderWeek1Step1Lines = function() {
