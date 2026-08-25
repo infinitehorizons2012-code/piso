@@ -87,57 +87,77 @@
     }
 
     // Play Acoustic Piano Tone with Overtones & Decay Envelope
+    // Warm Acoustic Piano Synthesizer (Smoothed 5ms attack envelope & lowpass filter to eliminate all pops/clicks)
     window.playPianoSoloTone = function(freq, duration = 1.8, velocity = 0.8) {
         try {
             const ctx = getAudioContext();
             const now = ctx.currentTime;
 
-            const osc = ctx.createOscillator();
-            const osc2 = ctx.createOscillator();
-            const osc3 = ctx.createOscillator();
+            // Master Gain for Note
+            const noteGain = ctx.createGain();
 
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, now);
+            // Lowpass Filter for warm acoustic timber & eliminating harsh high-end clicks
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(Math.min(3200, freq * 4), now);
+            filter.Q.setValueAtTime(1.0, now);
 
-            osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(freq * 2, now); // 2nd Harmonic
+            // Fundamental Oscillator (Sine + Triangle blend for warm piano body)
+            const oscFundamental = ctx.createOscillator();
+            oscFundamental.type = 'sine';
+            oscFundamental.frequency.setValueAtTime(freq, now);
 
-            osc3.type = 'sine';
-            osc3.frequency.setValueAtTime(freq * 3, now); // 3rd Harmonic
+            const oscWarmth = ctx.createOscillator();
+            oscWarmth.type = 'triangle';
+            oscWarmth.frequency.setValueAtTime(freq, now);
 
-            const gain = ctx.createGain();
-            const gain2 = ctx.createGain();
-            const gain3 = ctx.createGain();
-            const masterGain = ctx.createGain();
+            // 2nd Harmonic (Brightness)
+            const oscHarmonic2 = ctx.createOscillator();
+            oscHarmonic2.type = 'sine';
+            oscHarmonic2.frequency.setValueAtTime(freq * 2, now);
 
-            const decay = sustainPedal ? duration * 2.2 : duration;
+            // Gains per component
+            const gFund = ctx.createGain();
+            const gWarm = ctx.createGain();
+            const gHarm2 = ctx.createGain();
 
-            gain.gain.setValueAtTime(0.7 * velocity, now);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
+            const decay = sustainPedal ? duration * 2.5 : Math.max(0.6, duration);
 
-            gain2.gain.setValueAtTime(0.25 * velocity, now);
-            gain2.gain.exponentialRampToValueAtTime(0.0001, now + decay * 0.7);
+            // ATTACK ENVELOPE: 6ms smooth linear ramp from 0.0001 eliminates any popping/clicking ("bụp bụp")!
+            gFund.gain.setValueAtTime(0.0001, now);
+            gFund.gain.linearRampToValueAtTime(0.6 * velocity, now + 0.006);
+            gFund.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
-            gain3.gain.setValueAtTime(0.1 * velocity, now);
-            gain3.gain.exponentialRampToValueAtTime(0.0001, now + decay * 0.4);
+            gWarm.gain.setValueAtTime(0.0001, now);
+            gWarm.gain.linearRampToValueAtTime(0.25 * velocity, now + 0.006);
+            gWarm.gain.exponentialRampToValueAtTime(0.0001, now + decay * 0.8);
 
-            osc.connect(gain);
-            osc2.connect(gain2);
-            osc3.connect(gain3);
+            gHarm2.gain.setValueAtTime(0.0001, now);
+            gHarm2.gain.linearRampToValueAtTime(0.12 * velocity, now + 0.006);
+            gHarm2.gain.exponentialRampToValueAtTime(0.0001, now + decay * 0.5);
 
-            gain.connect(masterGain);
-            gain2.connect(masterGain);
-            gain3.connect(masterGain);
+            noteGain.gain.setValueAtTime(0.0001, now);
+            noteGain.gain.linearRampToValueAtTime(1.0, now + 0.005);
+            noteGain.gain.exponentialRampToValueAtTime(0.0001, now + decay);
 
-            masterGain.connect(ctx.destination);
+            oscFundamental.connect(gFund);
+            oscWarmth.connect(gWarm);
+            oscHarmonic2.connect(gHarm2);
 
-            osc.start(now);
-            osc2.start(now);
-            osc3.start(now);
+            gFund.connect(filter);
+            gWarm.connect(filter);
+            gHarm2.connect(filter);
 
-            osc.stop(now + decay);
-            osc2.stop(now + decay);
-            osc3.stop(now + decay);
+            filter.connect(noteGain);
+            noteGain.connect(ctx.destination);
+
+            oscFundamental.start(now);
+            oscWarmth.start(now);
+            oscHarmonic2.start(now);
+
+            oscFundamental.stop(now + decay + 0.05);
+            oscWarmth.stop(now + decay + 0.05);
+            oscHarmonic2.stop(now + decay + 0.05);
         } catch (e) {
             console.warn('Audio play error:', e);
         }
