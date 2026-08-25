@@ -754,7 +754,8 @@
         for (let line of lines) {
             const trimmed = line.trim();
             if (trimmed.startsWith('X:') || trimmed.startsWith('T:') || trimmed.startsWith('M:') ||
-                trimmed.startsWith('L:') || trimmed.startsWith('Q:') || trimmed.startsWith('K:')) {
+                trimmed.startsWith('L:') || trimmed.startsWith('Q:') || trimmed.startsWith('K:') ||
+                trimmed.startsWith('C:') || trimmed.startsWith('V:')) {
                 headerLines.push(trimmed);
             } else if (trimmed.length > 0) {
                 bodyLines.push(line);
@@ -762,6 +763,8 @@
         }
 
         const headerStr = headerLines.join('\n');
+        // Filter out T: (title) and X: (index) for clean staff-only line snippets!
+        const snippetHeader = headerLines.filter(l => !l.startsWith('T:') && !l.startsWith('X:')).join('\n');
 
         const parsedLines = [];
         let currentTitle = 'DÒNG 1';
@@ -771,12 +774,14 @@
         for (let line of bodyLines) {
             const trimmed = line.trim();
             if (trimmed.match(/^%\s*---?\s*DÒNG/i) || trimmed.match(/^%\s*DÒNG/i)) {
-                if (currentAbcLines.length > 0) {
+                const text = currentAbcLines.join('\n').trim();
+                if (text.includes('|') || text.match(/[A-Ga-g]/)) {
                     parsedLines.push({
                         id: `line_${lineCounter}`,
                         title: currentTitle,
-                        abcContent: currentAbcLines.join('\n').trim(),
-                        headerStr: headerStr
+                        abcContent: text,
+                        headerStr: headerStr,
+                        snippetHeader: snippetHeader
                     });
                     lineCounter++;
                 }
@@ -787,12 +792,14 @@
             }
         }
 
-        if (currentAbcLines.length > 0) {
+        const text = currentAbcLines.join('\n').trim();
+        if (text.includes('|') || text.match(/[A-Ga-g]/)) {
             parsedLines.push({
                 id: `line_${lineCounter}`,
                 title: currentTitle || `DÒNG ${lineCounter}`,
-                abcContent: currentAbcLines.join('\n').trim(),
-                headerStr: headerStr
+                abcContent: text,
+                headerStr: headerStr,
+                snippetHeader: snippetHeader
             });
         }
 
@@ -890,7 +897,7 @@
             setTimeout(() => {
                 const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
                 if (abcRenderer) {
-                    const fullSnippetAbc = `${lineObj.headerStr}\n${lineObj.abcContent}`;
+                    const fullSnippetAbc = `${lineObj.snippetHeader}\n${lineObj.abcContent}`;
                     try {
                         abcRenderer.renderAbc(`week1-step1-paper-${idx}`, fullSnippetAbc, {
                             responsive: 'resize',
@@ -985,7 +992,7 @@
     };
 
     window.generateWeek1LineGrandStaffAbc = function(lineObj, cfg) {
-        const header = lineObj.headerStr || 'M:4/4\nL:1/8\nK:C';
+        const header = lineObj.snippetHeader || 'M:4/4\nL:1/8\nK:C';
         let bodyTreble = lineObj.abcContent;
 
         const chordMap = {
