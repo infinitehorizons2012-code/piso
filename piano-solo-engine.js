@@ -634,42 +634,428 @@
     };
 
     window.switchPianoSubTab = function(tabName) {
-        const btnInteractive = document.getElementById('piano-subtab-btn-interactive');
-        const btnTheory = document.getElementById('piano-subtab-btn-theory');
         const contentInteractive = document.getElementById('piano-subcontent-interactive');
+        const contentWeek1 = document.getElementById('piano-subcontent-week1');
         const contentTheory = document.getElementById('piano-subcontent-theory');
 
-        if (tabName === 'interactive') {
-            if (contentInteractive) contentInteractive.style.display = 'block';
-            if (contentTheory) contentTheory.style.display = 'none';
-            if (btnInteractive) {
-                btnInteractive.style.background = 'linear-gradient(135deg, #be123c, #881337)';
-                btnInteractive.style.color = 'white';
-                btnInteractive.style.border = 'none';
-                btnInteractive.style.boxShadow = '0 4px 12px rgba(190,18,60,0.3)';
-            }
-            if (btnTheory) {
-                btnTheory.style.background = 'white';
-                btnTheory.style.color = '#475569';
-                btnTheory.style.border = '2px solid #cbd5e1';
-                btnTheory.style.boxShadow = 'none';
-            }
-        } else {
-            if (contentInteractive) contentInteractive.style.display = 'none';
-            if (contentTheory) contentTheory.style.display = 'block';
-            if (btnTheory) {
-                btnTheory.style.background = 'linear-gradient(135deg, #be123c, #881337)';
-                btnTheory.style.color = 'white';
-                btnTheory.style.border = 'none';
-                btnTheory.style.boxShadow = '0 4px 12px rgba(190,18,60,0.3)';
-            }
-            if (btnInteractive) {
-                btnInteractive.style.background = 'white';
-                btnInteractive.style.color = '#475569';
-                btnInteractive.style.border = '2px solid #cbd5e1';
-                btnInteractive.style.boxShadow = 'none';
+        if (contentInteractive) contentInteractive.style.display = (tabName === 'interactive' ? 'block' : 'none');
+        if (contentWeek1) contentWeek1.style.display = (tabName === 'week1' ? 'block' : 'none');
+        if (contentTheory) contentTheory.style.display = (tabName === 'theory' ? 'block' : 'none');
+
+        if (tabName === 'week1' && typeof window.initWeek1PedagogyView === 'function') {
+            window.initWeek1PedagogyView();
+        }
+    };
+
+    // --- WEEK 1 PEDAGOGY ENGINE (LUYỆN PIANO THEO DÒNG CHO TRẺ EM & NHẠC CÔNG) ---
+    const WEEK1_PRESETS = {
+        thang_cuoi: {
+            title: "Thằng Cuội (Bản Dành Cho Bé)",
+            abc: `X:1\nT: Thằng Cuội (Bản Dành Cho Bé)\nM: 4/4\nL: 1/8\nQ: 1/4=84\nK: C\n% --- DÒNG 1 ---\n"C" G3 A G2 E2 | "C" C3 E G4 | "Am" E3 D C2 A,2 | "Am" A,6 z2 |\n% --- DÒNG 2 ---\n"Am" E3 G A2 c2 | "F" C3 E F4 | "Dm" D3 F E2 D2 | "G" G6 z2 |\n% --- DÒNG 3 ---\n"F" c2 c2 c2 A2 | "G" d3 c B2 G2 | "C" c4 E4 | "C" G6 z2 |`
+        },
+        ban_nhac_cua_be: {
+            title: "Bản Nhạc Của Bé (Đô Trưởng C)",
+            abc: `X:1\nT: Bản Nhạc Của Bé\nM: 4/4\nL: 1/4\nQ: 1/4=100\nK: C\n% --- DÒNG 1 ---\n"C" C D E F | "C" G A B c |\n% --- DÒNG 2 ---\n"F" c B A G | "G" F E D C |`
+        },
+        fur_elise: {
+            title: "Für Elise (Đoạn A Đơn Giản)",
+            abc: `X:1\nT: Für Elise\nM: 3/8\nL: 1/16\nQ: 3/8=55\nK: Am\n% --- DÒNG 1 ---\n"Am" e^d eBdc | "Am" A2 z C EA | "E7" B2 z E ^GB |\n% --- DÒNG 2 ---\n"Am" c2 z e ^de | "Am" e^d eBdc | "Am" A2 z C EA |\n% --- DÒNG 3 ---\n"E7" B2 z E cB | "Am" A4 z2 |`
+        },
+        canon_in_d: {
+            title: "Canon in D (Giai Điệu)",
+            abc: `X:1\nT: Canon in D\nM: 4/4\nL: 1/8\nQ: 1/4=76\nK: D\n% --- DÒNG 1 ---\n"D" f2 e2 d2 c2 | "Bm" B2 A2 B2 c2 |\n% --- DÒNG 2 ---\n"G" f2 e2 d2 c2 | "A" B2 A2 B2 c2 |`
+        },
+        nho_oi: {
+            title: "Nhỏ Ơi (Piano Solo)",
+            abc: `X:1\nT: Nhỏ Ơi (Piano Solo)\nM: 3/4\nL: 1/8\nQ: 1/4=84\nK: C\n% --- DÒNG 1 ---\n"C" E2 G2 c2 | "C" e3 d c2 | "G" d2 E2 G2 | "G" B3 A G2 |\n% --- DÒNG 2 ---\n"Am" c2 E2 G2 | "F" A3 G F2 | "C" G2 C2 E2 | "G" D6 |`
+        }
+    };
+
+    window.week1State = {
+        abcInput: WEEK1_PRESETS.thang_cuoi.abc,
+        activeStep: 0,
+        parsedLines: [],
+        lineConfigs: {},
+        masterModalOpen: false
+    };
+
+    window.loadWeek1PresetSong = function(presetKey) {
+        const p = WEEK1_PRESETS[presetKey] || WEEK1_PRESETS.thang_cuoi;
+        window.week1State.abcInput = p.abc;
+        const textarea = document.getElementById('week1-abc-input');
+        if (textarea) textarea.value = p.abc;
+        window.renderWeek1MasterPreview();
+    };
+
+    window.renderWeek1MasterPreview = function() {
+        const textarea = document.getElementById('week1-abc-input');
+        if (textarea) {
+            window.week1State.abcInput = textarea.value;
+        }
+
+        const paper = document.getElementById('week1-master-preview-paper');
+        if (!paper) return;
+        paper.innerHTML = '';
+
+        const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+        if (!abcRenderer) return;
+
+        try {
+            abcRenderer.renderAbc('week1-master-preview-paper', window.week1State.abcInput, {
+                responsive: 'resize',
+                scale: 1.1,
+                staffwidth: 780,
+                add_classes: true
+            });
+        } catch (e) {
+            console.warn('Week 1 Master Preview error:', e);
+        }
+    };
+
+    window.switchWeek1Step = function(stepIdx) {
+        window.week1State.activeStep = stepIdx;
+
+        for (let i = 0; i <= 2; i++) {
+            const btn = document.getElementById(`week1-step-btn-${i}`);
+            const content = document.getElementById(`week1-step-${i}-content`);
+            if (content) content.style.display = (i === stepIdx ? 'block' : 'none');
+
+            if (btn) {
+                if (i === stepIdx) {
+                    btn.style.background = '#0284c7';
+                    btn.style.color = 'white';
+                    btn.style.border = 'none';
+                    btn.style.boxShadow = '0 4px 12px rgba(2,132,199,0.3)';
+                } else {
+                    btn.style.background = 'white';
+                    btn.style.color = '#475569';
+                    btn.style.border = '1.5px solid #cbd5e1';
+                    btn.style.boxShadow = 'none';
+                }
             }
         }
+
+        if (stepIdx === 1) {
+            window.parseWeek1Lines();
+            window.renderWeek1Step1Lines();
+        } else if (stepIdx === 2) {
+            window.parseWeek1Lines();
+            window.renderWeek1Step2Lines();
+        }
+    };
+
+    window.parseWeek1Lines = function() {
+        const rawAbc = window.week1State.abcInput || '';
+        const lines = rawAbc.split('\n');
+
+        let headerLines = [];
+        let bodyLines = [];
+
+        for (let line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('X:') || trimmed.startsWith('T:') || trimmed.startsWith('M:') ||
+                trimmed.startsWith('L:') || trimmed.startsWith('Q:') || trimmed.startsWith('K:')) {
+                headerLines.push(trimmed);
+            } else if (trimmed.length > 0) {
+                bodyLines.push(line);
+            }
+        }
+
+        const headerStr = headerLines.join('\n');
+
+        const parsedLines = [];
+        let currentTitle = 'DÒNG 1';
+        let currentAbcLines = [];
+        let lineCounter = 1;
+
+        for (let line of bodyLines) {
+            const trimmed = line.trim();
+            if (trimmed.match(/^%\s*---?\s*DÒNG/i) || trimmed.match(/^%\s*DÒNG/i)) {
+                if (currentAbcLines.length > 0) {
+                    parsedLines.push({
+                        id: `line_${lineCounter}`,
+                        title: currentTitle,
+                        abcContent: currentAbcLines.join('\n').trim(),
+                        headerStr: headerStr
+                    });
+                    lineCounter++;
+                }
+                currentTitle = trimmed.replace(/^%\s*-*\s*/, '').replace(/\s*-*$/, '').toUpperCase();
+                currentAbcLines = [];
+            } else {
+                currentAbcLines.push(line);
+            }
+        }
+
+        if (currentAbcLines.length > 0) {
+            parsedLines.push({
+                id: `line_${lineCounter}`,
+                title: currentTitle || `DÒNG ${lineCounter}`,
+                abcContent: currentAbcLines.join('\n').trim(),
+                headerStr: headerStr
+            });
+        }
+
+        window.week1State.parsedLines = parsedLines;
+
+        parsedLines.forEach((l, idx) => {
+            if (!window.week1State.lineConfigs[idx]) {
+                window.week1State.lineConfigs[idx] = {
+                    rhythmPattern: '4_beat',
+                    chordVoicing: '1_5_8_3',
+                    customFingeringStr: '1 - 2 - 3 - 4'
+                };
+            }
+        });
+    };
+
+    window.autoApplyWeek1Defaults = function() {
+        window.parseWeek1Lines();
+        window.week1State.parsedLines.forEach((l, idx) => {
+            window.week1State.lineConfigs[idx] = {
+                rhythmPattern: '4_beat',
+                chordVoicing: '1_5_8_3',
+                customFingeringStr: '1 - 2 - 3 - 4'
+            };
+        });
+        window.renderWeek1Step1Lines();
+        alert('⚡ Đã tự động đánh số phách và tên nốt hợp âm cho tất cả các dòng nhạc!');
+    };
+
+    window.renderWeek1Step1Lines = function() {
+        const container = document.getElementById('week1-step1-lines-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const lines = window.week1State.parsedLines;
+        if (lines.length === 0) {
+            container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Chưa có dữ liệu dòng nhạc. Vui lòng kiểm tra lại mã ABC ở Tab 0.</div>`;
+            return;
+        }
+
+        lines.forEach((lineObj, idx) => {
+            const cfg = window.week1State.lineConfigs[idx] || {};
+
+            const card = document.createElement('div');
+            card.style.cssText = `
+                background: #f8fafc;
+                border: 2px solid #e2e8f0;
+                border-radius: 18px;
+                padding: 18px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            `;
+
+            const chordMatches = lineObj.abcContent.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/g) || [];
+            const chordsList = Array.from(new Set(chordMatches.map(c => c.replace(/"/g, ''))));
+            const chordNamesStr = chordsList.length > 0 ? chordsList.join(' - ') : 'C';
+
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                  <span style="background: #0284c7; color: white; font-weight: 800; padding: 4px 14px; border-radius: 12px; font-size: 0.88rem;">📌 ${lineObj.title}</span>
+                  <span style="background: #e0f2fe; color: #0369a1; font-weight: 800; padding: 4px 14px; border-radius: 12px; font-size: 0.85rem;">🎸 Hợp Âm Dòng Này: ${chordNamesStr}</span>
+                </div>
+
+                <div id="week1-step1-paper-${idx}" style="background: white; border-radius: 14px; padding: 12px; border: 1.5px solid #cbd5e1; margin-bottom: 14px; min-height: 90px;"></div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; background: white; padding: 14px; border-radius: 14px; border: 1.5px solid #e2e8f0;">
+                  <div>
+                    <label style="display: block; font-weight: 800; color: #475569; font-size: 0.85rem; margin-bottom: 4px;">🥁 Đổi Tiết Tấu & Số Phách Đếm:</label>
+                    <select onchange="window.updateWeek1LineRhythm(${idx}, this.value)" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #94a3b8; font-weight: 700; color: #1e293b; outline: none; cursor: pointer;">
+                      <option value="4_beat" ${cfg.rhythmPattern === '4_beat' ? 'selected' : ''}>Phách 4/4 (1 - 2 - 3 - 4)</option>
+                      <option value="3_beat" ${cfg.rhythmPattern === '3_beat' ? 'selected' : ''}>Phách 3/4 (1 - 2 - 3)</option>
+                      <option value="3_to_4" ${cfg.rhythmPattern === '3_to_4' ? 'selected' : ''}>Biến 3 nốt ➔ 4 phách (1 - 2 - 3 - 4)</option>
+                      <option value="eighth" ${cfg.rhythmPattern === 'eighth' ? 'selected' : ''}>Móc Đơn (1 & 2 & 3 & 4)</option>
+                      <option value="triplets" ${cfg.rhythmPattern === 'triplets' ? 'selected' : ''}>Chùm 3 (1-e-a  2-e-a)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style="display: block; font-weight: 800; color: #475569; font-size: 0.85rem; margin-bottom: 4px;">🎹 Tên Nốt Hợp Âm & Thế Rải Tay Trái:</label>
+                    <select onchange="window.updateWeek1LineChord(${idx}, this.value)" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #94a3b8; font-weight: 700; color: #1e293b; outline: none; cursor: pointer;">
+                      <option value="1_5_8_3" ${cfg.chordVoicing === '1_5_8_3' ? 'selected' : ''}>Thế Quãng 10 Bay Bổng (1 - 5 - 8 - 3)</option>
+                      <option value="root_triad" ${cfg.chordVoicing === 'root_triad' ? 'selected' : ''}>Ba Âm Chuẩn (1 - 3 - 5)</option>
+                      <option value="arpeggio_10" ${cfg.chordVoicing === 'arpeggio_10' ? 'selected' : ''}>Rải Ngược Dòng (1 - 5 - 8 - 5)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label style="display: block; font-weight: 800; color: #475569; font-size: 0.85rem; margin-bottom: 4px;">🖐 Thế Bấm Ngón Tay (Fingering):</label>
+                    <input type="text" value="${cfg.customFingeringStr || '1 - 2 - 3 - 4'}" onchange="window.updateWeek1LineFingering(${idx}, this.value)" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #94a3b8; font-weight: 700; color: #1e293b; outline: none;">
+                  </div>
+                </div>
+            `;
+
+            container.appendChild(card);
+
+            setTimeout(() => {
+                const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+                if (abcRenderer) {
+                    const fullSnippetAbc = `${lineObj.headerStr}\n${lineObj.abcContent}`;
+                    try {
+                        abcRenderer.renderAbc(`week1-step1-paper-${idx}`, fullSnippetAbc, {
+                            responsive: 'resize',
+                            scale: 1.1,
+                            staffwidth: 720
+                        });
+                    } catch (e) {
+                        console.warn(`Error rendering Step 1 snippet ${idx}:`, e);
+                    }
+                }
+            }, 30);
+        });
+    };
+
+    window.updateWeek1LineRhythm = function(lineIdx, rhythmVal) {
+        if (!window.week1State.lineConfigs[lineIdx]) window.week1State.lineConfigs[lineIdx] = {};
+        window.week1State.lineConfigs[lineIdx].rhythmPattern = rhythmVal;
+    };
+
+    window.updateWeek1LineChord = function(lineIdx, chordVal) {
+        if (!window.week1State.lineConfigs[lineIdx]) window.week1State.lineConfigs[lineIdx] = {};
+        window.week1State.lineConfigs[lineIdx].chordVoicing = chordVal;
+    };
+
+    window.updateWeek1LineFingering = function(lineIdx, fingerVal) {
+        if (!window.week1State.lineConfigs[lineIdx]) window.week1State.lineConfigs[lineIdx] = {};
+        window.week1State.lineConfigs[lineIdx].customFingeringStr = fingerVal;
+    };
+
+    window.renderWeek1Step2Lines = function() {
+        const container = document.getElementById('week1-step2-lines-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const lines = window.week1State.parsedLines;
+        if (lines.length === 0) {
+            container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Chưa có dữ liệu dòng nhạc.</div>`;
+            return;
+        }
+
+        lines.forEach((lineObj, idx) => {
+            const cfg = window.week1State.lineConfigs[idx] || {};
+
+            const card = document.createElement('div');
+            card.style.cssText = `
+                background: white;
+                border: 2px solid #cbd5e1;
+                border-radius: 20px;
+                padding: 20px;
+                box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+            `;
+
+            const grandStaffAbc = window.generateWeek1LineGrandStaffAbc(lineObj, cfg);
+
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 12px 16px; border-radius: 14px; border: 1.5px solid #86efac;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="background: #16a34a; color: white; font-weight: 800; padding: 4px 14px; border-radius: 12px; font-size: 0.9rem;">🎹 ${lineObj.title} - KHÓA SOL & KHÓA FA</span>
+                    <span style="font-size: 0.85rem; color: #166534; font-weight: 700;">Tiết tấu: ${cfg.rhythmPattern || '4/4'} | Thế ngón: ${cfg.customFingeringStr || '1-5-8-3'}</span>
+                  </div>
+                  <button onclick="window.playWeek1LineAudio(${idx})" style="padding: 8px 16px; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+                    ▶️ Nghe Thử Dòng Này
+                  </button>
+                </div>
+
+                <div id="week1-step2-paper-${idx}" style="background: #f8fafc; border-radius: 14px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 14px; min-height: 160px;"></div>
+
+                <div style="display: flex; gap: 12px; font-size: 0.85rem; font-weight: 700; flex-wrap: wrap;">
+                  <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 10px;">🫱 Tay Phải (Khóa Sol): Giai Điệu + Số Phách Đếm</span>
+                  <span style="background: #fce7f3; color: #be123c; padding: 6px 12px; border-radius: 10px;">🫲 Tay Trái (Khóa Fa): Nốt Hợp Âm Rải Quãng 10</span>
+                </div>
+            `;
+
+            container.appendChild(card);
+
+            setTimeout(() => {
+                const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+                if (abcRenderer) {
+                    try {
+                        abcRenderer.renderAbc(`week1-step2-paper-${idx}`, grandStaffAbc, {
+                            responsive: 'resize',
+                            scale: 1.15,
+                            staffwidth: 740,
+                            add_classes: true
+                        });
+                    } catch (e) {
+                        console.warn(`Error rendering Step 2 Grand Staff ${idx}:`, e);
+                    }
+                }
+            }, 30);
+        });
+    };
+
+    window.generateWeek1LineGrandStaffAbc = function(lineObj, cfg) {
+        const header = lineObj.headerStr || 'M:4/4\nL:1/8\nK:C';
+        let bodyTreble = lineObj.abcContent;
+
+        const chordMap = {
+            'C': 'C, G, C E',
+            'Am': 'A,, E, A, C',
+            'F': 'F,, C, F, A,',
+            'Dm': 'D,, A,, D, F,',
+            'G': 'G,, D, G, B,',
+            'Em': 'E,, B,, E, G,',
+            'E7': 'E,, B,, E, ^G,'
+        };
+
+        const measures = bodyTreble.split('|');
+        let bassMeasures = [];
+
+        measures.forEach(m => {
+            if (!m.trim()) return;
+            const match = m.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/);
+            const chord = match ? match[1] : 'C';
+            const bassArpeggio = chordMap[chord] || 'C, G, C E';
+            bassMeasures.push(` ${bassArpeggio} `);
+        });
+
+        const bassBody = bassMeasures.join('|');
+
+        return `X:1\nT: ${lineObj.title}\n${header}\n%%score {1 | 2}\nV:1 clef=treble\n${bodyTreble}\nV:2 clef=bass\n${bassBody}`;
+    };
+
+    window.toggleWeek1MasterScoreModal = function() {
+        const modal = document.getElementById('week1-master-modal');
+        if (!modal) return;
+        const isHidden = (modal.style.display === 'none' || !modal.style.display);
+        modal.style.display = isHidden ? 'flex' : 'none';
+
+        if (isHidden) {
+            const paper = document.getElementById('week1-modal-paper');
+            const textarea = document.getElementById('week1-modal-abc-text');
+            if (textarea) textarea.value = window.week1State.abcInput;
+
+            if (paper) {
+                paper.innerHTML = '';
+                const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+                if (abcRenderer) {
+                    try {
+                        abcRenderer.renderAbc('week1-modal-paper', window.week1State.abcInput, {
+                            responsive: 'resize',
+                            scale: 1.1,
+                            staffwidth: 760
+                        });
+                    } catch (e) {
+                        console.warn('Master Modal render error:', e);
+                    }
+                }
+            }
+        }
+    };
+
+    window.playWeek1LineAudio = function(lineIdx) {
+        const lineObj = window.week1State.parsedLines[lineIdx];
+        if (!lineObj) return;
+        const cfg = window.week1State.lineConfigs[lineIdx] || {};
+        const grandStaffAbc = window.generateWeek1LineGrandStaffAbc(lineObj, cfg);
+        window.renderPianoSoloSheet(grandStaffAbc);
+        window.playPianoSoloSong();
+    };
+
+    window.initWeek1PedagogyView = function() {
+        setTimeout(() => {
+            window.loadWeek1PresetSong('thang_cuoi');
+        }, 50);
     };
 
     window.initPianoSoloView = function() {
