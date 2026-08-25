@@ -1281,7 +1281,51 @@
             return;
         }
 
+        const chordMap = {
+            'C': 'C, E, G, z',
+            'Am': 'A,, C, E, z',
+            'F': 'F,, A,, C, z',
+            'Dm': 'D,, F,, A,, z',
+            'G': 'G,, D, G, B,',
+            'Em': 'E,, G,, B,, z',
+            'E7': 'E,, ^G,, B,, z',
+            'Bm': 'B,, D, F, z',
+            'D': 'D,, F,, A,, z',
+            'None': 'z4'
+        };
+
         lines.forEach((lineObj, idx) => {
+            const measures = window.parseLineMeasures(lineObj.abcContent);
+            const grandStaffAbc = window.generateWeek1LineGrandStaffAbc(lineObj, idx);
+
+            const measureControlsHtml = measures.map((mObj, mIdx) => {
+                const cfg = window.getMeasureConfig(idx, mIdx, mObj.chord);
+                const customBassKey = `${idx}_${mIdx}`;
+                const defaultBass = (cfg.rhythmPattern === 'none' || cfg.chord === 'None') ? 'z4' : (chordMap[cfg.chord] || 'C, E, G, z');
+                const mBassAbc = (window.week1State.step2BassMeasures && window.week1State.step2BassMeasures[customBassKey] !== undefined)
+                    ? window.week1State.step2BassMeasures[customBassKey]
+                    : defaultBass;
+
+                return `
+                    <div style="background: white; border: 1.5px solid #86efac; border-radius: 14px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                      <div style="font-weight: 800; color: #15803d; font-size: 0.88rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>🎼 Ô Nhịp ${mObj.index} (2 Tay)</span>
+                        <span style="font-size: 0.76rem; background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 8px; font-weight: 800;">Hợp Âm: ${cfg.chord}</span>
+                      </div>
+
+                      <div style="margin-bottom: 8px;">
+                        <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">🫱 Tay Phải (Khóa Sol):</label>
+                        <textarea rows="2" oninput="window.updateStep2MeasureAbc(${idx}, ${mIdx}, 'treble', this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.82rem; color: #0f172a; outline: none; background: #f0f9ff; resize: vertical;">${mObj.text}</textarea>
+                      </div>
+
+                      <div>
+                        <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.78rem; margin-bottom: 3px;">🫲 Tay Trái (Khóa Fa):</label>
+                        <textarea rows="2" oninput="window.updateStep2MeasureAbc(${idx}, ${mIdx}, 'bass', this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #f43f5e; font-family: monospace; font-weight: 700; font-size: 0.82rem; color: #0f172a; outline: none; background: #fff1f2; resize: vertical;">${mBassAbc}</textarea>
+                      </div>
+                    </div>
+                `;
+            }).join('');
+
             const card = document.createElement('div');
             card.style.cssText = `
                 background: white;
@@ -1290,8 +1334,6 @@
                 padding: 20px;
                 box-shadow: 0 6px 18px rgba(0,0,0,0.04);
             `;
-
-            const grandStaffAbc = window.generateWeek1LineGrandStaffAbc(lineObj, idx);
 
             card.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 12px 16px; border-radius: 14px; border: 1.5px solid #86efac;">
@@ -1310,10 +1352,17 @@
                   <span style="background: #fce7f3; color: #be123c; padding: 6px 12px; border-radius: 10px;">🫲 Tay Trái (Khóa Fa): Nốt Hợp Âm Rải Theo Ô Nhịp</span>
                 </div>
 
+                <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px; margin-bottom: 14px;">
+                  <h4 style="margin: 0 0 10px 0; color: #166534; font-size: 0.9rem; font-weight: 800;">⚙️ Mã ABC Notation 2 Tay Từng Ô Nhịp (Dòng này có ${measures.length} ô nhịp):</h4>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
+                    ${measureControlsHtml}
+                  </div>
+                </div>
+
                 <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 14px;">
                   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                    <label style="font-weight: 800; color: #166534; font-size: 0.88rem;">📝 Mã ABC Notation 2 Tay (Đại Khuông Nhạc - Khóa Sol & Fa) Dòng Này:</label>
-                    <span style="font-size: 0.78rem; background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 8px; font-weight: 800;">Xem & Chỉnh Sửa Trực Tiếp</span>
+                    <label style="font-weight: 800; color: #166534; font-size: 0.88rem;">📝 Mã ABC Notation Tổng Thể 2 Tay (Khóa Sol & Fa) Dòng Này:</label>
+                    <span style="font-size: 0.78rem; background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 8px; font-weight: 800;">Tự Động Đồng Bộ 2 Tay</span>
                   </div>
                   <textarea id="week1-step2-abc-text-${idx}" rows="5" oninput="window.updateStep2GrandStaffAbc(${idx}, this.value)" style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1.5px solid #4ade80; font-family: monospace; font-weight: 700; font-size: 0.86rem; color: #0f172a; outline: none; background: white; resize: vertical; line-height: 1.4;">${grandStaffAbc}</textarea>
                 </div>
@@ -1348,7 +1397,7 @@
             'Am': 'A,, C, E, z',
             'F': 'F,, A,, C, z',
             'Dm': 'D,, F,, A,, z',
-            'G': 'G,, B,, D, z',
+            'G': 'G,, D, G, B,',
             'Em': 'E,, G,, B,, z',
             'E7': 'E,, ^G,, B,, z',
             'Bm': 'B,, D, F, z',
@@ -1379,12 +1428,17 @@
             noteMeasures.push(mNotesText);
             lyricMeasures.push(mWords.length > 0 ? mWords.join(' ') : '*');
 
-            const cfg = window.getMeasureConfig(lineIdx, mIdx, mObj.chord);
-            if (cfg.rhythmPattern === 'none' || cfg.chord === 'None') {
-                bassMeasures.push(' z4 ');
+            const customBassKey = `${lineIdx}_${mIdx}`;
+            if (window.week1State.step2BassMeasures && window.week1State.step2BassMeasures[customBassKey] !== undefined) {
+                bassMeasures.push(` ${window.week1State.step2BassMeasures[customBassKey]} `);
             } else {
-                const arpeggio = chordMap[cfg.chord] || 'C, E, G, z';
-                bassMeasures.push(` ${arpeggio} `);
+                const cfg = window.getMeasureConfig(lineIdx, mIdx, mObj.chord);
+                if (cfg.rhythmPattern === 'none' || cfg.chord === 'None') {
+                    bassMeasures.push(' z4 ');
+                } else {
+                    const arpeggio = chordMap[cfg.chord] || 'C, E, G, z';
+                    bassMeasures.push(` ${arpeggio} `);
+                }
             }
         });
 
