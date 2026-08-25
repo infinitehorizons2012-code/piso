@@ -767,7 +767,7 @@
         const snippetHeader = headerLines.filter(l => !l.startsWith('T:') && !l.startsWith('X:')).join('\n');
 
         const parsedLines = [];
-        let currentTitle = 'DÒNG 1';
+        let currentTitle = null;
         let currentAbcLines = [];
         let lineCounter = 1;
 
@@ -778,7 +778,7 @@
                 if (text.includes('|') || text.match(/[A-Ga-g]/)) {
                     parsedLines.push({
                         id: `line_${lineCounter}`,
-                        title: currentTitle,
+                        title: currentTitle || `DÒNG ${lineCounter}`,
                         abcContent: text,
                         headerStr: headerStr,
                         snippetHeader: snippetHeader
@@ -808,9 +808,9 @@
         parsedLines.forEach((l, idx) => {
             if (!window.week1State.lineConfigs[idx]) {
                 window.week1State.lineConfigs[idx] = {
-                    rhythmPattern: '4_beat',
+                    rhythmPattern: '3_beat',
                     chordVoicing: '1_5_8_3',
-                    customFingeringStr: '1 - 2 - 3 - 4'
+                    customFingeringStr: '1 - 2 - 3'
                 };
             }
         });
@@ -820,14 +820,65 @@
         window.parseWeek1Lines();
         window.week1State.parsedLines.forEach((l, idx) => {
             window.week1State.lineConfigs[idx] = {
-                rhythmPattern: '4_beat',
+                rhythmPattern: '3_beat',
                 chordVoicing: '1_5_8_3',
-                customFingeringStr: '1 - 2 - 3 - 4'
+                customFingeringStr: '1 - 2 - 3'
             };
         });
         window.renderWeek1Step1Lines();
-        alert('⚡ Đã tự động đánh số phách và tên nốt hợp âm cho tất cả các dòng nhạc!');
+        alert('⚡ Đã tự động đánh số phách (1 2 3) và tên nốt hợp âm (C E G / A C E) cho tất cả các dòng nhạc!');
     };
+
+    const CHORD_NOTE_SOLFEGE_MAP = {
+        'C': 'C - E - G',
+        'Am': 'A - C - E',
+        'F': 'F - A - C',
+        'Dm': 'D - F - A',
+        'G': 'G - B - D',
+        'Em': 'E - G - B',
+        'E7': 'E - ^G - B',
+        'Bm': 'B - D - F#',
+        'D': 'D - F# - A'
+    };
+
+    function generateStep1AnnotatedAbc(lineObj, cfg) {
+        const snippetHeader = lineObj.snippetHeader || 'M: 2/4\nL: 1/8\nK: C';
+        const lineAbc = lineObj.abcContent;
+
+        const measures = lineAbc.split('|');
+        let numberLyrics = [];
+        let chordNoteLyrics = [];
+
+        let currentChord = 'C';
+        const rhythmPattern = cfg.rhythmPattern || '3_beat';
+
+        measures.forEach(m => {
+            const trimmed = m.trim();
+            if (!trimmed) return;
+
+            const chordMatch = trimmed.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/);
+            if (chordMatch) {
+                currentChord = chordMatch[1];
+            }
+
+            const chordNotes = CHORD_NOTE_SOLFEGE_MAP[currentChord] || 'C - E - G';
+
+            if (rhythmPattern === '4_beat') {
+                numberLyrics.push(' 1  2  3  4 ');
+            } else if (rhythmPattern === '3_beat') {
+                numberLyrics.push(' 1  2  3 ');
+            } else {
+                numberLyrics.push(' 1  2  3 ');
+            }
+
+            chordNoteLyrics.push(` ${chordNotes} `);
+        });
+
+        const w1 = 'w:' + numberLyrics.join('|');
+        const w2 = 'w:' + chordNoteLyrics.join('|');
+
+        return `${snippetHeader}\n${lineAbc}\n${w1}\n${w2}`;
+    }
 
     window.renderWeek1Step1Lines = function() {
         const container = document.getElementById('week1-step1-lines-container');
@@ -868,26 +919,22 @@
                   <div>
                     <label style="display: block; font-weight: 800; color: #475569; font-size: 0.85rem; margin-bottom: 4px;">🥁 Đổi Tiết Tấu & Số Phách Đếm:</label>
                     <select onchange="window.updateWeek1LineRhythm(${idx}, this.value)" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #94a3b8; font-weight: 700; color: #1e293b; outline: none; cursor: pointer;">
-                      <option value="4_beat" ${cfg.rhythmPattern === '4_beat' ? 'selected' : ''}>Phách 4/4 (1 - 2 - 3 - 4)</option>
-                      <option value="3_beat" ${cfg.rhythmPattern === '3_beat' ? 'selected' : ''}>Phách 3/4 (1 - 2 - 3)</option>
-                      <option value="3_to_4" ${cfg.rhythmPattern === '3_to_4' ? 'selected' : ''}>Biến 3 nốt ➔ 4 phách (1 - 2 - 3 - 4)</option>
-                      <option value="eighth" ${cfg.rhythmPattern === 'eighth' ? 'selected' : ''}>Móc Đơn (1 & 2 & 3 & 4)</option>
-                      <option value="triplets" ${cfg.rhythmPattern === 'triplets' ? 'selected' : ''}>Chùm 3 (1-e-a  2-e-a)</option>
+                      <option value="3_beat" ${cfg.rhythmPattern === '3_beat' ? 'selected' : ''}>Phách 2/4 - 3 Nốt (1 - 2 - 3)</option>
+                      <option value="4_beat" ${cfg.rhythmPattern === '4_beat' ? 'selected' : ''}>Phách 4/4 - 4 Nốt (1 - 2 - 3 - 4)</option>
                     </select>
                   </div>
 
                   <div>
-                    <label style="display: block; font-weight: 800; color: #475569; font-size: 0.85rem; margin-bottom: 4px;">🎹 Tên Nốt Hợp Âm & Thế Rải Tay Trái:</label>
+                    <label style="display: block; font-weight: 800; color: #475569; font-size: 0.85rem; margin-bottom: 4px;">🎹 Tên Nốt Hợp Âm Tay Trái:</label>
                     <select onchange="window.updateWeek1LineChord(${idx}, this.value)" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #94a3b8; font-weight: 700; color: #1e293b; outline: none; cursor: pointer;">
-                      <option value="1_5_8_3" ${cfg.chordVoicing === '1_5_8_3' ? 'selected' : ''}>Thế Quãng 10 Bay Bổng (1 - 5 - 8 - 3)</option>
-                      <option value="root_triad" ${cfg.chordVoicing === 'root_triad' ? 'selected' : ''}>Ba Âm Chuẩn (1 - 3 - 5)</option>
-                      <option value="arpeggio_10" ${cfg.chordVoicing === 'arpeggio_10' ? 'selected' : ''}>Rải Ngược Dòng (1 - 5 - 8 - 5)</option>
+                      <option value="1_5_8_3" ${cfg.chordVoicing === '1_5_8_3' ? 'selected' : ''}>Thế 3 Nốt Chuẩn Bội Ngọc (C - E - G / A - C - E)</option>
+                      <option value="root_triad" ${cfg.chordVoicing === 'root_triad' ? 'selected' : ''}>Ba Âm Gốc (1 - 3 - 5)</option>
                     </select>
                   </div>
 
                   <div>
                     <label style="display: block; font-weight: 800; color: #475569; font-size: 0.85rem; margin-bottom: 4px;">🖐 Thế Bấm Ngón Tay (Fingering):</label>
-                    <input type="text" value="${cfg.customFingeringStr || '1 - 2 - 3 - 4'}" onchange="window.updateWeek1LineFingering(${idx}, this.value)" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #94a3b8; font-weight: 700; color: #1e293b; outline: none;">
+                    <input type="text" value="${cfg.customFingeringStr || '1 - 2 - 3'}" onchange="window.updateWeek1LineFingering(${idx}, this.value)" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #94a3b8; font-weight: 700; color: #1e293b; outline: none;">
                   </div>
                 </div>
             `;
@@ -897,12 +944,13 @@
             setTimeout(() => {
                 const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
                 if (abcRenderer) {
-                    const fullSnippetAbc = `${lineObj.snippetHeader}\n${lineObj.abcContent}`;
+                    const fullSnippetAbc = generateStep1AnnotatedAbc(lineObj, cfg);
                     try {
                         abcRenderer.renderAbc(`week1-step1-paper-${idx}`, fullSnippetAbc, {
                             responsive: 'resize',
-                            scale: 1.1,
-                            staffwidth: 720
+                            scale: 1.15,
+                            staffwidth: 720,
+                            add_classes: true
                         });
                     } catch (e) {
                         console.warn(`Error rendering Step 1 snippet ${idx}:`, e);
