@@ -49,7 +49,9 @@
           <div class="dropdown-menu-content">
             <button class="dropdown-item" onclick="window.switchTab('dropdown-piano-btn', 'tab-piano-solo'); window.switchPianoSubTab('interactive');">🎮 1. Tương Tác (Phím Đàn & Solo)</button>
             <button class="dropdown-item" onclick="window.switchTab('dropdown-piano-btn', 'tab-piano-solo'); window.switchPianoSubTab('theory');">📚 2. Lý Thuyết (Bách Khoa Toàn Thư Hòa Âm)</button>
-            <button class="dropdown-item" onclick="window.switchTab('dropdown-piano-btn', 'tab-piano-solo'); window.switchPianoSubTab('week1');">📅 3. Tuần 1: Thực Hành Luyện 2 Bước</button>
+            <button class="dropdown-item" onclick="window.switchTab('dropdown-piano-btn', 'tab-piano-solo'); window.switchPianoSubTab('week1'); window.switchWeek1Step(0);">📅 3. Tuần 1: Thực Hành Luyện 2 Bước</button>
+            <button class="dropdown-item" onclick="window.switchTab('dropdown-piano-btn', 'tab-piano-solo'); window.switchPianoSubTab('week1'); window.switchWeek1Step(3);">📜 4. Sheet Nhạc Tổng Thể Bước 1 (Giai Điệu)</button>
+            <button class="dropdown-item" onclick="window.switchTab('dropdown-piano-btn', 'tab-piano-solo'); window.switchPianoSubTab('week1'); window.switchWeek1Step(4);">🎹 5. Sheet Nhạc Tổng Thể Bước 2 (2 Tay Sol & Fa)</button>
           </div>
         </div>
 
@@ -156,14 +158,20 @@
 
           <!-- STEP PROGRESS TAB BUTTONS -->
           <div style="display: flex; gap: 10px; margin-bottom: 22px; background: #f8fafc; padding: 8px; border-radius: 18px; border: 1.5px solid #e2e8f0; flex-wrap: wrap;">
-            <button id="week1-step-btn-0" onclick="window.switchWeek1Step(0)" style="flex: 1; min-width: 200px; padding: 12px 16px; border-radius: 14px; font-weight: 800; border: none; background: #0284c7; color: white; cursor: pointer; transition: all 0.2s; font-size: 0.95rem;">
-              📄 Tab 0: Nạp Sheet Nhạc Tổng Thể
+            <button id="week1-step-btn-0" onclick="window.switchWeek1Step(0)" style="flex: 1; min-width: 170px; padding: 12px 14px; border-radius: 14px; font-weight: 800; border: none; background: #0284c7; color: white; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;">
+              📄 Tab 0: Nạp Sheet Nhạc
             </button>
-            <button id="week1-step-btn-1" onclick="window.switchWeek1Step(1)" style="flex: 1; min-width: 220px; padding: 12px 16px; border-radius: 14px; font-weight: 800; border: 1.5px solid #cbd5e1; background: white; color: #475569; cursor: pointer; transition: all 0.2s; font-size: 0.95rem;">
-              🔢 Bước 1: Đánh Số Phách & Chọn Hợp Âm
+            <button id="week1-step-btn-1" onclick="window.switchWeek1Step(1)" style="flex: 1; min-width: 180px; padding: 12px 14px; border-radius: 14px; font-weight: 800; border: 1.5px solid #cbd5e1; background: white; color: #475569; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;">
+              🔢 Bước 1: Đánh Số Phách & Hợp Âm
             </button>
-            <button id="week1-step-btn-2" onclick="window.switchWeek1Step(2)" style="flex: 1; min-width: 220px; padding: 12px 16px; border-radius: 14px; font-weight: 800; border: 1.5px solid #cbd5e1; background: white; color: #475569; cursor: pointer; transition: all 0.2s; font-size: 0.95rem;">
-              🎹 Bước 2: Ghép Khóa Sol & Fa Theo Dòng
+            <button id="week1-step-btn-2" onclick="window.switchWeek1Step(2)" style="flex: 1; min-width: 180px; padding: 12px 14px; border-radius: 14px; font-weight: 800; border: 1.5px solid #cbd5e1; background: white; color: #475569; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;">
+              🎹 Bước 2: Ghép Sol & Fa Theo Dòng
+            </button>
+            <button id="week1-step-btn-3" onclick="window.switchWeek1Step(3)" style="flex: 1; min-width: 180px; padding: 12px 14px; border-radius: 14px; font-weight: 800; border: 1.5px solid #cbd5e1; background: white; color: #0369a1; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;">
+              📜 Sheet Tổng Thể Bước 1
+            </button>
+            <button id="week1-step-btn-4" onclick="window.switchWeek1Step(4)" style="flex: 1; min-width: 180px; padding: 12px 14px; border-radius: 14px; font-weight: 800; border: 1.5px solid #cbd5e1; background: white; color: #059669; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;">
+              🎹 Sheet Tổng Thể Bước 2 (2 Tay)
             </button>
           </div>
 
@@ -208,7 +216,7 @@
                 <h3 style="margin: 0; color: #0284c7; font-size: 1.3rem; font-weight: 800;">🔢 Bước 1: Nhập & Cấu Hình ABC Notation Từng Ô Nhịp</h3>
                 <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.92rem;">Cho phép nhập nốt nhạc, lời hát tùy chỉnh & tự động đồng bộ sang Bước 2 (Đại Khuông Nhạc)!</p>
               </div>
-              <button onclick="window.toggleWeek1MasterScoreModal()" style="padding: 10px 18px; border-radius: 14px; font-weight: 800; background: #e0f2fe; color: #0369a1; border: 1.5px solid #38bdf8; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+              <button onclick="window.switchWeek1Step(3)" style="padding: 10px 18px; border-radius: 14px; font-weight: 800; background: #e0f2fe; color: #0369a1; border: 1.5px solid #38bdf8; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                 👁️ Xem Sheet Nhạc Tổng Thể Bước 1
               </button>
             </div>
@@ -233,8 +241,8 @@
                 <h3 style="margin: 0; color: #059669; font-size: 1.3rem; font-weight: 800;">🎹 Bước 2: Khớp Tiết Tấu & Ghép Khóa Sol - Khóa Pha Từng Dòng Nhạc</h3>
                 <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.92rem;">Giao diện HTML tách từng dòng nhạc minh bạch cho trẻ em dễ hiểu. Tay phải (Sol) đánh giai điệu + số ngón, Tay trái (Fa) chạy câu rải hợp âm!</p>
               </div>
-              <button onclick="window.toggleWeek1MasterScoreModal()" style="padding: 10px 18px; border-radius: 14px; font-weight: 800; background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                👁️ Xem Sheet Nhạc Tổng Thể
+              <button onclick="window.switchWeek1Step(4)" style="padding: 10px 18px; border-radius: 14px; font-weight: 800; background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                👁️ Xem Sheet Nhạc Tổng Thể Bước 2
               </button>
             </div>
 
@@ -245,8 +253,60 @@
               <button onclick="window.switchWeek1Step(1)" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: white; color: #64748b; border: 1.5px solid #cbd5e1; cursor: pointer;">
                 ⬅ Quay Lại Bước 1 (Sửa Đánh Số & Hợp Âm)
               </button>
-              <button onclick="window.toggleWeek1MasterScoreModal()" style="padding: 12px 26px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(2,132,199,0.35); font-size: 1rem;">
-                🎉 Hoàn Thành: Xem Bản Nhạc Đầy Đủ & Chơi Độc Tấu
+              <button onclick="window.switchWeek1Step(4)" style="padding: 12px 26px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(2,132,199,0.35); font-size: 1rem;">
+                🎉 Hoàn Thành: Xem Sheet Tổng Thể 2 Tay Bước 2
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 3 CONTAINER (SHEET TỔNG THỂ BƯỚC 1 - GIAI ĐIỆU) -->
+          <div id="week1-step-3-content" style="display: none; background: white; border: 2px solid #e2e8f0; border-radius: 20px; padding: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h3 style="margin: 0; color: #0284c7; font-size: 1.3rem; font-weight: 800;">📜 Sheet Nhạc Tổng Thể Bước 1 - Giai Điệu Bài Hát</h3>
+                <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.92rem;">Toàn bộ bản nhạc giai điệu bài hát ở Bước 1 được tự động tách dòng 4 ô nhịp rộng rãi, hiển thị đầy đủ nốt & lời hát!</p>
+              </div>
+            </div>
+
+            <div id="week1-step3-paper" style="background: #f8fafc; border-radius: 16px; padding: 20px; border: 2px dashed #cbd5e1; margin-bottom: 20px; min-height: 250px;"></div>
+
+            <div style="background: #f0f9ff; border: 1.5px solid #38bdf8; border-radius: 14px; padding: 16px; margin-bottom: 20px;">
+              <label style="font-weight: 800; color: #0369a1; font-size: 0.9rem; display: block; margin-bottom: 8px;">📝 Mã ABC Notation Tổng Thể Bước 1 (Tách Dòng 4 Ô Nhịp):</label>
+              <textarea id="week1-step3-abc-text" rows="8" readonly style="width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #0284c7; font-family: monospace; font-weight: 700; font-size: 0.9rem; color: #0f172a; outline: none; background: white; line-height: 1.45;"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <button onclick="window.switchWeek1Step(1)" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: white; color: #64748b; border: 1.5px solid #cbd5e1; cursor: pointer;">
+                ⬅ Quay Lại Bước 1
+              </button>
+              <button onclick="window.switchWeek1Step(4)" style="padding: 12px 26px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(16,185,129,0.35); font-size: 1rem;">
+                ➔ Sang Sheet Tổng Thể Bước 2 (2 Tay) ➔
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 4 CONTAINER (SHEET TỔNG THỂ BƯỚC 2 - 2 TAY PIANO) -->
+          <div id="week1-step-4-content" style="display: none; background: white; border: 2px solid #e2e8f0; border-radius: 20px; padding: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
+              <div>
+                <h3 style="margin: 0; color: #059669; font-size: 1.3rem; font-weight: 800;">🎹 Sheet Nhạc Tổng Thể Bước 2 - Độc Tấu Piano 2 Tay (Sol & Fa)</h3>
+                <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.92rem;">Bản nhạc hoàn chỉnh 2 tay (Khóa Sol giai điệu + Khóa Fa chạy câu rải hợp âm) được ghép tự động theo từng dòng 4 ô nhịp minh bạch!</p>
+              </div>
+            </div>
+
+            <div id="week1-step4-paper" style="background: #f8fafc; border-radius: 16px; padding: 20px; border: 2px dashed #cbd5e1; margin-bottom: 20px; min-height: 250px;"></div>
+
+            <div style="background: #f0fdf4; border: 1.5px solid #4ade80; border-radius: 14px; padding: 16px; margin-bottom: 20px;">
+              <label style="font-weight: 800; color: #166534; font-size: 0.9rem; display: block; margin-bottom: 8px;">📝 Mã ABC Notation Tổng Thể Bước 2 (2 Tay Khóa Sol & Fa):</label>
+              <textarea id="week1-step4-abc-text" rows="8" readonly style="width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #16a34a; font-family: monospace; font-weight: 700; font-size: 0.9rem; color: #0f172a; outline: none; background: white; line-height: 1.45;"></textarea>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <button onclick="window.switchWeek1Step(2)" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: white; color: #64748b; border: 1.5px solid #cbd5e1; cursor: pointer;">
+                ⬅ Quay Lại Bước 2
+              </button>
+              <button onclick="window.switchWeek1Step(3)" style="padding: 12px 26px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(2,132,199,0.35); font-size: 1rem;">
+                📜 Xem Sheet Tổng Thể Bước 1
               </button>
             </div>
           </div>

@@ -806,7 +806,7 @@
     window.switchWeek1Step = function(stepIdx) {
         window.week1State.activeStep = stepIdx;
 
-        for (let i = 0; i <= 2; i++) {
+        for (let i = 0; i <= 4; i++) {
             const btn = document.getElementById(`week1-step-btn-${i}`);
             const content = document.getElementById(`week1-step-${i}-content`);
             if (content) content.style.display = (i === stepIdx ? 'block' : 'none');
@@ -832,6 +832,50 @@
         } else if (stepIdx === 2) {
             window.parseWeek1Lines();
             window.renderWeek1Step2Lines();
+        } else if (stepIdx === 3) {
+            window.parseWeek1Lines();
+            const step1Abc = window.generateFullSongStep1MelodyAbc();
+            const textarea = document.getElementById('week1-step3-abc-text');
+            if (textarea) textarea.value = step1Abc;
+            const paper = document.getElementById('week1-step3-paper');
+            if (paper) {
+                paper.innerHTML = '';
+                const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+                if (abcRenderer) {
+                    try {
+                        abcRenderer.renderAbc('week1-step3-paper', step1Abc, {
+                            responsive: 'resize',
+                            scale: 1.1,
+                            staffwidth: 760,
+                            add_classes: true
+                        });
+                    } catch (e) {
+                        console.warn('Step 3 Sheet render error:', e);
+                    }
+                }
+            }
+        } else if (stepIdx === 4) {
+            window.parseWeek1Lines();
+            const step2Abc = window.generateFullSongGrandStaffAbc();
+            const textarea = document.getElementById('week1-step4-abc-text');
+            if (textarea) textarea.value = step2Abc;
+            const paper = document.getElementById('week1-step4-paper');
+            if (paper) {
+                paper.innerHTML = '';
+                const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+                if (abcRenderer) {
+                    try {
+                        abcRenderer.renderAbc('week1-step4-paper', step2Abc, {
+                            responsive: 'resize',
+                            scale: 1.1,
+                            staffwidth: 760,
+                            add_classes: true
+                        });
+                    } catch (e) {
+                        console.warn('Step 4 Sheet render error:', e);
+                    }
+                }
+            }
         }
     };
 
