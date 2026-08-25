@@ -681,8 +681,8 @@
     };
 
     window.populateWeek1LibraryDropdown = function() {
-        const optgroup = document.getElementById('week1-library-optgroup');
-        if (!optgroup) return;
+        const select = document.getElementById('week1-preset-song-select');
+        if (!select) return;
 
         let libraryItems = [];
         try {
@@ -693,38 +693,42 @@
         }
 
         if (!libraryItems || libraryItems.length === 0) {
-            optgroup.innerHTML = `<option disabled value="">(Chưa có bài lưu trong Thư Viện)</option>`;
+            select.innerHTML = `<option disabled selected value="">(Chưa có bài trong Thư Viện - Hãy lưu bài ở Bước 1 & 2)</option>`;
             return;
         }
 
-        optgroup.innerHTML = libraryItems.map(item => {
+        const currentValue = select.value;
+        let html = `<option value="" disabled ${!currentValue ? 'selected' : ''}>-- Chọn bài từ Thư Viện (${libraryItems.length} bài) --</option>`;
+        html += libraryItems.map(item => {
             const title = item.title || item.name || 'Bản Nhạc Không Tên';
             const folder = item.folderPath ? ` [${item.folderPath}]` : '';
-            return `<option value="lib_${item.id}">📚 ${title}${folder}</option>`;
+            const val = String(item.id).startsWith('lib_') ? String(item.id) : `lib_${item.id}`;
+            const isSelected = (currentValue === val) ? 'selected' : '';
+            return `<option value="${val}" ${isSelected}>📚 ${title}${folder}</option>`;
         }).join('');
+
+        select.innerHTML = html;
     };
 
     window.loadWeek1PresetSong = function(presetKey) {
+        if (!presetKey) return;
         let abcContent = '';
 
-        if (presetKey && presetKey.startsWith('lib_')) {
-            const songId = presetKey.replace('lib_', '');
-            let libraryItems = [];
-            try {
-                const cached = localStorage.getItem('piso_library_cache');
-                if (cached) libraryItems = JSON.parse(cached);
-            } catch (e) {}
+        const songId = presetKey.startsWith('lib_') ? presetKey.replace('lib_', '') : presetKey;
+        let libraryItems = [];
+        try {
+            const cached = localStorage.getItem('piso_library_cache');
+            if (cached) libraryItems = JSON.parse(cached);
+        } catch (e) {}
 
-            const targetSong = libraryItems.find(item => String(item.id) === String(songId));
-            if (targetSong && targetSong.abc) {
-                abcContent = targetSong.abc;
-            } else {
-                alert('Không tìm thấy dữ liệu bài hát này trong Thư Viện!');
-                return;
-            }
+        const targetSong = libraryItems.find(item => String(item.id) === String(songId) || String(item.id) === String(presetKey));
+        if (targetSong && targetSong.abc) {
+            abcContent = targetSong.abc;
+        } else if (WEEK1_PRESETS[presetKey]) {
+            abcContent = WEEK1_PRESETS[presetKey].abc;
         } else {
-            const p = WEEK1_PRESETS[presetKey] || WEEK1_PRESETS.thang_cuoi;
-            abcContent = p.abc;
+            alert('Không tìm thấy dữ liệu bài hát này trong Thư Viện!');
+            return;
         }
 
         window.week1State.abcInput = abcContent;
