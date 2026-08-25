@@ -1412,17 +1412,6 @@
             }
         });
 
-        // Move rhythm/beat rows (khoanh đỏ 4: 1~2~3) ABOVE lyric rows (khoanh đỏ 5: Bóng trăng)
-        lyricRows.sort((a, b) => {
-            const aText = a.join(' ');
-            const bText = b.join(' ');
-            const aHasDigits = /[0-9]/.test(aText);
-            const bHasDigits = /[0-9]/.test(bText);
-            if (aHasDigits && !bHasDigits) return -1;
-            if (!aHasDigits && bHasDigits) return 1;
-            return 0;
-        });
-
         const lineNotesAbc = noteMeasures.join(' | ');
         const customW = lyricRows.map(row => 'w:' + row.join(' | ')).join('\n');
 
@@ -1468,9 +1457,19 @@
                         <span style="font-size: 0.76rem; background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 8px; font-weight: 800;">Hợp Âm: ${cfg.chord}</span>
                       </div>
 
-                      <div>
+                      <div style="margin-bottom: 8px;">
                         <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">📝 Mã ABC Notation Ô Nhịp ${mObj.index}:</label>
                         <textarea rows="4" oninput="window.updateMeasureAbcText(${idx}, ${mIdx}, this.value)" style="width: 100%; min-height: 95px; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.88rem; color: #0f172a; outline: none; background: #f0f9ff; resize: vertical; line-height: 1.45;">${mObj.text}</textarea>
+                      </div>
+
+                      <div style="margin-bottom: 8px;">
+                        <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.78rem; margin-bottom: 3px;">🥁 Tiết Tấu Tay Trái:</label>
+                        <input type="text" value="${cfg.rhythmText || '1 đơn - 2 đơn - 3 đen'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'rhythmText', this.value)" placeholder="Ví dụ: 1 đơn - 2 đơn - 3 đen..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #f43f5e; font-weight: 700; font-size: 0.82rem; color: #881337; outline: none; background: #fff1f2;">
+                      </div>
+
+                      <div>
+                        <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">🎼 Quãng / Bậc Nốt Đệm:</label>
+                        <input type="text" value="${cfg.intervalText || '1 - 3 - 5'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'intervalText', this.value)" placeholder="Ví dụ: 1 - 3 - 5 hoặc 3 - 3 - 5..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-weight: 700; font-size: 0.82rem; color: #0369a1; outline: none; background: #f0f9ff;">
                       </div>
                     </div>
                 `;
