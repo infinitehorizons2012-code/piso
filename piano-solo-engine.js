@@ -51,7 +51,7 @@
         }
     };
 
-    // Computer Keyboard Mappings for 3 Octaves (C3 to C6)
+    // Computer Keyboard Mappings for Octave 4 (C4 - B4) & Octave 5 (C5 - C6)
     const KEY_BOARD_MAP = {
         // Octave 3 (C3 - B3)
         'z': { note: 'C3', midi: 48 }, 's': { note: 'C#3', midi: 49 },
@@ -147,15 +147,15 @@
         return 440 * Math.pow(2, (midi - 69) / 12);
     };
 
-    // Render Virtual Piano 3-Octave Keyboard (C3 to C6)
+    // Render Full Visual Piano 5-Octave Keyboard (C2 to C7: MIDI 36 to 96) for Complete 2-Hand Visibility
     window.renderVirtualPianoKeyboard = function() {
         const keyboardElem = document.getElementById('piano-solo-keyboard');
         if (!keyboardElem) return;
 
         keyboardElem.innerHTML = '';
 
-        const startMidi = 48; // C3
-        const endMidi = 77;   // F5
+        const startMidi = 36; // C2 (Low Bass - Left Hand)
+        const endMidi = 96;   // C7 (High Treble - Right Hand)
 
         const notesInOctave = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
         let whiteKeyOffset = 0;
@@ -166,6 +166,7 @@
             const noteName = notesInOctave[noteIdx];
             const fullName = `${noteName}${octave}`;
             const isBlack = noteName.includes('#');
+            const isLeftHandRange = (midi < 60);
 
             // Find key binding
             let keyBindStr = '';
@@ -185,22 +186,22 @@
                 keyDiv.className = 'black-key';
                 keyDiv.style.cssText = `
                     position: absolute;
-                    left: ${whiteKeyOffset * 42 - 14}px;
-                    width: 28px;
-                    height: 105px;
+                    left: ${whiteKeyOffset * 26 - 9}px;
+                    width: 18px;
+                    height: 100px;
                     background: linear-gradient(180deg, #1e293b, #0f172a);
                     border: 1px solid #020617;
-                    border-radius: 0 0 6px 6px;
+                    border-radius: 0 0 5px 5px;
                     z-index: 2;
-                    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
                     cursor: pointer;
                     display: flex;
                     flex-direction: column;
                     justify-content: flex-end;
                     align-items: center;
-                    padding-bottom: 8px;
-                    color: #facc15;
-                    font-size: 0.7rem;
+                    padding-bottom: 6px;
+                    color: ${isLeftHandRange ? '#38bdf8' : '#facc15'};
+                    font-size: 0.62rem;
                     font-weight: 800;
                     transition: background 0.1s, transform 0.1s;
                 `;
@@ -208,12 +209,12 @@
                 keyDiv.className = 'white-key';
                 keyDiv.style.cssText = `
                     position: relative;
-                    width: 40px;
-                    height: 170px;
-                    margin-right: 2px;
+                    width: 25px;
+                    height: 160px;
+                    margin-right: 1px;
                     background: linear-gradient(180deg, #ffffff, #f1f5f9);
                     border: 1.5px solid #cbd5e1;
-                    border-radius: 0 0 8px 8px;
+                    border-radius: 0 0 7px 7px;
                     z-index: 1;
                     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
                     cursor: pointer;
@@ -221,9 +222,9 @@
                     flex-direction: column;
                     justify-content: flex-end;
                     align-items: center;
-                    padding-bottom: 12px;
+                    padding-bottom: 10px;
                     color: #1e293b;
-                    font-size: 0.78rem;
+                    font-size: 0.7rem;
                     font-weight: 800;
                     transition: background 0.1s, transform 0.1s;
                 `;
@@ -231,20 +232,21 @@
             }
 
             keyDiv.innerHTML = `
-                ${showKeyLabels ? `<span style="font-size: 0.72rem; color: ${isBlack ? '#fde047' : '#0369a1'};">${fullName}</span>` : ''}
-                ${keyBindStr ? `<span style="font-size: 0.68rem; opacity: 0.75; font-weight: bold; background: ${isBlack ? 'rgba(255,255,255,0.15)' : '#e2e8f0'}; padding: 1px 4px; border-radius: 4px; margin-top: 2px;">${keyBindStr}</span>` : ''}
+                ${showKeyLabels ? `<span style="font-size: 0.65rem; color: ${isLeftHandRange ? '#0284c7' : '#e11d48'}; font-weight: 800;">${fullName}</span>` : ''}
+                ${keyBindStr ? `<span style="font-size: 0.62rem; opacity: 0.85; font-weight: bold; background: ${isBlack ? 'rgba(255,255,255,0.2)' : '#e2e8f0'}; padding: 1px 3px; border-radius: 3px; margin-top: 2px;">${keyBindStr}</span>` : ''}
             `;
 
             keyDiv.addEventListener('mousedown', (e) => {
                 e.preventDefault();
-                window.triggerPianoKey(midi);
+                window.triggerPianoKey(midi, 400, isLeftHandRange ? 'left' : 'right');
             });
 
             keyboardElem.appendChild(keyDiv);
         }
     };
 
-    window.triggerPianoKey = function(midi, durMs = 400) {
+    // Trigger key playback with distinct color coding for Left Hand (Cyan/Blue #0284c7) vs Right Hand (Rose/Gold #e11d48 / #fde047)
+    window.triggerPianoKey = function(midi, durMs = 400, hand = null) {
         const freq = window.midiToFreq(midi);
         const durSec = Math.max(0.3, durMs / 1000);
         window.playPianoSoloTone(freq, durSec, 0.85);
@@ -252,10 +254,19 @@
         const keyElem = document.getElementById(`piano-key-${midi}`);
         if (keyElem) {
             const isBlack = keyElem.classList.contains('black-key');
-            keyElem.style.background = isBlack ? '#eab308' : '#fde047';
+            const isLeft = (hand === 'left') || (midi < 60);
+
+            // Left Hand = Royal Blue/Cyan (#0284c7), Right Hand = Rose/Gold (#e11d48 / #fde047)
+            const activeColor = isLeft ? '#0284c7' : (isBlack ? '#f43f5e' : '#fde047');
+            const glowShadow = isLeft ? '0 0 14px #0284c7' : '0 0 14px #e11d48';
+
+            keyElem.style.background = activeColor;
+            keyElem.style.boxShadow = glowShadow;
             keyElem.style.transform = 'scale(0.96)';
+
             setTimeout(() => {
                 keyElem.style.background = isBlack ? 'linear-gradient(180deg, #1e293b, #0f172a)' : 'linear-gradient(180deg, #ffffff, #f1f5f9)';
+                keyElem.style.boxShadow = isBlack ? '0 4px 8px rgba(0,0,0,0.5)' : '0 4px 8px rgba(0,0,0,0.1)';
                 keyElem.style.transform = 'none';
             }, Math.min(300, durMs));
         }
@@ -267,7 +278,7 @@
         const key = e.key.toLowerCase();
         if (KEY_BOARD_MAP[key]) {
             const midi = KEY_BOARD_MAP[key].midi;
-            window.triggerPianoKey(midi);
+            window.triggerPianoKey(midi, 400, midi < 60 ? 'left' : 'right');
         }
     });
 
@@ -336,7 +347,7 @@
         }
     };
 
-    // DYNAMIC PARSER: Parses current ABC Notation string directly from editor into exact note events
+    // DYNAMIC PARSER: Parses current ABC Notation string directly from editor into exact note events with Left/Right hand assignments
     function parseAbcToNoteEvents(abcCode) {
         const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
         if (!abcRenderer || !abcRenderer.parseOnly) {
@@ -360,16 +371,21 @@
                 tune.lines.forEach((line) => {
                     if (!line.staff) return;
                     line.staff.forEach((staff) => {
+                        const isBassClef = (staff.clef && staff.clef.type === 'bass');
                         if (!staff.voices) return;
-                        staff.voices.forEach((voice) => {
+                        staff.voices.forEach((voice, vIdx) => {
                             let currentTime = 0;
+                            const isLeftHand = isBassClef || vIdx === 1;
+
                             voice.forEach((elem) => {
                                 const dur = elem.duration || 0;
                                 if (elem.el_type === 'note' && elem.pitches) {
                                     elem.pitches.forEach((p) => {
                                         const midi = p.pitch + 60;
+                                        const noteHand = isLeftHand || midi < 60 ? 'left' : 'right';
                                         noteEvents.push({
                                             midi: midi,
+                                            hand: noteHand,
                                             timeMs: Math.round(currentTime * quarterMs * 4),
                                             durMs: Math.max(150, Math.round(dur * quarterMs * 4))
                                         });
@@ -409,8 +425,11 @@
         }
 
         isPlayingSong = true;
-        const btnPlay = document.getElementById('btn-play-piano-solo');
-        if (btnPlay) btnPlay.innerHTML = `🔄 Đang Phát (${noteEvents.length} Nốt ABC)...`;
+        const btnPlay1 = document.getElementById('btn-play-piano-solo');
+        const btnPlay2 = document.getElementById('btn-play-sheet-abc');
+        const textStr = `🔄 Đang Phát (${noteEvents.length} Nốt ABC)...`;
+        if (btnPlay1) btnPlay1.innerHTML = textStr;
+        if (btnPlay2) btnPlay2.innerHTML = textStr;
 
         let maxEndMs = 0;
 
@@ -420,7 +439,7 @@
 
             const timer = setTimeout(() => {
                 if (isPlayingSong) {
-                    window.triggerPianoKey(n.midi, n.durMs);
+                    window.triggerPianoKey(n.midi, n.durMs, n.hand);
                 }
             }, n.timeMs);
             activePlaybackTimers.push(timer);
@@ -437,8 +456,10 @@
         activePlaybackTimers.forEach(t => clearTimeout(t));
         activePlaybackTimers = [];
 
-        const btnPlay = document.getElementById('btn-play-piano-solo');
-        if (btnPlay) btnPlay.innerHTML = '▶️ Bắt Đầu Độc Tấu';
+        const btnPlay1 = document.getElementById('btn-play-piano-solo');
+        const btnPlay2 = document.getElementById('btn-play-sheet-abc');
+        if (btnPlay1) btnPlay1.innerHTML = '▶️ Bắt Đầu Độc Tấu';
+        if (btnPlay2) btnPlay2.innerHTML = '▶️ Nghe Độc Tấu Sheet ABC Này';
     };
 
     window.initPianoSoloView = function() {
