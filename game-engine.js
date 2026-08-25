@@ -748,10 +748,10 @@
                 {
                     id: 'banana',
                     questionText: 'Mô hình tiết tấu cao cấp vừa phát ra là gì?',
-                    name: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba - Triplet)',
+                    name: '🍌 BA-NA-NA (Chùm 3 Liên ba - Triplet)',
                     soundType: 'pattern_triplet',
                     options: [
-                        { id: 'banana', label: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba)' },
+                        { id: 'banana', label: '🍌 BA-NA-NA (Chùm 3 Liên ba)' },
                         { id: 'avocado', label: '🥑 A-VO-CA-DO (3 móc kép + 1 móc đơn)' },
                         { id: 'sweet_potato', label: '🍠 SWEET-PO-TA-TO (1 móc đơn + 3 móc kép)' }
                     ],
@@ -3673,7 +3673,7 @@
             { code: 'FC-16', title: '💃 Điệu Bolero (Lắc lư trữ tình)', desc: 'Tiết tấu rumba/bolero trữ tình, da diết, thân thuộc với nhạc Việt.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Bolero / Rumba Beat', abc: 'X:1\nM:4/4\nL:1/8\nK:C clef=perc\ncc c2 cc c2 |', soundType: 'genre_bolero', icon: '💃' }
         ],
         lvl3: [
-            { code: 'FC-17', title: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba 1 phách)', desc: 'Chùm 3 nốt liên ba (Triplet) chia 1 phách làm 3 phần đều nhau hoàn hảo dính chùm chung 1 beam.', countText: 'Đếm: "1-2-3 / 1-thị-trưởng"', notation: 'Chùm 3 Liên Ba (chung 1 beam)', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\n(3ccc |', soundType: 'pattern_triplet', icon: '🍌' },
+            { code: 'FC-17', title: '🍌 BA-NA-NA (Chùm 3 Liên ba 1 phách)', desc: 'Chùm 3 nốt liên ba (Triplet) chia 1 phách làm 3 phần đều nhau hoàn hảo dính chùm chung 1 beam.', countText: 'Đếm: "1 - 2 - 3"', notation: 'Chùm 3 Liên Ba (chung 1 beam)', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\n(3ccc |', soundType: 'pattern_triplet', icon: '🍌' },
             { code: 'FC-18', title: '🥑 A-VO-CA-DO (3 móc kép + 1 móc đơn dính chùm 1 beam)', desc: '3 nốt móc kép (1/4×3) + 1 nốt móc đơn (1/2) dính chùm chung 1 vạch xà ngang chính (beam) nối liền cả 4 nốt.', countText: 'Đếm: "1 e & - a"', notation: '3 móc kép + 1 móc đơn (dính chùm 1 beam)', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\nc/2c/2c/2c |', soundType: 'pattern_avocado', icon: '🥑' },
             { code: 'FC-19', title: '🍠 SWEET-PO-TA-TO (1 móc đơn + 3 móc kép dính chùm 1 beam)', desc: '1 nốt móc đơn (1/2) + 3 nốt móc kép (1/4×3) dính chùm chung 1 vạch xà ngang chính (beam) nối liền cả 4 nốt.', countText: 'Đếm: "1 - e & a"', notation: '1 móc đơn + 3 móc kép (dính chùm 1 beam)', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\ncc/2c/2c/2 |', soundType: 'pattern_potato', icon: '🍠' },
             { code: 'FC-20', title: '🍍 PINE-AP-PLE 2 Phách (Chùm 3 nốt đen 2 phách)', desc: 'Chùm 3 nốt đen (Quarter note triplets) dồn đều trong không gian 2 phách.', countText: 'Đếm: "1 - 2 - 3 (trên 2 phách)"', notation: 'Chùm 3 Nốt Đen trên 2 phách', abc: 'X:1\nM:2/4\nL:1/4\nK:C clef=perc\n(3c c c |', soundType: 'pattern_triplet_2beat', icon: '🍍' },
