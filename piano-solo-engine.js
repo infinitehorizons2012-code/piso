@@ -1084,14 +1084,12 @@
         container.innerHTML = '';
 
         const lines = window.week1State.parsedLines;
-        if (lines.length === 0) {
-            container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Chưa có dữ liệu dòng nhạc.</div>`;
+        if (!lines || lines.length === 0) {
+            container.innerHTML = `<div style="text-align: center; color: #94a3b8; padding: 20px;">Chưa có dữ liệu dòng nhạc. Vui lòng nạp bài hát ở Tab 0 hoặc nhập ở Bước 1.</div>`;
             return;
         }
 
         lines.forEach((lineObj, idx) => {
-            const cfg = window.week1State.lineConfigs[idx] || {};
-
             const card = document.createElement('div');
             card.style.cssText = `
                 background: white;
@@ -1101,13 +1099,12 @@
                 box-shadow: 0 6px 18px rgba(0,0,0,0.04);
             `;
 
-            const grandStaffAbc = window.generateWeek1LineGrandStaffAbc(lineObj, cfg);
+            const grandStaffAbc = window.generateWeek1LineGrandStaffAbc(lineObj, idx);
 
             card.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 12px 16px; border-radius: 14px; border: 1.5px solid #86efac;">
                   <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="background: #16a34a; color: white; font-weight: 800; padding: 4px 14px; border-radius: 12px; font-size: 0.9rem;">🎹 ${lineObj.title} - KHÓA SOL & KHÓA FA</span>
-                    <span style="font-size: 0.85rem; color: #166534; font-weight: 700;">Tiết tấu: ${cfg.rhythmPattern || '4/4'} | Thế ngón: ${cfg.customFingeringStr || '1-5-8-3'}</span>
+                    <span style="background: #16a34a; color: white; font-weight: 800; padding: 4px 14px; border-radius: 12px; font-size: 0.9rem;">🎹 ${lineObj.title} - KHÓA SOL & KHÓA FA (2 TAY)</span>
                   </div>
                   <button onclick="window.playWeek1LineAudio(${idx})" style="padding: 8px 16px; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
                     ▶️ Nghe Thử Dòng Này
@@ -1117,8 +1114,8 @@
                 <div id="week1-step2-paper-${idx}" style="background: #f8fafc; border-radius: 14px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 14px; min-height: 160px;"></div>
 
                 <div style="display: flex; gap: 12px; font-size: 0.85rem; font-weight: 700; flex-wrap: wrap;">
-                  <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 10px;">🫱 Tay Phải (Khóa Sol): Giai Điệu + Số Phách Đếm</span>
-                  <span style="background: #fce7f3; color: #be123c; padding: 6px 12px; border-radius: 10px;">🫲 Tay Trái (Khóa Fa): Nốt Hợp Âm Rải Quãng 10</span>
+                  <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 10px;">🫱 Tay Phải (Khóa Sol): Giai Điệu Bài Hát</span>
+                  <span style="background: #fce7f3; color: #be123c; padding: 6px 12px; border-radius: 10px;">🫲 Tay Trái (Khóa Fa): Nốt Hợp Âm Rải Theo Ô Nhịp</span>
                 </div>
             `;
 
@@ -1142,34 +1139,61 @@
         });
     };
 
-    window.generateWeek1LineGrandStaffAbc = function(lineObj, cfg) {
-        const header = lineObj.snippetHeader || 'M:4/4\nL:1/8\nK:C';
-        let bodyTreble = lineObj.abcContent;
+    window.generateWeek1LineGrandStaffAbc = function(lineObj, lineIdx) {
+        const snippetHeader = lineObj.snippetHeader || 'M:2/4\nL:1/8\nK:C';
+        const measures = window.parseLineMeasures(lineObj.abcContent);
 
         const chordMap = {
-            'C': 'C, G, C E',
-            'Am': 'A,, E, A, C',
-            'F': 'F,, C, F, A,',
-            'Dm': 'D,, A,, D, F,',
-            'G': 'G,, D, G, B,',
-            'Em': 'E,, B,, E, G,',
-            'E7': 'E,, B,, E, ^G,'
+            'C': 'C, E, G, z',
+            'Am': 'A,, C, E, z',
+            'F': 'F,, A,, C, z',
+            'Dm': 'D,, F,, A,, z',
+            'G': 'G,, B,, D, z',
+            'Em': 'E,, G,, B,, z',
+            'E7': 'E,, ^G,, B,, z',
+            'Bm': 'B,, D, F, z',
+            'D': 'D,, F,, A,, z',
+            'None': 'z4'
         };
 
-        const measures = bodyTreble.split('|');
+        let noteMeasures = [];
+        let lyricMeasures = [];
         let bassMeasures = [];
 
-        measures.forEach(m => {
-            if (!m.trim()) return;
-            const match = m.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/);
-            const chord = match ? match[1] : 'C';
-            const bassArpeggio = chordMap[chord] || 'C, G, C E';
-            bassMeasures.push(` ${bassArpeggio} `);
+        measures.forEach((mObj, mIdx) => {
+            const lines = mObj.text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let mNotes = [];
+            let mWords = [];
+
+            lines.forEach(l => {
+                if (l.startsWith('%')) return;
+                if (/^w[0-9]*:?/i.test(l)) {
+                    const words = l.replace(/^w[0-9]*:?/i, '').trim();
+                    if (words) mWords.push(words);
+                } else {
+                    mNotes.push(l);
+                }
+            });
+
+            const mNotesText = mNotes.join(' ');
+            noteMeasures.push(mNotesText);
+            lyricMeasures.push(mWords.length > 0 ? mWords.join(' ') : '*');
+
+            const cfg = window.getMeasureConfig(lineIdx, mIdx, mObj.chord);
+            if (cfg.rhythmPattern === 'none' || cfg.chord === 'None') {
+                bassMeasures.push(' z4 ');
+            } else {
+                const arpeggio = chordMap[cfg.chord] || 'C, E, G, z';
+                bassMeasures.push(` ${arpeggio} `);
+            }
         });
 
-        const bassBody = bassMeasures.join('|');
+        const lineNotesAbc = noteMeasures.join(' | ');
+        const hasLyrics = lyricMeasures.some(w => w !== '*');
+        const customW = hasLyrics ? ('w:' + lyricMeasures.join(' | ') + '\n') : '';
+        const bassBody = bassMeasures.join(' | ');
 
-        return `X:1\nT: ${lineObj.title}\n${header}\n%%score {1 | 2}\nV:1 clef=treble\n${bodyTreble}\nV:2 clef=bass\n${bassBody}`;
+        return `X:1\nT: ${lineObj.title}\n${snippetHeader}\n%%score {1 | 2}\nV:1 clef=treble\n${lineNotesAbc}\n${customW}V:2 clef=bass\n${bassBody}`;
     };
 
     window.toggleWeek1MasterScoreModal = function() {
