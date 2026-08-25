@@ -1438,7 +1438,7 @@
         const measures = window.parseLineMeasures(lineObj.abcContent);
 
         let noteMeasures = [];
-        let lyricMeasures = [];
+        let lyricRows = [];
         let bassMeasures = [];
 
         measures.forEach((mObj, mIdx) => {
@@ -1458,24 +1458,34 @@
 
             const mNotesText = mNotes.join(' ');
             noteMeasures.push(mNotesText);
-            lyricMeasures.push(mWords.length > 0 ? mWords.join(' ') : '*');
+
+            mWords.forEach((wStr, rIdx) => {
+                if (!lyricRows[rIdx]) lyricRows[rIdx] = [];
+                lyricRows[rIdx][mIdx] = wStr;
+            });
 
             const customBassKey = `${lineIdx}_${mIdx}`;
             if (window.week1State.step2BassMeasures && window.week1State.step2BassMeasures[customBassKey] !== undefined) {
                 bassMeasures.push(` ${window.week1State.step2BassMeasures[customBassKey]} `);
             } else {
                 const cfg = window.getMeasureConfig(lineIdx, mIdx, mObj.chord);
-                const bassNotes = window.getBassRhythmNotes(cfg.chord, cfg.rhythmPattern);
+                const bassNotes = window.getBassRhythmNotes(cfg.chord, cfg.rhythmText, cfg.intervalText);
                 bassMeasures.push(` ${bassNotes} `);
             }
         });
 
+        const numMeasures = measures.length;
+        lyricRows.forEach(row => {
+            for (let i = 0; i < numMeasures; i++) {
+                if (!row[i]) row[i] = '*';
+            }
+        });
+
         const lineNotesAbc = noteMeasures.join(' | ');
-        const hasLyrics = lyricMeasures.some(w => w !== '*');
-        const customW = hasLyrics ? ('w:' + lyricMeasures.join(' | ') + '\n') : '';
+        const customW = lyricRows.map(row => 'w:' + row.join(' | ')).join('\n');
         const bassBody = bassMeasures.join(' | ');
 
-        return `X:1\nT: ${lineObj.title}\n${snippetHeader}\n%%score {1 | 2}\nV:1 clef=treble\n${lineNotesAbc}\n${customW}V:2 clef=bass\n${bassBody}`;
+        return `X:1\nT: ${lineObj.title}\n${snippetHeader}\n%%score {1 | 2}\nV:1 clef=treble\n${lineNotesAbc}\n${customW ? customW + '\n' : ''}V:2 clef=bass\n${bassBody}`;
     };
 
     window.toggleWeek1MasterScoreModal = function() {
