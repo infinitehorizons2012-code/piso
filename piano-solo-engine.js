@@ -676,6 +676,7 @@
         activeStep: 0,
         parsedLines: [],
         lineConfigs: {},
+        measureConfigs: {},
         masterModalOpen: false
     };
 
@@ -691,6 +692,41 @@
         } else if (window.week1State.activeStep === 2) {
             window.renderWeek1Step2Lines();
         }
+    };
+
+    window.getMeasureConfig = function(lineIdx, mIdx, defaultChord) {
+        if (!window.week1State.measureConfigs) {
+            window.week1State.measureConfigs = {};
+        }
+        const key = `${lineIdx}_${mIdx}`;
+        if (!window.week1State.measureConfigs[key]) {
+            const isNoChord = (defaultChord === 'None' || !defaultChord);
+            window.week1State.measureConfigs[key] = {
+                chord: defaultChord || 'None',
+                rhythmPattern: isNoChord ? 'none' : '3_beat',
+                chordVoicing: '3_note'
+            };
+        }
+        return window.week1State.measureConfigs[key];
+    };
+
+    window.updateMeasureConfig = function(lineIdx, mIdx, field, value) {
+        if (!window.week1State.measureConfigs) {
+            window.week1State.measureConfigs = {};
+        }
+        const key = `${lineIdx}_${mIdx}`;
+        if (!window.week1State.measureConfigs[key]) {
+            window.week1State.measureConfigs[key] = { chord: 'C', rhythmPattern: '3_beat', chordVoicing: '3_note' };
+        }
+        window.week1State.measureConfigs[key][field] = value;
+
+        if (field === 'chord' && value === 'None') {
+            window.week1State.measureConfigs[key].rhythmPattern = 'none';
+        } else if (field === 'chord' && value !== 'None' && window.week1State.measureConfigs[key].rhythmPattern === 'none') {
+            window.week1State.measureConfigs[key].rhythmPattern = '3_beat';
+        }
+
+        window.renderWeek1Step1Lines();
     };
 
     window.renderWeek1MasterPreview = function() {
