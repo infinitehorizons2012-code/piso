@@ -4,9 +4,8 @@
     let audioCtx = null;
     let sustainPedal = false;
     let showKeyLabels = true;
-    let activeOscillators = {};
     let isPlayingSong = false;
-    let currentPlaybackTimer = null;
+    let activePlaybackTimers = [];
 
     // 8 Classical & Modern Piano Solo Pieces (ABC Format with Grand Staff %%score {1 2})
     const PIANO_SOLO_SONGS = {
@@ -93,7 +92,6 @@
             const ctx = getAudioContext();
             const now = ctx.currentTime;
 
-            // Main Fundamental & Harmonics
             const osc = ctx.createOscillator();
             const osc2 = ctx.createOscillator();
             const osc3 = ctx.createOscillator();
@@ -246,9 +244,10 @@
         }
     };
 
-    window.triggerPianoKey = function(midi) {
+    window.triggerPianoKey = function(midi, durMs = 400) {
         const freq = window.midiToFreq(midi);
-        window.playPianoSoloTone(freq, 1.8, 0.85);
+        const durSec = Math.max(0.3, durMs / 1000);
+        window.playPianoSoloTone(freq, durSec, 0.85);
 
         const keyElem = document.getElementById(`piano-key-${midi}`);
         if (keyElem) {
@@ -258,7 +257,7 @@
             setTimeout(() => {
                 keyElem.style.background = isBlack ? 'linear-gradient(180deg, #1e293b, #0f172a)' : 'linear-gradient(180deg, #ffffff, #f1f5f9)';
                 keyElem.style.transform = 'none';
-            }, 180);
+            }, Math.min(300, durMs));
         }
     };
 
@@ -299,6 +298,7 @@
         window.renderPianoSoloSheet(song.abc);
     };
 
+    // Renders ABC sheet music dynamically as user types or selects a song
     window.renderPianoSoloSheet = function(abcCode) {
         const paper = document.getElementById('piano-solo-paper');
         if (!paper) return;
@@ -307,14 +307,18 @@
         const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
         if (!abcRenderer) return;
 
-        abcRenderer.renderAbc('piano-solo-paper', abcCode, {
-            responsive: 'resize',
-            scale: 1.15,
-            staffwidth: 780,
-            paddingtop: 15,
-            paddingbottom: 15,
-            add_classes: true
-        });
+        try {
+            abcRenderer.renderAbc('piano-solo-paper', abcCode, {
+                responsive: 'resize',
+                scale: 1.15,
+                staffwidth: 780,
+                paddingtop: 15,
+                paddingbottom: 15,
+                add_classes: true
+            });
+        } catch (err) {
+            console.warn('ABC Render error:', err);
+        }
     };
 
     window.renderPianoSoloAbcFromEditor = function() {
@@ -332,59 +336,107 @@
         }
     };
 
-    // Auto Play Piano Solo Song (plays Treble & Bass notes and animates Virtual Piano keys)
-    window.playPianoSoloSong = function() {
-        if (isPlayingSong) window.stopPianoSoloSong();
+    // DYNAMIC PARSER: Parses current ABC Notation string directly from editor into exact note events
+    function parseAbcToNoteEvents(abcCode) {
+        const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+        if (!abcRenderer || !abcRenderer.parseOnly) {
+            return [];
+        }
 
-        const selectElem = document.getElementById('piano-solo-song-select');
-        const songKey = selectElem ? selectElem.value : 'fur_elise';
-        const song = PIANO_SOLO_SONGS[songKey] || PIANO_SOLO_SONGS.fur_elise;
+        try {
+            const parsed = abcRenderer.parseOnly(abcCode);
+            if (!parsed || parsed.length === 0) return [];
+
+            const tune = parsed[0];
+            let tempoBpm = 100;
+            if (tune.metaText && tune.metaText.tempo) {
+                tempoBpm = tune.metaText.tempo.bpm || 100;
+            }
+
+            const quarterMs = (60000 / tempoBpm);
+            const noteEvents = [];
+
+            if (tune.lines) {
+                tune.lines.forEach((line) => {
+                    if (!line.staff) return;
+                    line.staff.forEach((staff) => {
+                        if (!staff.voices) return;
+                        staff.voices.forEach((voice) => {
+                            let currentTime = 0;
+                            voice.forEach((elem) => {
+                                const dur = elem.duration || 0;
+                                if (elem.el_type === 'note' && elem.pitches) {
+                                    elem.pitches.forEach((p) => {
+                                        const midi = p.pitch + 60;
+                                        noteEvents.push({
+                                            midi: midi,
+                                            timeMs: Math.round(currentTime * quarterMs * 4),
+                                            durMs: Math.max(150, Math.round(dur * quarterMs * 4))
+                                        });
+                                    });
+                                }
+                                currentTime += dur;
+                            });
+                        });
+                    });
+                });
+            }
+
+            noteEvents.sort((a, b) => a.timeMs - b.timeMs);
+            return noteEvents;
+        } catch (e) {
+            console.warn('Error parsing ABC string:', e);
+            return [];
+        }
+    }
+
+    // Auto Play Piano Solo Song (Parses current ABC string & plays actual notes on Piano Virtual Keyboard)
+    window.playPianoSoloSong = function() {
+        window.stopPianoSoloSong();
+
+        const textarea = document.getElementById('piano-solo-abc-editor');
+        const abcCode = textarea ? textarea.value : (PIANO_SOLO_SONGS.fur_elise.abc);
+
+        // Render sheet first to guarantee 100% sync
+        window.renderPianoSoloSheet(abcCode);
+
+        // Extract exact note events from the ABC notation
+        const noteEvents = parseAbcToNoteEvents(abcCode);
+
+        if (noteEvents.length === 0) {
+            alert('Không tìm thấy nốt nhạc hợp lệ trong mã ABC! Vui lòng kiểm tra lại mã ABC.');
+            return;
+        }
 
         isPlayingSong = true;
         const btnPlay = document.getElementById('btn-play-piano-solo');
-        if (btnPlay) btnPlay.innerHTML = '🔄 Đang Độc Tấu...';
+        if (btnPlay) btnPlay.innerHTML = `🔄 Đang Phát (${noteEvents.length} Nốt ABC)...`;
 
-        // Play sequence of notes based on song key
-        const sampleMelodies = {
-            fur_elise: [
-                { midi: 76, time: 0 }, { midi: 75, time: 200 }, { midi: 76, time: 400 }, { midi: 75, time: 600 },
-                { midi: 76, time: 800 }, { midi: 71, time: 1000 }, { midi: 74, time: 1200 }, { midi: 72, time: 1400 },
-                { midi: 69, time: 1600 }, { midi: 48, time: 1600 }, { midi: 52, time: 1800 }, { midi: 57, time: 2000 },
-                { midi: 71, time: 2200 }, { midi: 52, time: 2200 }, { midi: 56, time: 2400 }, { midi: 59, time: 2600 },
-                { midi: 72, time: 2800 }, { midi: 48, time: 2800 }, { midi: 52, time: 3000 }, { midi: 57, time: 3200 }
-            ],
-            canon_in_d: [
-                { midi: 74, time: 0 }, { midi: 62, time: 0 }, { midi: 73, time: 400 }, { midi: 57, time: 400 },
-                { midi: 71, time: 800 }, { midi: 59, time: 800 }, { midi: 69, time: 1200 }, { midi: 54, time: 1200 },
-                { midi: 67, time: 1600 }, { midi: 55, time: 1600 }, { midi: 66, time: 2000 }, { midi: 50, time: 2000 },
-                { midi: 67, time: 2400 }, { midi: 55, time: 2400 }, { midi: 69, time: 2800 }, { midi: 57, time: 2800 }
-            ],
-            river_flows_in_you: [
-                { midi: 69, time: 0 }, { midi: 73, time: 200 }, { midi: 76, time: 400 }, { midi: 73, time: 600 },
-                { midi: 69, time: 800 }, { midi: 73, time: 1000 }, { midi: 76, time: 1200 }, { midi: 73, time: 1400 },
-                { midi: 74, time: 1600 }, { midi: 73, time: 1800 }, { midi: 69, time: 2000 }, { midi: 67, time: 2200 }
-            ]
-        };
+        let maxEndMs = 0;
 
-        const notes = sampleMelodies[songKey] || sampleMelodies.fur_elise;
+        noteEvents.forEach(n => {
+            const endMs = n.timeMs + n.durMs;
+            if (endMs > maxEndMs) maxEndMs = endMs;
 
-        notes.forEach(n => {
             const timer = setTimeout(() => {
                 if (isPlayingSong) {
-                    window.triggerPianoKey(n.midi);
+                    window.triggerPianoKey(n.midi, n.durMs);
                 }
-            }, n.time);
+            }, n.timeMs);
+            activePlaybackTimers.push(timer);
         });
 
-        const totalDuration = notes[notes.length - 1].time + 1000;
-        currentPlaybackTimer = setTimeout(() => {
+        const stopTimer = setTimeout(() => {
             window.stopPianoSoloSong();
-        }, totalDuration);
+        }, maxEndMs + 800);
+        activePlaybackTimers.push(stopTimer);
     };
 
     window.stopPianoSoloSong = function() {
         isPlayingSong = false;
-        if (currentPlaybackTimer) clearTimeout(currentPlaybackTimer);
+        activePlaybackTimers.forEach(t => clearTimeout(t));
+        activePlaybackTimers = [];
+
         const btnPlay = document.getElementById('btn-play-piano-solo');
         if (btnPlay) btnPlay.innerHTML = '▶️ Bắt Đầu Độc Tấu';
     };
