@@ -1189,7 +1189,7 @@
 
                       <div style="margin-bottom: 8px;">
                         <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">📝 Mã ABC Notation Ô Nhịp ${mObj.index}:</label>
-                        <textarea rows="2" oninput="window.updateMeasureAbcText(${idx}, ${mIdx}, this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.84rem; color: #0f172a; outline: none; background: #f0f9ff; resize: vertical;">${mObj.text}</textarea>
+                        <textarea rows="4" oninput="window.updateMeasureAbcText(${idx}, ${mIdx}, this.value)" style="width: 100%; min-height: 95px; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.88rem; color: #0f172a; outline: none; background: #f0f9ff; resize: vertical; line-height: 1.45;">${mObj.text}</textarea>
                       </div>
 
                       <div style="margin-bottom: 8px;">
@@ -1315,12 +1315,12 @@
 
                       <div style="margin-bottom: 8px;">
                         <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">🫱 Tay Phải (Khóa Sol):</label>
-                        <textarea rows="2" oninput="window.updateStep2MeasureAbc(${idx}, ${mIdx}, 'treble', this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.82rem; color: #0f172a; outline: none; background: #f0f9ff; resize: vertical;">${mObj.text}</textarea>
+                        <textarea rows="3" oninput="window.updateStep2MeasureAbc(${idx}, ${mIdx}, 'treble', this.value)" style="width: 100%; min-height: 75px; padding: 8px 10px; border-radius: 10px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.86rem; color: #0f172a; outline: none; background: #f0f9ff; resize: vertical; line-height: 1.4;">${mObj.text}</textarea>
                       </div>
 
                       <div>
                         <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.78rem; margin-bottom: 3px;">🫲 Tay Trái (Khóa Fa):</label>
-                        <textarea rows="2" oninput="window.updateStep2MeasureAbc(${idx}, ${mIdx}, 'bass', this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #f43f5e; font-family: monospace; font-weight: 700; font-size: 0.82rem; color: #0f172a; outline: none; background: #fff1f2; resize: vertical;">${mBassAbc}</textarea>
+                        <textarea rows="3" oninput="window.updateStep2MeasureAbc(${idx}, ${mIdx}, 'bass', this.value)" style="width: 100%; min-height: 75px; padding: 8px 10px; border-radius: 10px; border: 1.5px solid #f43f5e; font-family: monospace; font-weight: 700; font-size: 0.86rem; color: #0f172a; outline: none; background: #fff1f2; resize: vertical; line-height: 1.4;">${mBassAbc}</textarea>
                       </div>
                     </div>
                 `;
