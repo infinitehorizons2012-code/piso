@@ -1184,7 +1184,7 @@
                     <div style="background: white; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                       <div style="font-weight: 800; color: #0369a1; font-size: 0.88rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                         <span>🎼 Ô Nhịp ${mObj.index}</span>
-                        <span style="font-size: 0.76rem; background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 8px; font-weight: 800;">Mã ABC Ô Này</span>
+                        <span style="font-size: 0.76rem; background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 8px; font-weight: 800;">Hợp Âm: ${cfg.chord}</span>
                       </div>
 
                       <div style="margin-bottom: 8px;">
@@ -1192,25 +1192,14 @@
                         <textarea rows="4" oninput="window.updateMeasureAbcText(${idx}, ${mIdx}, this.value)" style="width: 100%; min-height: 95px; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.88rem; color: #0f172a; outline: none; background: #f0f9ff; resize: vertical; line-height: 1.45;">${mObj.text}</textarea>
                       </div>
 
-                      <div style="margin-bottom: 8px;">
-                        <label style="display: block; font-weight: 700; color: #475569; font-size: 0.78rem; margin-bottom: 3px;">🎸 Hợp Âm Ô Này:</label>
-                        <select onchange="window.updateMeasureConfig(${idx}, ${mIdx}, 'chord', this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #94a3b8; font-weight: 700; font-size: 0.82rem; outline: none; cursor: pointer;">
-                          <option value="None" ${cfg.chord === 'None' ? 'selected' : ''}>None (Không có / Ô lướt)</option>
-                          <option value="C" ${cfg.chord === 'C' ? 'selected' : ''}>C (Đô Trưởng: C - E - G)</option>
-                          <option value="Am" ${cfg.chord === 'Am' ? 'selected' : ''}>Am (La Thứ: A - C - E)</option>
-                          <option value="F" ${cfg.chord === 'F' ? 'selected' : ''}>F (Fa Trưởng: F - A - C)</option>
-                          <option value="Dm" ${cfg.chord === 'Dm' ? 'selected' : ''}>Dm (Rê Thứ: D - F - A)</option>
-                          <option value="G" ${cfg.chord === 'G' ? 'selected' : ''}>G (Sol Trưởng: G - B - D)</option>
-                          <option value="Em" ${cfg.chord === 'Em' ? 'selected' : ''}>Em (Mi Thứ: E - G - B)</option>
-                        </select>
-                      </div>
-
                       <div>
-                        <label style="display: block; font-weight: 700; color: #475569; font-size: 0.78rem; margin-bottom: 3px;">🥁 Tiết Tấu Tay Trái:</label>
-                        <select onchange="window.updateMeasureConfig(${idx}, ${mIdx}, 'rhythmPattern', this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #94a3b8; font-weight: 700; font-size: 0.82rem; outline: none; cursor: pointer;">
-                          <option value="none" ${cfg.rhythmPattern === 'none' ? 'selected' : ''}>Nghỉ (Không chọn gì hết)</option>
-                          <option value="3_beat" ${cfg.rhythmPattern === '3_beat' ? 'selected' : ''}>Tiết tấu 3 nốt (1-2-3 ➔ C-E-G)</option>
-                          <option value="4_beat" ${cfg.rhythmPattern === '4_beat' ? 'selected' : ''}>Tiết tấu 4 nốt (1-2-3-4 ➔ C-E-G-C)</option>
+                        <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.78rem; margin-bottom: 3px;">🥁 Tiết Tấu Tay Trái (Ô Nhịp 2/4):</label>
+                        <select onchange="window.updateMeasureConfig(${idx}, ${mIdx}, 'rhythmPattern', this.value)" style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #f43f5e; font-weight: 700; font-size: 0.82rem; color: #881337; outline: none; cursor: pointer; background: #fff1f2;">
+                          <option value="don_don_den" ${(cfg.rhythmPattern === 'don_don_den' || cfg.rhythmPattern === '3_beat' || !cfg.rhythmPattern) ? 'selected' : ''}>🎶 Đơn - Đơn - Đen (1-2-3 ➔ 2 Phách)</option>
+                          <option value="den_den" ${cfg.rhythmPattern === 'den_den' ? 'selected' : ''}>🎵 Đen - Đen (1-2 ➔ 2 Phách)</option>
+                          <option value="bon_don" ${(cfg.rhythmPattern === 'bon_don' || cfg.rhythmPattern === '4_beat') ? 'selected' : ''}>🎶 4 Nốt Đơn (1-2-3-4 ➔ 2 Phách)</option>
+                          <option value="trang" ${cfg.rhythmPattern === 'trang' ? 'selected' : ''}>🎼 Nốt Trắng (Giữ Tới 2 Phách)</option>
+                          <option value="none" ${cfg.rhythmPattern === 'none' ? 'selected' : ''}>🔇 Nghỉ (Không đệm / z4)</option>
                         </select>
                       </div>
                     </div>
@@ -1226,7 +1215,7 @@
                 <div id="week1-step1-paper-${idx}" style="background: white; border-radius: 14px; padding: 12px; border: 1.5px solid #cbd5e1; margin-bottom: 14px; min-height: 90px;"></div>
 
                 <div style="background: white; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px;">
-                  <h4 style="margin: 0 0 10px 0; color: #0369a1; font-size: 0.9rem; font-weight: 800;">⚙️ Cấu Hình Tiết Tấu & Hợp Âm Từng Ô Nhịp (Dòng này có ${measures.length} ô nhịp):</h4>
+                  <h4 style="margin: 0 0 10px 0; color: #0369a1; font-size: 0.9rem; font-weight: 800;">⚙️ Cấu Hình Tiết Tấu Từng Ô Nhịp (Dòng này có ${measures.length} ô nhịp):</h4>
                   <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
                     ${measureControlsHtml}
                   </div>
@@ -1238,20 +1227,38 @@
             setTimeout(() => {
                 const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
                 if (abcRenderer) {
-                    const fullSnippetAbc = generateStep1AnnotatedAbc(lineObj, idx);
                     try {
-                        abcRenderer.renderAbc(`week1-step1-paper-${idx}`, fullSnippetAbc, {
+                        abcRenderer.renderAbc(`week1-step1-paper-${idx}`, lineObj.abcContent, {
                             responsive: 'resize',
                             scale: 1.15,
-                            staffwidth: 720,
+                            staffwidth: 740,
                             add_classes: true
                         });
                     } catch (e) {
-                        console.warn(`Error rendering Step 1 snippet ${idx}:`, e);
+                        console.warn(`Error rendering Step 1 staff line ${idx}:`, e);
                     }
                 }
             }, 30);
         });
+    };
+
+    window.updateStep2MeasureAbc = function(lineIdx, mIdx, hand, newText) {
+        if (hand === 'treble') {
+            window.updateMeasureAbcText(lineIdx, mIdx, newText);
+        } else if (hand === 'bass') {
+            if (!window.week1State.step2BassMeasures) {
+                window.week1State.step2BassMeasures = {};
+            }
+            window.week1State.step2BassMeasures[`${lineIdx}_${mIdx}`] = newText;
+        }
+
+        const lineObj = window.week1State.parsedLines[lineIdx];
+        if (lineObj) {
+            const updatedGrandAbc = window.generateWeek1LineGrandStaffAbc(lineObj, lineIdx);
+            const textarea = document.getElementById(`week1-step2-abc-text-${lineIdx}`);
+            if (textarea) textarea.value = updatedGrandAbc;
+            window.updateStep2GrandStaffAbc(lineIdx, updatedGrandAbc);
+        }
     };
 
     window.updateStep2GrandStaffAbc = function(lineIdx, newAbc) {
@@ -1281,19 +1288,6 @@
             return;
         }
 
-        const chordMap = {
-            'C': 'C, E, G, z',
-            'Am': 'A,, C, E, z',
-            'F': 'F,, A,, C, z',
-            'Dm': 'D,, F,, A,, z',
-            'G': 'G,, D, G, B,',
-            'Em': 'E,, G,, B,, z',
-            'E7': 'E,, ^G,, B,, z',
-            'Bm': 'B,, D, F, z',
-            'D': 'D,, F,, A,, z',
-            'None': 'z4'
-        };
-
         lines.forEach((lineObj, idx) => {
             const measures = window.parseLineMeasures(lineObj.abcContent);
             const grandStaffAbc = window.generateWeek1LineGrandStaffAbc(lineObj, idx);
@@ -1301,7 +1295,7 @@
             const measureControlsHtml = measures.map((mObj, mIdx) => {
                 const cfg = window.getMeasureConfig(idx, mIdx, mObj.chord);
                 const customBassKey = `${idx}_${mIdx}`;
-                const defaultBass = (cfg.rhythmPattern === 'none' || cfg.chord === 'None') ? 'z4' : (chordMap[cfg.chord] || 'C, E, G, z');
+                const defaultBass = window.getBassRhythmNotes(cfg.chord, cfg.rhythmPattern);
                 const mBassAbc = (window.week1State.step2BassMeasures && window.week1State.step2BassMeasures[customBassKey] !== undefined)
                     ? window.week1State.step2BassMeasures[customBassKey]
                     : defaultBass;
@@ -1392,19 +1386,6 @@
         const snippetHeader = lineObj.snippetHeader || 'M:2/4\nL:1/8\nK:C';
         const measures = window.parseLineMeasures(lineObj.abcContent);
 
-        const chordMap = {
-            'C': 'C, E, G, z',
-            'Am': 'A,, C, E, z',
-            'F': 'F,, A,, C, z',
-            'Dm': 'D,, F,, A,, z',
-            'G': 'G,, D, G, B,',
-            'Em': 'E,, G,, B,, z',
-            'E7': 'E,, ^G,, B,, z',
-            'Bm': 'B,, D, F, z',
-            'D': 'D,, F,, A,, z',
-            'None': 'z4'
-        };
-
         let noteMeasures = [];
         let lyricMeasures = [];
         let bassMeasures = [];
@@ -1433,12 +1414,8 @@
                 bassMeasures.push(` ${window.week1State.step2BassMeasures[customBassKey]} `);
             } else {
                 const cfg = window.getMeasureConfig(lineIdx, mIdx, mObj.chord);
-                if (cfg.rhythmPattern === 'none' || cfg.chord === 'None') {
-                    bassMeasures.push(' z4 ');
-                } else {
-                    const arpeggio = chordMap[cfg.chord] || 'C, E, G, z';
-                    bassMeasures.push(` ${arpeggio} `);
-                }
+                const bassNotes = window.getBassRhythmNotes(cfg.chord, cfg.rhythmPattern);
+                bassMeasures.push(` ${bassNotes} `);
             }
         });
 
