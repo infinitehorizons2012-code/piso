@@ -957,22 +957,22 @@
 
                 if (cfg.rhythmPattern === '4_beat') {
                     if (noteCount <= 1) {
-                        numberLyrics.push(' "1 2 3 4" ');
-                        chordNoteLyrics.push(` "${chordObj.notes.join(' ')} ${chordObj.notes[0]}" `);
+                        numberLyrics.push(' 1~2~3~4 ');
+                        chordNoteLyrics.push(` ${chordObj.notes.join('~')}~${chordObj.notes[0]} `);
                     } else {
                         const skips = Array(noteCount - 1).fill('*').join(' ');
-                        numberLyrics.push(` "1 2 3 4" ${skips} `);
-                        chordNoteLyrics.push(` "${chordObj.notes.join(' ')} ${chordObj.notes[0]}" ${skips} `);
+                        numberLyrics.push(` 1~2~3~4 ${skips} `);
+                        chordNoteLyrics.push(` ${chordObj.notes.join('~')}~${chordObj.notes[0]} ${skips} `);
                     }
                 } else {
                     // Default 3_beat
                     if (noteCount <= 1) {
-                        numberLyrics.push(' "1 2 3" ');
-                        chordNoteLyrics.push(` "${chordObj.notes.join(' ')}" `);
+                        numberLyrics.push(' 1~2~3 ');
+                        chordNoteLyrics.push(` ${chordObj.notes.join('~')} `);
                     } else {
                         const skips = Array(noteCount - 1).fill('*').join(' ');
-                        numberLyrics.push(` "1 2 3" ${skips} `);
-                        chordNoteLyrics.push(` "${chordObj.notes.join(' ')}" ${skips} `);
+                        numberLyrics.push(` 1~2~3 ${skips} `);
+                        chordNoteLyrics.push(` ${chordObj.notes.join('~')} ${skips} `);
                     }
                 }
             }
@@ -1029,7 +1029,7 @@
 
                       <div style="margin-bottom: 8px;">
                         <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">📝 Mã ABC Notation Ô Nhịp ${mObj.index}:</label>
-                        <input type="text" value="${mObj.text.replace(/"/g, '&quot;')}" onchange="window.updateMeasureAbcText(${idx}, ${mIdx}, this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.84rem; color: #0f172a; outline: none; background: #f0f9ff;">
+                        <textarea rows="2" onchange="window.updateMeasureAbcText(${idx}, ${mIdx}, this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.84rem; color: #0f172a; outline: none; background: #f0f9ff; resize: vertical;">${mObj.text}</textarea>
                       </div>
 
                       <div style="margin-bottom: 8px;">
