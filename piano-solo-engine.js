@@ -681,8 +681,10 @@
     };
 
     window.week1LibCurrentFolder = '/';
+    window.week1LibTargetMode = 'week1';
 
-    window.openWeek1LibraryModal = function() {
+    window.openWeek1LibraryModal = function(targetMode = 'week1') {
+        window.week1LibTargetMode = targetMode;
         const modal = document.getElementById('week1-library-modal');
         if (modal) modal.style.display = 'flex';
         if (typeof window.fetchLibrary === 'function') {
@@ -815,15 +817,23 @@
                 selectBtn.innerHTML = '✅ Nạp Bài Này';
                 selectBtn.onclick = () => {
                     if (item.abc) {
-                        window.populateWeek1LibraryDropdown();
-                        const select = document.getElementById('week1-preset-song-select');
-                        if (select) {
-                            const val = String(item.id).startsWith('lib_') ? String(item.id) : `lib_${item.id}`;
-                            select.value = val;
+                        if (window.week1LibTargetMode === 'interactive') {
+                            const editorTextarea = document.getElementById('piano-solo-abc-editor');
+                            if (editorTextarea) editorTextarea.value = item.abc;
+                            window.renderPianoSoloSheet(item.abc);
+                            window.closeWeek1LibraryModal();
+                            alert(`🎉 Đã nạp thành công bản nhạc '${item.title}' vào Bàn Phím Độc Tấu Tương Tác!`);
+                        } else {
+                            window.populateWeek1LibraryDropdown();
+                            const select = document.getElementById('week1-preset-song-select');
+                            if (select) {
+                                const val = String(item.id).startsWith('lib_') ? String(item.id) : `lib_${item.id}`;
+                                select.value = val;
+                            }
+                            window.loadWeek1PresetSong(`lib_${item.id}`);
+                            window.closeWeek1LibraryModal();
+                            alert(`🎉 Đã nạp thành công bản nhạc '${item.title}' từ Thư Viện vào Thực Hành!`);
                         }
-                        window.loadWeek1PresetSong(`lib_${item.id}`);
-                        window.closeWeek1LibraryModal();
-                        alert(`🎉 Đã nạp thành công bản nhạc '${item.title}' từ Thư Viện vào Thực Hành!`);
                     } else {
                         alert('Bản nhạc này không chứa dữ liệu ABC notation!');
                     }
