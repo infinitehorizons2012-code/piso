@@ -894,12 +894,35 @@
             if (cfg.rhythmPattern === 'none' || chordKey === 'None') {
                 numberLyrics.push(' ');
                 chordNoteLyrics.push(' ');
-            } else if (cfg.rhythmPattern === '4_beat') {
-                numberLyrics.push(' 1 2 3 4 ');
-                chordNoteLyrics.push(` ${chordObj.notes.join(' ')} ${chordObj.notes[0]} `);
             } else {
-                numberLyrics.push(' 1 2 3 ');
-                chordNoteLyrics.push(` ${chordObj.notes.join(' ')} `);
+                const cleanText = mObj.text.replace(/"[^"]*"/g, '').replace(/%[^\n]*/g, '');
+                const noteMatches = cleanText.match(/[A-Ga-g][,']?[0-9]*/g) || [];
+                const noteCount = noteMatches.length;
+
+                if (cfg.rhythmPattern === '4_beat') {
+                    if (noteCount <= 1) {
+                        numberLyrics.push(' 1-2-3-4 ');
+                        chordNoteLyrics.push(` ${chordObj.notes.join('-')}-${chordObj.notes[0]} `);
+                    } else if (noteCount === 2) {
+                        numberLyrics.push(' 1-2-3-4 * ');
+                        chordNoteLyrics.push(` ${chordObj.notes.join('-')}-${chordObj.notes[0]} * `);
+                    } else {
+                        numberLyrics.push(' 1 2 3 4 ');
+                        chordNoteLyrics.push(` ${chordObj.notes.join(' ')} ${chordObj.notes[0]} `);
+                    }
+                } else {
+                    // Default 3_beat
+                    if (noteCount <= 1) {
+                        numberLyrics.push(' 1-2-3 ');
+                        chordNoteLyrics.push(` ${chordObj.notes.join('-')} `);
+                    } else if (noteCount === 2) {
+                        numberLyrics.push(' 1-2-3 * ');
+                        chordNoteLyrics.push(` ${chordObj.notes.join('-')} * `);
+                    } else {
+                        numberLyrics.push(' 1 2 3 ');
+                        chordNoteLyrics.push(` ${chordObj.notes.join(' ')} `);
+                    }
+                }
             }
         });
 
