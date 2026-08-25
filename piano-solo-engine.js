@@ -763,43 +763,77 @@
         }
 
         const headerStr = headerLines.join('\n');
-        // Filter out T: (title) and X: (index) for clean staff-only line snippets!
         const snippetHeader = headerLines.filter(l => !l.startsWith('T:') && !l.startsWith('X:')).join('\n');
 
         const parsedLines = [];
-        let currentTitle = null;
-        let currentAbcLines = [];
         let lineCounter = 1;
 
-        for (let line of bodyLines) {
-            const trimmed = line.trim();
-            if (trimmed.match(/^%\s*---?\s*DÒNG/i) || trimmed.match(/^%\s*DÒNG/i)) {
-                const text = currentAbcLines.join('\n').trim();
-                if (text.includes('|') || text.match(/[A-Ga-g]/)) {
+        const hasExplicitLineComments = bodyLines.some(l => /^%\s*-*\s*DÒNG/i.test(l.trim()));
+
+        if (hasExplicitLineComments) {
+            let currentTitle = null;
+            let currentAbcLines = [];
+
+            for (let line of bodyLines) {
+                const trimmed = line.trim();
+                if (trimmed.match(/^%\s*---?\s*DÒNG/i) || trimmed.match(/^%\s*DÒNG/i)) {
+                    const text = currentAbcLines.join('\n').trim();
+                    if (text.includes('|') || text.match(/[A-Ga-g]/)) {
+                        parsedLines.push({
+                            id: `line_${lineCounter}`,
+                            title: currentTitle || `DÒNG ${lineCounter}`,
+                            abcContent: text,
+                            headerStr: headerStr,
+                            snippetHeader: snippetHeader
+                        });
+                        lineCounter++;
+                    }
+                    currentTitle = trimmed.replace(/^%\s*-*\s*/, '').replace(/\s*-*$/, '').toUpperCase();
+                    currentAbcLines = [];
+                } else {
+                    currentAbcLines.push(line);
+                }
+            }
+
+            const text = currentAbcLines.join('\n').trim();
+            if (text.includes('|') || text.match(/[A-Ga-g]/)) {
+                parsedLines.push({
+                    id: `line_${lineCounter}`,
+                    title: currentTitle || `DÒNG ${lineCounter}`,
+                    abcContent: text,
+                    headerStr: headerStr,
+                    snippetHeader: snippetHeader
+                });
+            }
+        } else {
+            // Auto-split multi-line ABC or single long line into 4-measure chunks
+            const cleanBodyLines = bodyLines.filter(l => !l.trim().startsWith('%') && l.trim().length > 0);
+
+            cleanBodyLines.forEach(lText => {
+                const rawMeasures = lText.split('|').map(m => m.trim()).filter(m => m.length > 0);
+                if (rawMeasures.length <= 4) {
                     parsedLines.push({
                         id: `line_${lineCounter}`,
-                        title: currentTitle || `DÒNG ${lineCounter}`,
-                        abcContent: text,
+                        title: `DÒNG ${lineCounter}`,
+                        abcContent: lText.trim(),
                         headerStr: headerStr,
                         snippetHeader: snippetHeader
                     });
                     lineCounter++;
+                } else {
+                    // Group every 4 measures into a new DÒNG card!
+                    for (let i = 0; i < rawMeasures.length; i += 4) {
+                        const chunk = rawMeasures.slice(i, i + 4).join(' | ');
+                        parsedLines.push({
+                            id: `line_${lineCounter}`,
+                            title: `DÒNG ${lineCounter}`,
+                            abcContent: chunk,
+                            headerStr: headerStr,
+                            snippetHeader: snippetHeader
+                        });
+                        lineCounter++;
+                    }
                 }
-                currentTitle = trimmed.replace(/^%\s*-*\s*/, '').replace(/\s*-*$/, '').toUpperCase();
-                currentAbcLines = [];
-            } else {
-                currentAbcLines.push(line);
-            }
-        }
-
-        const text = currentAbcLines.join('\n').trim();
-        if (text.includes('|') || text.match(/[A-Ga-g]/)) {
-            parsedLines.push({
-                id: `line_${lineCounter}`,
-                title: currentTitle || `DÒNG ${lineCounter}`,
-                abcContent: text,
-                headerStr: headerStr,
-                snippetHeader: snippetHeader
             });
         }
 
