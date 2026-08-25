@@ -1641,6 +1641,59 @@
         window.playPianoSoloSong();
     };
 
+    window.saveSongToLibrary = async function(titleName, abcContent, folderPath = '/') {
+        if (!titleName || !abcContent) return;
+        const CF_WORKER_URL = 'https://piano-library.infinite-horizons-2012.workers.dev';
+        
+        try {
+            const payload = { title: titleName, abc: abcContent, folderPath: folderPath || '/' };
+            const res = await fetch(CF_WORKER_URL + '/api/songs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert(`🎉 Đã lưu bản nhạc '${titleName}' thành công vào Thư viện Cloud!`);
+                if (typeof window.fetchLibrary === 'function') window.fetchLibrary(true);
+            } else {
+                throw new Error(data.error || 'Server error');
+            }
+        } catch(err) {
+            console.warn('Saving fallback to localStorage cache:', err);
+            const cached = localStorage.getItem('piso_library_cache');
+            let items = cached ? JSON.parse(cached) : [];
+            items.push({ id: 'song_' + Date.now(), title: titleName, abc: abcContent, folderPath: folderPath || '/' });
+            localStorage.setItem('piso_library_cache', JSON.stringify(items));
+            alert(`🎉 Đã lưu bản nhạc '${titleName}' vào Thư Viện!`);
+            if (typeof window.renderLibraryCurrentView === 'function') window.renderLibraryCurrentView();
+        }
+    };
+
+    window.saveStep1ToLibrary = async function() {
+        window.parseWeek1Lines();
+        const abcContent = window.generateFullSongStep1MelodyAbc();
+        const songTitleMatch = abcContent.match(/T:\s*(.+)/);
+        const defaultTitle = songTitleMatch ? songTitleMatch[1].trim() + ' (Bước 1 Giai Điệu)' : 'Bản Nhạc Bước 1 Giai Điệu';
+        
+        const userTitle = prompt('Nhập tên bản nhạc muốn lưu vào Thư Viện (Bước 1 - Giai Điệu):', defaultTitle);
+        if (!userTitle) return;
+
+        window.saveSongToLibrary(userTitle, abcContent, '/Tuần 1 - Giai Điệu');
+    };
+
+    window.saveStep2ToLibrary = async function() {
+        window.parseWeek1Lines();
+        const abcContent = window.generateFullSongGrandStaffAbc();
+        const songTitleMatch = abcContent.match(/T:\s*(.+)/);
+        const defaultTitle = songTitleMatch ? songTitleMatch[1].trim() + ' (Bước 2 Piano Solo 2 Tay)' : 'Bản Nhạc Bước 2 Piano Solo';
+
+        const userTitle = prompt('Nhập tên bản nhạc muốn lưu vào Thư Viện (Bước 2 - 2 Tay Sol & Fa):', defaultTitle);
+        if (!userTitle) return;
+
+        window.saveSongToLibrary(userTitle, abcContent, '/Tuần 1 - Piano Solo 2 Tay');
+    };
+
     window.initWeek1PedagogyView = function() {
         setTimeout(() => {
             window.loadWeek1PresetSong('thang_cuoi');

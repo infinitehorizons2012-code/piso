@@ -205,9 +205,14 @@
                 <h3 style="margin: 0; color: #0284c7; font-size: 1.3rem; font-weight: 800;">🔢 Bước 1: Nhập & Cấu Hình ABC Notation Từng Ô Nhịp</h3>
                 <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.92rem;">Cho phép nhập nốt nhạc, lời hát tùy chỉnh & tự động đồng bộ sang Bước 2 (Đại Khuông Nhạc)!</p>
               </div>
-              <button onclick="window.toggleWeek1MasterScoreModal()" style="padding: 10px 18px; border-radius: 14px; font-weight: 800; background: #e0f2fe; color: #0369a1; border: 1.5px solid #38bdf8; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                👁️ Xem Sheet Nhạc Tổng Thể Bước 1
-              </button>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button onclick="window.toggleWeek1MasterScoreModal()" style="padding: 7px 14px; border-radius: 12px; font-weight: 800; background: #e0f2fe; color: #0369a1; border: 1.5px solid #38bdf8; cursor: pointer; font-size: 0.84rem; display: flex; align-items: center; gap: 5px;">
+                  👁️ Xem Sheet Bước 1
+                </button>
+                <button onclick="window.saveStep1ToLibrary()" style="padding: 7px 14px; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; font-size: 0.84rem; display: flex; align-items: center; gap: 5px; box-shadow: 0 3px 10px rgba(2,132,199,0.25);">
+                  💾 Lưu Sheet Bước 1 Vào Thư Viện
+                </button>
+              </div>
             </div>
 
             <!-- DYNAMIC LINE CARDS FOR STEP 1 -->
@@ -230,9 +235,14 @@
                 <h3 style="margin: 0; color: #059669; font-size: 1.3rem; font-weight: 800;">🎹 Bước 2: Khớp Tiết Tấu & Ghép Khóa Sol - Khóa Pha Từng Dòng Nhạc</h3>
                 <p style="margin: 4px 0 0 0; color: #64748b; font-size: 0.92rem;">Giao diện HTML tách từng dòng nhạc minh bạch cho trẻ em dễ hiểu. Tay phải (Sol) đánh giai điệu + số ngón, Tay trái (Fa) chạy câu rải hợp âm!</p>
               </div>
-              <button onclick="window.toggleWeek1MasterScoreModal()" style="padding: 10px 18px; border-radius: 14px; font-weight: 800; background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                👁️ Xem Sheet Nhạc Tổng Thể
-              </button>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <button onclick="window.toggleWeek1MasterScoreModal()" style="padding: 7px 14px; border-radius: 12px; font-weight: 800; background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; cursor: pointer; font-size: 0.84rem; display: flex; align-items: center; gap: 5px;">
+                  👁️ Xem Sheet Bước 2
+                </button>
+                <button onclick="window.saveStep2ToLibrary()" style="padding: 7px 14px; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; font-size: 0.84rem; display: flex; align-items: center; gap: 5px; box-shadow: 0 3px 10px rgba(16,185,129,0.25);">
+                  💾 Lưu Sheet 2 Tay Bước 2 Vào Thư Viện
+                </button>
+              </div>
             </div>
 
             <!-- DYNAMIC LINE CARDS FOR STEP 2 (GRAND STAFF KHÓA SOL + KHÓA FA) -->
