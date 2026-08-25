@@ -841,28 +841,94 @@
     };
 
     window.parseLineMeasures = function(abcContent) {
-        const rawMeasures = abcContent.split('|').map(m => m.trim()).filter(m => m.length > 0);
+        const lines = abcContent.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        let noteLines = [];
+        let lyricLines = [];
+
+        lines.forEach(l => {
+            if (l.startsWith('%')) return;
+            if (/^w[0-9]*:?/i.test(l)) {
+                lyricLines.push(l.replace(/^w[0-9]*:?/i, '').trim());
+            } else {
+                noteLines.push(l);
+            }
+        });
+
+        const fullNotesAbc = noteLines.join(' ');
+        const noteMeasures = fullNotesAbc.split('|').map(m => m.trim()).filter(m => m.length > 0);
+        const lyricRows = lyricLines.map(line => line.split('|').map(m => m.trim()));
+
         let measures = [];
         let lastChord = 'None';
 
-        rawMeasures.forEach((mText, idx) => {
-            const chordMatch = mText.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/);
+        noteMeasures.forEach((mNotesText, idx) => {
+            const chordMatch = mNotesText.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/);
             let chord = chordMatch ? chordMatch[1] : null;
 
             if (chord) {
                 lastChord = chord;
             }
 
+            let mLyrics = [];
+            lyricRows.forEach(row => {
+                if (row[idx] && row[idx] !== '*') {
+                    mLyrics.push('w: ' + row[idx]);
+                }
+            });
+
+            const fullMeasureText = mNotesText + (mLyrics.length > 0 ? ('\n' + mLyrics.join('\n')) : '');
+
             measures.push({
                 index: idx + 1,
-                text: mText,
-                chord: chord || (mText.includes('"') ? 'None' : lastChord),
+                text: fullMeasureText,
+                notes: mNotesText,
+                chord: chord || (mNotesText.includes('"') ? 'None' : lastChord),
                 hasExplicitChord: !!chord
             });
         });
 
         return measures;
     };
+
+    function compileLineAbcFromMeasures(measures) {
+        let noteMeasures = [];
+        let lyricRows = [];
+
+        measures.forEach((mObj, mIdx) => {
+            const lines = mObj.text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let mNotes = [];
+            let mLyrics = [];
+
+            lines.forEach(l => {
+                if (l.startsWith('%')) return;
+                if (/^w[0-9]*:?/i.test(l)) {
+                    const words = l.replace(/^w[0-9]*:?/i, '').trim();
+                    if (words) mLyrics.push(words);
+                } else {
+                    mNotes.push(l);
+                }
+            });
+
+            noteMeasures.push(mNotes.join(' '));
+
+            mLyrics.forEach((wStr, rIdx) => {
+                if (!lyricRows[rIdx]) lyricRows[rIdx] = [];
+                lyricRows[rIdx][mIdx] = wStr;
+            });
+        });
+
+        const numMeasures = measures.length;
+        lyricRows.forEach(row => {
+            for (let i = 0; i < numMeasures; i++) {
+                if (!row[i]) row[i] = '*';
+            }
+        });
+
+        const notesLine = noteMeasures.join(' | ');
+        const lyricsLines = lyricRows.map(row => 'w: ' + row.join(' | ')).join('\n');
+
+        return `${notesLine}\n${lyricsLines ? lyricsLines + '\n' : ''}`;
+    }
 
     window.getMeasureConfig = function(lineIdx, mIdx, defaultChord) {
         const key = `${lineIdx}_${mIdx}`;
@@ -931,7 +997,7 @@
             }
         }
 
-        lineObj.abcContent = measures.map(m => m.text).join(' | ');
+        lineObj.abcContent = compileLineAbcFromMeasures(measures);
 
         const allLineContents = window.week1State.parsedLines.map(l => l.abcContent);
         window.week1State.abcInput = `${lineObj.headerStr}\n${allLineContents.join('\n')}`;
