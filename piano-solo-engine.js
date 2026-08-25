@@ -793,7 +793,8 @@
 
             const blockText = currentBlockLines.join('\n').trim();
             const fullNotesAbc = noteLines.join(' ');
-            const rawMeasures = fullNotesAbc.split('|').map(m => m.trim()).filter(m => m.length > 0);
+            const cleanNotesAbc = fullNotesAbc.replace(/\|\s*\]/g, '|').replace(/\|\s*\|/g, '|').replace(/:\s*\|/g, '|').replace(/\|\s*:/g, '|');
+            const rawMeasures = cleanNotesAbc.split('|').map(m => m.trim()).filter(m => m.length > 0 && /[A-Ga-gZz]/.test(m));
 
             if (rawMeasures.length <= 4) {
                 parsedLines.push({
@@ -830,7 +831,7 @@
 
                     parsedLines.push({
                         id: `line_${lineCounter}`,
-                        title: currentTitle ? `${currentTitle} (${i / 4 + 1})` : `DÒNG ${lineCounter}`,
+                        title: currentTitle ? `${currentTitle} (${Math.floor(i / 4) + 1})` : `DÒNG ${lineCounter}`,
                         abcContent: chunkText,
                         headerStr: headerStr,
                         snippetHeader: snippetHeader
@@ -886,11 +887,13 @@
         const fullNotesAbc = noteLines.join(' ').trim();
         if (!fullNotesAbc) return [];
 
+        const cleanNotesAbc = fullNotesAbc.replace(/\|\s*\]/g, '|').replace(/\|\s*\|/g, '|').replace(/:\s*\|/g, '|').replace(/\|\s*:/g, '|');
+
         let noteMeasures = [];
-        if (fullNotesAbc.includes('|')) {
-            noteMeasures = fullNotesAbc.split('|').map(m => m.trim()).filter(m => m.length > 0);
+        if (cleanNotesAbc.includes('|')) {
+            noteMeasures = cleanNotesAbc.split('|').map(m => m.trim()).filter(m => m.length > 0 && /[A-Ga-gZz]/.test(m));
         } else {
-            noteMeasures = [fullNotesAbc];
+            noteMeasures = [cleanNotesAbc];
         }
 
         const lyricRows = lyricLines.map(line => line.split('|').map(m => m.trim()));
