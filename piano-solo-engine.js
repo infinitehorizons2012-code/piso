@@ -1254,6 +1254,22 @@
         });
     };
 
+    window.updateStep2GrandStaffAbc = function(lineIdx, newAbc) {
+        const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+        if (abcRenderer) {
+            try {
+                abcRenderer.renderAbc(`week1-step2-paper-${lineIdx}`, newAbc, {
+                    responsive: 'resize',
+                    scale: 1.15,
+                    staffwidth: 740,
+                    add_classes: true
+                });
+            } catch (e) {
+                console.warn(`Error rendering updated Step 2 Grand Staff ${lineIdx}:`, e);
+            }
+        }
+    };
+
     window.renderWeek1Step2Lines = function() {
         const container = document.getElementById('week1-step2-lines-container');
         if (!container) return;
@@ -1289,9 +1305,17 @@
 
                 <div id="week1-step2-paper-${idx}" style="background: #f8fafc; border-radius: 14px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 14px; min-height: 160px;"></div>
 
-                <div style="display: flex; gap: 12px; font-size: 0.85rem; font-weight: 700; flex-wrap: wrap;">
+                <div style="display: flex; gap: 12px; font-size: 0.85rem; font-weight: 700; flex-wrap: wrap; margin-bottom: 14px;">
                   <span style="background: #e0f2fe; color: #0369a1; padding: 6px 12px; border-radius: 10px;">🫱 Tay Phải (Khóa Sol): Giai Điệu Bài Hát</span>
                   <span style="background: #fce7f3; color: #be123c; padding: 6px 12px; border-radius: 10px;">🫲 Tay Trái (Khóa Fa): Nốt Hợp Âm Rải Theo Ô Nhịp</span>
+                </div>
+
+                <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 14px; padding: 14px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="font-weight: 800; color: #166534; font-size: 0.88rem;">📝 Mã ABC Notation 2 Tay (Đại Khuông Nhạc - Khóa Sol & Fa) Dòng Này:</label>
+                    <span style="font-size: 0.78rem; background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 8px; font-weight: 800;">Xem & Chỉnh Sửa Trực Tiếp</span>
+                  </div>
+                  <textarea id="week1-step2-abc-text-${idx}" rows="5" oninput="window.updateStep2GrandStaffAbc(${idx}, this.value)" style="width: 100%; padding: 10px 12px; border-radius: 10px; border: 1.5px solid #4ade80; font-family: monospace; font-weight: 700; font-size: 0.86rem; color: #0f172a; outline: none; background: white; resize: vertical; line-height: 1.4;">${grandStaffAbc}</textarea>
                 </div>
             `;
 
