@@ -601,6 +601,20 @@
                     explain: '🍉 WA-TER-ME-LON gồm 4 nốt móc kép chia 1 phách làm 4 phần bằng nhau (Đếm: 1 e & a).'
                 },
                 {
+                    id: 'orange',
+                    questionText: 'Tiết tấu 1 phách vừa vang lên là loại trái cây nào?',
+                    name: '🍊 O-RANGE (Móc kép + Móc đơn chấm - 1/4 + 3/4 phách)',
+                    soundType: 'pattern_orange',
+                    options: [
+                        { id: 'mango', label: '🥭 MAN-GO (Móc đơn chấm + Móc kép - Đếm: 1 a)' },
+                        { id: 'orange', label: '🍊 O-RANGE (Móc kép + Móc đơn chấm - Đếm: 1 e)' },
+                        { id: 'lemon', label: '🍋 LE-MON (2 móc đơn ♫ - Đếm: 1 &)' },
+                        { id: 'watermelon', label: '🍉 WA-TER-ME-LON (4 móc kép ♬♬ - Đếm: 1 e & a)' }
+                    ],
+                    correctId: 'orange',
+                    explain: '🍊 O-RANGE gồm 1 nốt móc kép giật ở đầu (1/4 phách) và 1 nốt móc đơn chấm dôi ở sau (3/4 phách).'
+                },
+                {
                     id: 'mango',
                     questionText: 'Tiết tấu 1 phách vừa vang lên là loại trái cây nào?',
                     name: '🥭 MAN-GO (Móc đơn chấm + Móc kép - 3/4 + 1/4 phách)',
@@ -777,12 +791,25 @@
                     name: '🍠 SWEET-PO-TA-TO (1 móc đơn + Chùm 3 móc kép)',
                     soundType: 'pattern_potato',
                     options: [
-                        { id: 'banana', label: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba)' },
+                        { id: 'banana', label: '🍌 BA-NA-NA (Chùm 3 Liên ba)' },
                         { id: 'avocado', label: '🥑 A-VO-CA-DO (3 móc kép + 1 móc đơn)' },
                         { id: 'sweet_potato', label: '🍠 SWEET-PO-TA-TO (1 móc đơn + 3 móc kép)' }
                     ],
                     correctId: 'sweet_potato',
                     explain: '🍠 SWEET-PO-TA-TO gồm 1 móc đơn ở đầu + 3 móc kép dồn đuôi phía sau.'
+                },
+                {
+                    id: 'triplet_2beat',
+                    questionText: 'Mô hình tiết tấu 2 phách vừa phát ra là gì?',
+                    name: '🍍 PINE-AP-PLE 2 Phách (Chùm 3 nốt đen trên 2 phách)',
+                    soundType: 'pattern_triplet_2beat',
+                    options: [
+                        { id: 'triplet_2beat', label: '🍍 PINE-AP-PLE 2 Phách (Chùm 3 nốt đen trên 2 phách)' },
+                        { id: 'banana', label: '🍌 BA-NA-NA (Chùm 3 nốt móc đơn trên 1 phách)' },
+                        { id: 'ginger', label: '🫚 GIN-GER (2 phách - Đen chấm + Móc đơn)' }
+                    ],
+                    correctId: 'triplet_2beat',
+                    explain: '🍍 PINE-AP-PLE 2 Phách là Chùm 3 Nốt Đen dồn đều trong khoảng thời gian của 2 phách.'
                 },
                 {
                     id: 'genre_reggae',
@@ -933,6 +960,10 @@
             playTone(800, 0.07, 'square', 0);
             playTone(800, 0.07, 'square', 0.133);
             playTone(800, 0.07, 'square', 0.266);
+        } else if (soundType === 'pattern_triplet_2beat') {
+            playTone(800, 0.1, 'square', 0);
+            playTone(800, 0.1, 'square', 0.266);
+            playTone(800, 0.1, 'square', 0.533);
         } else if (soundType === 'pattern_avocado') {
             playTone(800, 0.06, 'square', 0);
             playTone(800, 0.06, 'square', 0.08);
@@ -1591,13 +1622,74 @@
                 </div>
             `;
         } else if (gameId === 'rhythm') {
+            const lvl1Cards = RHYTHM_FLASHCARDS.lvl1.map(c => `
+                <div style="background: white; border-radius: 16px; border: 1.5px solid #86efac; padding: 14px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 1.4rem;">${c.icon}</span>
+                        <span style="background: #16a34a; color: white; font-weight: 800; padding: 2px 10px; border-radius: 10px; font-size: 0.8rem;">${c.code}</span>
+                    </div>
+                    <h5 style="margin: 4px 0; color: #15803d; font-size: 1.02rem; font-weight: 800;">${c.title}</h5>
+                    <div id="theory-abc-${c.code}" style="min-height: 80px; display: flex; justify-content: center; align-items: center; background: #f8fafc; border-radius: 12px; border: 1px solid #cbd5e1; margin: 8px 0; padding: 4px;"></div>
+                    <div style="font-size: 0.85rem; color: #166534; font-weight: 800; margin-bottom: 4px;">⏱️ ${c.countText}</div>
+                    <div style="font-size: 0.8rem; color: #475569; font-weight: 600;">💡 ${c.desc}</div>
+                </div>
+            `).join('');
+
+            const lvl2Cards = RHYTHM_FLASHCARDS.lvl2.map(c => `
+                <div style="background: white; border-radius: 16px; border: 1.5px solid #a5f3fc; padding: 14px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 1.4rem;">${c.icon}</span>
+                        <span style="background: #0891b2; color: white; font-weight: 800; padding: 2px 10px; border-radius: 10px; font-size: 0.8rem;">${c.code}</span>
+                    </div>
+                    <h5 style="margin: 4px 0; color: #0e7490; font-size: 1.02rem; font-weight: 800;">${c.title}</h5>
+                    <div id="theory-abc-${c.code}" style="min-height: 80px; display: flex; justify-content: center; align-items: center; background: #f8fafc; border-radius: 12px; border: 1px solid #cbd5e1; margin: 8px 0; padding: 4px;"></div>
+                    <div style="font-size: 0.85rem; color: #0891b2; font-weight: 800; margin-bottom: 4px;">⏱️ ${c.countText}</div>
+                    <div style="font-size: 0.8rem; color: #475569; font-weight: 600;">💡 ${c.desc}</div>
+                </div>
+            `).join('');
+
+            const lvl3Cards = RHYTHM_FLASHCARDS.lvl3.map(c => `
+                <div style="background: white; border-radius: 16px; border: 1.5px solid #e9d5ff; padding: 14px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 1.4rem;">${c.icon}</span>
+                        <span style="background: #9333ea; color: white; font-weight: 800; padding: 2px 10px; border-radius: 10px; font-size: 0.8rem;">${c.code}</span>
+                    </div>
+                    <h5 style="margin: 4px 0; color: #6b21a8; font-size: 1.02rem; font-weight: 800;">${c.title}</h5>
+                    <div id="theory-abc-${c.code}" style="min-height: 80px; display: flex; justify-content: center; align-items: center; background: #f8fafc; border-radius: 12px; border: 1px solid #cbd5e1; margin: 8px 0; padding: 4px;"></div>
+                    <div style="font-size: 0.85rem; color: #7e22ce; font-weight: 800; margin-bottom: 4px;">⏱️ ${c.countText}</div>
+                    <div style="font-size: 0.8rem; color: #475569; font-weight: 600;">💡 ${c.desc}</div>
+                </div>
+            `).join('');
+
             htmlContent = `
                 <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                    <h3 style="margin-top: 0; color: #431407; font-size: 1.35rem; font-weight: 800;">📖 Lý Thuyết Tiết Tấu & Trường Độ Nốt Nhạc</h3>
-                    <p style="font-size: 1rem; color: #475569;">Mỗi loại nốt nhạc đại diện cho một độ dài thời gian (trường độ) khác nhau:</p>
-                    
-                    <div style="margin: 20px 0; background: linear-gradient(135deg, #ecfeff, #eff6ff); padding: 20px; border-radius: 16px; border: 2px solid #a5f3fc;">
-                        <div id="theory-rhythm-paper" style="min-height: 150px; background: white; border-radius: 12px; padding: 10px; border: 1px dashed #38bdf8;"></div>
+                    <div style="background: linear-gradient(135deg, #0284c7, #0369a1); color: white; padding: 22px; border-radius: 20px; margin-bottom: 26px; box-shadow: 0 8px 20px rgba(2,132,199,0.25);">
+                        <h3 style="margin: 0; color: white; font-size: 1.5rem; font-weight: 800;">📖 Cẩm Nang Lý Thuyết 24 Thẻ Tiết Tấu (Rhythm Match)</h3>
+                        <p style="margin: 6px 0 0 0; color: #e0f2fe; font-size: 0.95rem; font-weight: 600;">Dưới đây là 24 Đơn vị Kiến thức Tiết tấu chuẩn Nhạc Viện Quốc Tế được minh họa trực tiếp bằng Khuông Nhạc thực tế (SVG Staff Notation):</p>
+                    </div>
+
+                    <!-- LEVEL 1 SECTION -->
+                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 22px; border-radius: 20px; border: 2px solid #86efac;">
+                        <h4 style="margin: 0 0 14px 0; color: #15803d; font-size: 1.25rem; font-weight: 800;">☀️ LEVEL 1: NHẬP MÔN TIẾT TẤU & TRÁI CÂY CƠ BẢN (8 THẺ)</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                            ${lvl1Cards}
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 2 SECTION -->
+                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #ecfeff, #cff4fc); padding: 22px; border-radius: 20px; border: 2px solid #a5f3fc;">
+                        <h4 style="margin: 0 0 14px 0; color: #0e7490; font-size: 1.25rem; font-weight: 800;">🌿 LEVEL 2: CỦ QUẢ NỘI PHÁCH & ĐIỆU NHẠC (9 THẺ)</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                            ${lvl2Cards}
+                        </div>
+                    </div>
+
+                    <!-- LEVEL 3 SECTION -->
+                    <div style="margin-bottom: 10px; background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 20px; border: 2px solid #e9d5ff;">
+                        <h4 style="margin: 0 0 14px 0; color: #6b21a8; font-size: 1.25rem; font-weight: 800;">🎷 LEVEL 3: LIÊN BA & ĐIỆU NHẠC CAO CẤP (7 THẺ)</h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                            ${lvl3Cards}
+                        </div>
                     </div>
                 </div>
             `;
@@ -2521,8 +2613,10 @@
             renderTheoryAbcHelper('theory-bass-lvl2-paper', bassLvl2Abc);
             renderTheoryAbcHelper('theory-bass-lvl3-paper', bassLvl3Abc);
         } else if (gameId === 'rhythm') {
-            const rhythmAbc = `X:1\nM:4/4\nL:1/4\nK:C clef=treble\nc c2 c/2 c/2 c4 |\nw: Nốt_Đen(1phách) Trắng(2phách) Móc_đơn(1/2) Móc_đơn(1/2) Tròn(4phách)`;
-            renderTheoryAbcHelper('theory-rhythm-paper', rhythmAbc);
+            const allRhythmCards = [...RHYTHM_FLASHCARDS.lvl1, ...RHYTHM_FLASHCARDS.lvl2, ...RHYTHM_FLASHCARDS.lvl3];
+            allRhythmCards.forEach(c => {
+                renderTheoryAbcHelper(`theory-abc-${c.code}`, c.abc);
+            });
         } else if (gameId === 'interval') {
             const intervalsTheoryData = [
                 { items: [
