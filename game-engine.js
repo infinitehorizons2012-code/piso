@@ -1622,73 +1622,273 @@
                 </div>
             `;
         } else if (gameId === 'rhythm') {
-            const lvl1Cards = RHYTHM_FLASHCARDS.lvl1.map(c => `
-                <div style="background: white; border-radius: 16px; border: 1.5px solid #86efac; padding: 14px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-size: 1.4rem;">${c.icon}</span>
-                        <span style="background: #16a34a; color: white; font-weight: 800; padding: 2px 10px; border-radius: 10px; font-size: 0.8rem;">${c.code}</span>
-                    </div>
-                    <h5 style="margin: 4px 0; color: #15803d; font-size: 1.02rem; font-weight: 800;">${c.title}</h5>
-                    <div id="theory-abc-${c.code}" style="min-height: 80px; display: flex; justify-content: center; align-items: center; background: #f8fafc; border-radius: 12px; border: 1px solid #cbd5e1; margin: 8px 0; padding: 4px;"></div>
-                    <div style="font-size: 0.85rem; color: #166534; font-weight: 800; margin-bottom: 4px;">⏱️ ${c.countText}</div>
-                    <div style="font-size: 0.8rem; color: #475569; font-weight: 600;">💡 ${c.desc}</div>
-                </div>
-            `).join('');
+            const allCards = [...RHYTHM_FLASHCARDS.lvl1, ...RHYTHM_FLASHCARDS.lvl2, ...RHYTHM_FLASHCARDS.lvl3];
 
-            const lvl2Cards = RHYTHM_FLASHCARDS.lvl2.map(c => `
+            // Helper to render fruit card HTML with SVG staff container
+            const renderFruitCardHTML = (c) => `
                 <div style="background: white; border-radius: 16px; border: 1.5px solid #a5f3fc; padding: 14px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-size: 1.4rem;">${c.icon}</span>
-                        <span style="background: #0891b2; color: white; font-weight: 800; padding: 2px 10px; border-radius: 10px; font-size: 0.8rem;">${c.code}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <span style="font-size: 1.5rem;">${c.icon}</span>
+                        <span style="background: #0284c7; color: white; font-weight: 800; padding: 2px 10px; border-radius: 10px; font-size: 0.78rem;">${c.code}</span>
                     </div>
-                    <h5 style="margin: 4px 0; color: #0e7490; font-size: 1.02rem; font-weight: 800;">${c.title}</h5>
-                    <div id="theory-abc-${c.code}" style="min-height: 80px; display: flex; justify-content: center; align-items: center; background: #f8fafc; border-radius: 12px; border: 1px solid #cbd5e1; margin: 8px 0; padding: 4px;"></div>
-                    <div style="font-size: 0.85rem; color: #0891b2; font-weight: 800; margin-bottom: 4px;">⏱️ ${c.countText}</div>
-                    <div style="font-size: 0.8rem; color: #475569; font-weight: 600;">💡 ${c.desc}</div>
+                    <h5 style="margin: 2px 0 6px 0; color: #0369a1; font-size: 1.05rem; font-weight: 800;">${c.title}</h5>
+                    
+                    <!-- REAL ABC SVG MUSICAL STAFF CONTAINER -->
+                    <div id="theory-abc-${c.code}" style="min-height: 80px; display: flex; justify-content: center; align-items: center; background: #f8fafc; border-radius: 12px; border: 1px solid #cbd5e1; margin: 6px 0; padding: 4px;"></div>
+                    
+                    <div style="font-size: 0.85rem; color: #166534; font-weight: 800; margin-bottom: 4px; background: #f0fdf4; padding: 4px 8px; border-radius: 8px; border: 1px solid #bbf7d0;">
+                        ⏱️ Cách đếm: <b>${c.countText}</b>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #475569; font-weight: 600; line-height: 1.4;">
+                        💡 ${c.desc}
+                    </div>
                 </div>
-            `).join('');
+            `;
 
-            const lvl3Cards = RHYTHM_FLASHCARDS.lvl3.map(c => `
-                <div style="background: white; border-radius: 16px; border: 1.5px solid #e9d5ff; padding: 14px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <span style="font-size: 1.4rem;">${c.icon}</span>
-                        <span style="background: #9333ea; color: white; font-weight: 800; padding: 2px 10px; border-radius: 10px; font-size: 0.8rem;">${c.code}</span>
-                    </div>
-                    <h5 style="margin: 4px 0; color: #6b21a8; font-size: 1.02rem; font-weight: 800;">${c.title}</h5>
-                    <div id="theory-abc-${c.code}" style="min-height: 80px; display: flex; justify-content: center; align-items: center; background: #f8fafc; border-radius: 12px; border: 1px solid #cbd5e1; margin: 8px 0; padding: 4px;"></div>
-                    <div style="font-size: 0.85rem; color: #7e22ce; font-weight: 800; margin-bottom: 4px;">⏱️ ${c.countText}</div>
-                    <div style="font-size: 0.8rem; color: #475569; font-weight: 600;">💡 ${c.desc}</div>
-                </div>
-            `).join('');
+            // Group cards into 1-Beat, 1-Beat Complex, 2-Beat, Genres
+            const group1BeatCodes = ['FC-04', 'FC-05', 'FC-17', 'FC-06', 'FC-08', 'FC-09', 'FC-10', 'FC-07'];
+            const group1BeatComplexCodes = ['FC-18', 'FC-19'];
+            const group2BeatsCodes = ['FC-20', 'FC-11', 'FC-12'];
+
+            const group1BeatCards = allCards.filter(c => group1BeatCodes.includes(c.code));
+            const group1BeatComplexCards = allCards.filter(c => group1BeatComplexCodes.includes(c.code));
+            const group2BeatsCards = allCards.filter(c => group2BeatsCodes.includes(c.code));
+            const genreCards = allCards.filter(c => c.code.startsWith('FC-') && parseInt(c.code.replace('FC-', '')) >= 13 && parseInt(c.code.replace('FC-', '')) <= 16 || ['FC-21', 'FC-22', 'FC-23'].includes(c.code));
 
             htmlContent = `
-                <div style="background: white; padding: 30px; border-radius: 20px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                    <div style="background: linear-gradient(135deg, #0284c7, #0369a1); color: white; padding: 22px; border-radius: 20px; margin-bottom: 26px; box-shadow: 0 8px 20px rgba(2,132,199,0.25);">
-                        <h3 style="margin: 0; color: white; font-size: 1.5rem; font-weight: 800;">📖 Cẩm Nang Lý Thuyết 24 Thẻ Tiết Tấu (Rhythm Match)</h3>
-                        <p style="margin: 6px 0 0 0; color: #e0f2fe; font-size: 0.95rem; font-weight: 600;">Dưới đây là 24 Đơn vị Kiến thức Tiết tấu chuẩn Nhạc Viện Quốc Tế được minh họa trực tiếp bằng Khuông Nhạc thực tế (SVG Staff Notation):</p>
+                <div style="background: white; padding: 30px; border-radius: 24px; border: 2px solid #e2e8f0; line-height: 1.7; color: #1e293b; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                    
+                    <!-- MASTER BANNER -->
+                    <div style="background: linear-gradient(135deg, #0284c7, #0369a1); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 8px 22px rgba(2,132,199,0.3);">
+                        <span style="background: #fde047; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">🥁 GIÁO TRÌNH CHUẨN PIANO GODDESS ACADEMY</span>
+                        <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.65rem; font-weight: 800;">📖 Cẩm Nang Lý Thuyết Tiết Tấu & Điệu Nhạc (Rhythm Match)</h2>
+                        <p style="margin: 4px 0 0 0; color: #e0f2fe; font-weight: 600; font-size: 0.95rem;">Làm chủ cảm âm tiết tấu, bảng tra củ quả 1-2 phách & bí kíp thám tử nhận diện điệu nhạc 5 giây!</p>
                     </div>
 
-                    <!-- LEVEL 1 SECTION -->
+                    <!-- MỤC 1: TIẾT TẤU LÀ GÌ? -->
                     <div style="margin-bottom: 28px; background: linear-gradient(135deg, #f0fdf4, #dcfce7); padding: 22px; border-radius: 20px; border: 2px solid #86efac;">
-                        <h4 style="margin: 0 0 14px 0; color: #15803d; font-size: 1.25rem; font-weight: 800;">☀️ LEVEL 1: NHẬP MÔN TIẾT TẤU & TRÁI CÂY CƠ BẢN (8 THẺ)</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
-                            ${lvl1Cards}
+                        <h3 style="margin: 0 0 10px 0; color: #15803d; font-size: 1.3rem; font-weight: 800;">1. Tiết Tấu (Rhythm) Là Gì?</h3>
+                        <p style="margin: 0 0 10px 0; color: #166534; font-size: 0.98rem; font-weight: 600;">
+                            <b>Rhythm (Tiết tấu)</b> là cách sắp xếp thời gian của các âm thanh (ngắn / dài, mạnh / nhẹ, vang lên / ngừng nghỉ).
+                        </p>
+                        <div style="background: white; padding: 14px 18px; border-radius: 14px; border: 1.5px solid #86efac; color: #14532d; font-size: 0.93rem; line-height: 1.6;">
+                            💡 Nếu không có Rhythm, các nốt nhạc và hợp âm chỉ là những âm thanh đứng yên vô hồn.<br/>
+                            Chính Rhythm quyết định một bài hát sẽ làm người nghe bật khóc (<b>Ballad</b>), muốn khiêu vũ (<b>Waltz</b>), hay muốn nhảy nhót (<b>Disco / Rock</b>).
                         </div>
                     </div>
 
-                    <!-- LEVEL 2 SECTION -->
+                    <!-- MỤC 2: 4 TRỤ CỘT TẠO NÊN TIẾT TẤU -->
+                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #eff6ff, #dbeafe); padding: 22px; border-radius: 20px; border: 2px solid #bfdbfe;">
+                        <h3 style="margin: 0 0 14px 0; color: #1d4ed8; font-size: 1.3rem; font-weight: 800;">2. 4 Trụ Cột Tạo Nên Tiết Tấu (Building Blocks of Rhythm)</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+                            <div style="background: white; padding: 16px; border-radius: 16px; border: 1.5px solid #93c5fd;">
+                                <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 1.05rem; font-weight: 800;">🅰️ Phách & Tốc Độ (Beat & Tempo)</h4>
+                                <p style="margin: 0 0 8px 0; font-size: 0.88rem; color: #334155;">• <b>Beat (Phách):</b> Nhịp đập đều đặn liên tục bên dưới bài hát (giống như nhịp tim hoặc tiếng dậm chân).</p>
+                                <p style="margin: 0; font-size: 0.88rem; color: #334155;">• <b>Tempo (Tốc độ - BPM):</b><br/>
+                                    - <i>Chậm (60 - 80 BPM):</i> Ballad, Lo-fi, nhạc trữ tình.<br/>
+                                    - <i>Vừa (90 - 110 BPM):</i> Pop, R&B, Funk thư thái.<br/>
+                                    - <i>Nhanh (120 - 140+ BPM):</i> Disco, Dance, Rock, EDM.
+                                </p>
+                            </div>
+
+                            <div style="background: white; padding: 16px; border-radius: 16px; border: 1.5px solid #93c5fd;">
+                                <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 1.05rem; font-weight: 800;">🅱️ Số Nhịp (Time Signatures)</h4>
+                                <p style="margin: 0; font-size: 0.88rem; color: #334155; line-height: 1.6;">
+                                    • <b>4/4 (Nhịp 4 phách):</b> Nhịp quốc dân (Mạnh - Nhẹ - Vừa - Nhẹ).<br/>
+                                    • <b>2/4 (Nhịp 2 phách):</b> Hành khúc, nhạc thiếu nhi, March.<br/>
+                                    • <b>3/4 (Nhịp 3 phách):</b> Nhịp Waltz (Valse) dìu dặt (Bùm - chát - chát).<br/>
+                                    • <b>6/8 (Nhịp 6/8):</b> Slow Rock / Ballad (Bùm 2 3 - Chát 5 6).
+                                </p>
+                            </div>
+
+                            <div style="background: white; padding: 16px; border-radius: 16px; border: 1.5px solid #93c5fd;">
+                                <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 1.05rem; font-weight: 800;">🅲 Trường Độ Nốt & Dấu Nghỉ</h4>
+                                <p style="margin: 0; font-size: 0.88rem; color: #334155; line-height: 1.6;">
+                                    Nốt Tròn (4 phách) ➔ Nốt Trắng (2 phách) ➔ Nốt Đen (1 phách) ➔ Nốt Móc Đơn (1/2 phách) ➔ Nốt Móc Kép (1/4 phách).
+                                </p>
+                            </div>
+
+                            <div style="background: white; padding: 16px; border-radius: 16px; border: 1.5px solid #93c5fd;">
+                                <h4 style="margin: 0 0 8px 0; color: #1d4ed8; font-size: 1.05rem; font-weight: 800;">🅳 Đảo Nhịp (Syncopation / Off-beat)</h4>
+                                <p style="margin: 0; font-size: 0.88rem; color: #334155; line-height: 1.6;">
+                                    Nhấn cố tình vào các phách nhẹ hoặc nốt lẻ (nửa phách) tạo cảm giác nhún nhảy, gai góc (Reggae, Funk, Jazz).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MỤC 3: BẢNG TRA CỨU TIẾT TẤU BẰNG TRÁI CÂY (MASTER FRUIT RHYTHM CHART) -->
                     <div style="margin-bottom: 28px; background: linear-gradient(135deg, #ecfeff, #cff4fc); padding: 22px; border-radius: 20px; border: 2px solid #a5f3fc;">
-                        <h4 style="margin: 0 0 14px 0; color: #0e7490; font-size: 1.25rem; font-weight: 800;">🌿 LEVEL 2: CỦ QUẢ NỘI PHÁCH & ĐIỆU NHẠC (9 THẺ)</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
-                            ${lvl2Cards}
+                        <h3 style="margin: 0 0 6px 0; color: #0e7490; font-size: 1.35rem; font-weight: 800;">3. BẢNG TRA CỨU TIẾT TẤU BẰNG TRÁI CÂY (MASTER FRUIT RHYTHM CHART)</h3>
+                        <p style="margin: 0 0 16px 0; color: #0369a1; font-weight: 700; font-size: 0.92rem;">(Chuẩn theo giáo trình Piano Goddess Academy — Có Khuông Nhạc Thực Tế SVG)</p>
+
+                        <!-- 🟢 NHÓM 1 PHÁCH -->
+                        <div style="margin-bottom: 22px;">
+                            <h4 style="color: #15803d; font-size: 1.15rem; font-weight: 800; margin: 0 0 12px 0;">🟢 NHÓM 1 PHÁCH (FALLS UNDER 1 BEAT - 8 Biến thể phân chia chuẩn nhạc viện)</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                                ${group1BeatCards.map(renderFruitCardHTML).join('')}
+                            </div>
+                        </div>
+
+                        <!-- 🔴 NHÓM 1 PHÁCH PHỨC TẠP -->
+                        <div style="margin-bottom: 22px;">
+                            <h4 style="color: #b91c1c; font-size: 1.15rem; font-weight: 800; margin: 0 0 12px 0;">🔴 NHÓM 1 PHÁCH PHỨC TẠP (COMPLEX TRIPLETS UNDER 1 BEAT - Kỹ thuật đi ngón thần tốc)</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                                ${group1BeatComplexCards.map(renderFruitCardHTML).join('')}
+                            </div>
+                        </div>
+
+                        <!-- 🟡 NHÓM 2 PHÁCH -->
+                        <div>
+                            <h4 style="color: #b45309; font-size: 1.15rem; font-weight: 800; margin: 0 0 12px 0;">🟡 NHÓM 2 PHÁCH (FALLS UNDER 2 BEATS - Nốt ngân dài qua 2 phách)</h4>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+                                ${group2BeatsCards.map(renderFruitCardHTML).join('')}
+                            </div>
                         </div>
                     </div>
 
-                    <!-- LEVEL 3 SECTION -->
-                    <div style="margin-bottom: 10px; background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 20px; border: 2px solid #e9d5ff;">
-                        <h4 style="margin: 0 0 14px 0; color: #6b21a8; font-size: 1.25rem; font-weight: 800;">🎷 LEVEL 3: LIÊN BA & ĐIỆU NHẠC CAO CẤP (7 THẺ)</h4>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
-                            ${lvl3Cards}
+                    <!-- MỤC 4: BẢNG TỔNG HỢP CÁC ĐIỆU NHẠC (GROOVES) PHỔ BIẾN NHẤT THẾ GIỚI -->
+                    <div style="margin-bottom: 28px; background: linear-gradient(135deg, #faf5ff, #f3e8ff); padding: 22px; border-radius: 20px; border: 2px solid #e9d5ff;">
+                        <h3 style="margin: 0 0 14px 0; color: #6b21a8; font-size: 1.3rem; font-weight: 800;">4. Bảng Tổng Hợp Các Điệu Nhạc (Grooves) Phổ Biến Nhất Thế Giới</h3>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 14px; overflow: hidden; font-size: 0.9rem;">
+                                <thead>
+                                    <tr style="background: linear-gradient(135deg, #9333ea, #7e22ce); color: white; text-align: left;">
+                                        <th style="padding: 12px 14px;">Điệu Nhạc (Style)</th>
+                                        <th style="padding: 12px 14px;">Số Nhịp & Tempo</th>
+                                        <th style="padding: 12px 14px;">Cách Nhấn & Cảm Xúc Đặc Trưng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid #f3e8ff;">
+                                        <td style="padding: 10px 14px; font-weight: 800; color: #6b21a8;">🎼 Ballad / Slow Pop</td>
+                                        <td style="padding: 10px 14px; font-weight: 700; color: #475569;">4/4 (65-80 BPM)</td>
+                                        <td style="padding: 10px 14px; color: #334155;">Tỉa nốt êm ái, ngân dài. Cảm xúc sâu lắng, tâm sự.</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #f3e8ff; background: #faf5ff;">
+                                        <td style="padding: 10px 14px; font-weight: 800; color: #6b21a8;">🎸 Pop/Rock 8-Beat</td>
+                                        <td style="padding: 10px 14px; font-weight: 700; color: #475569;">4/4 (95-115 BPM)</td>
+                                        <td style="padding: 10px 14px; color: #334155;">Đập nhịp 8 nốt móc đơn đều đặn, chắc chắn, khỏe khoắn.</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #f3e8ff;">
+                                        <td style="padding: 10px 14px; font-weight: 800; color: #6b21a8;">🕺 Disco / 4-on-the-floor</td>
+                                        <td style="padding: 10px 14px; font-weight: 700; color: #475569;">4/4 (120-130 BPM)</td>
+                                        <td style="padding: 10px 14px; color: #334155;">Tiếng trống Kick dập đều 4 phách, Hi-hat giật phách nhẹ. Sôi động.</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #f3e8ff; background: #faf5ff;">
+                                        <td style="padding: 10px 14px; font-weight: 800; color: #6b21a8;">🎷 Swing / Shuffle</td>
+                                        <td style="padding: 10px 14px; font-weight: 700; color: #475569;">4/4 (Vừa / Nhanh)</td>
+                                        <td style="padding: 10px 14px; color: #334155;">Nhịp nhún nhảy không đều (Nốt dài - nốt ngắn). Đậm chất Jazz/Blues.</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #f3e8ff;">
+                                        <td style="padding: 10px 14px; font-weight: 800; color: #6b21a8;">🌊 Bossa Nova / Latin</td>
+                                        <td style="padding: 10px 14px; font-weight: 700; color: #475569;">4/4 (90-110 BPM)</td>
+                                        <td style="padding: 10px 14px; color: #334155;">Nhịp rải gõ đảo phách phức tạp, tinh tế, lãng mạn.</td>
+                                    </tr>
+                                    <tr style="background: #faf5ff;">
+                                        <td style="padding: 10px 14px; font-weight: 800; color: #6b21a8;">🌴 Reggae / Funk</td>
+                                        <td style="padding: 10px 14px; font-weight: 700; color: #475569;">4/4 (80-100 BPM)</td>
+                                        <td style="padding: 10px 14px; color: #334155;">Nhấn cực mạnh vào các phách ngược (Off-beat). Nghe lắc lư.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- MỤC 5: BỘ KỸ NĂNG THÁM TỬ ÂM NHẠC: BÍ KÍP 3 BƯỚC NHẬN DIỆN CỦA MỌI BÀI HÁT -->
+                    <div style="background: linear-gradient(135deg, #fff7ed, #ffedd5); padding: 22px; border-radius: 20px; border: 2px solid #fed7aa;">
+                        <h3 style="margin: 0 0 10px 0; color: #c2410c; font-size: 1.35rem; font-weight: 800;">5. BỘ KỸ NĂNG THÁM TỬ ÂM NHẠC: BÍ KÍP 3 BƯỚC NHẬN DIỆN CỦA MỌI BÀI HÁT</h3>
+                        <p style="margin: 0 0 16px 0; color: #9a3412; font-weight: 600; font-size: 0.93rem;">
+                            Để biết một bài hát đang chơi ở Điệu nhạc nào chỉ sau 5 giây nghe nhạc, bạn áp dụng đúng 3 bước lọc dưới đây:
+                        </p>
+
+                        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;">
+                            <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #fdba74;">
+                                <h4 style="margin: 0 0 6px 0; color: #c2410c; font-size: 1.05rem; font-weight: 800;">🕵️ BƯỚC 1: Dậm chân đếm phách (Tìm Số Nhịp)</h4>
+                                <p style="margin: 0; font-size: 0.88rem; color: #334155; line-height: 1.6;">
+                                    Nhắm mắt dậm chân theo tiếng trống trầm (Bass) hoặc nhịp tim:<br/>
+                                    • <i>Đếm 1 - 2 - 3, 1 - 2 - 3 (Xoay tròn, khiêu vũ):</i> ➔ <b>100% nhịp 3/4</b> ➔ Điệu VALSE (Waltz) hoặc BOSTON (VD: Nhỏ ơi, Bụi phấn).<br/>
+                                    • <i>Đếm 1-2-3-4-5-6 (Sóng biển dào dạt, dậm mạnh 1 & 4):</i> ➔ <b>100% nhịp 6/8</b> ➔ Điệu SLOW ROCK (VD: Diễm xưa, Mắt biếc).<br/>
+                                    • <i>Đếm 1 - 2 - 3 - 4 (90% bài hát phổ biến):</i> ➔ <b>Nhịp 4/4</b> ➔ Chuyển sang Bước 2!
+                                </p>
+                            </div>
+
+                            <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #fdba74;">
+                                <h4 style="margin: 0 0 6px 0; color: #c2410c; font-size: 1.05rem; font-weight: 800;">🏃 BƯỚC 2: Đo Tốc Độ (Tempo - Nhanh hay Chậm?)</h4>
+                                <p style="margin: 0; font-size: 0.88rem; color: #334155; line-height: 1.6;">
+                                    • <b>4/4 Chậm (60-80 BPM):</b> Tỉa nốt êm ái ➔ <b>BALLAD / SLOW POP</b> | Giật lắc lư trữ tình ➔ <b>BOLERO</b>.<br/>
+                                    • <b>4/4 Vừa (90-110 BPM):</b> Đập nhịp 8 nốt chắc chắn ➔ <b>POP 8-BEAT</b> | Gảy giật ngược tưng bừng ➔ <b>REGGAE / FUNK</b>.<br/>
+                                    • <b>4/4 Nhanh (120+ BPM):</b> Trống dập Bùm! Bùm! Bùm! Bùm! 4 phách đều ➔ <b>DISCO / DANCE</b> | Quạt chả dồn dập ➔ <b>ROCK</b>.
+                                </p>
+                            </div>
+
+                            <div style="background: white; padding: 16px; border-radius: 14px; border: 1.5px solid #fdba74;">
+                                <h4 style="margin: 0 0 6px 0; color: #c2410c; font-size: 1.05rem; font-weight: 800;">👂 BƯỚC 3: Lắng nghe tiếng trống Snare (Tiếng "CHÁT")</h4>
+                                <p style="margin: 0; font-size: 0.88rem; color: #334155; line-height: 1.6;">
+                                    • <i>Rơi vào Phách 3:</i> Điệu Ballad hoặc Slow Rock.<br/>
+                                    • <i>Rơi vào Phách 2 & 4:</i> Điệu Pop, Rock, Disco, Funk.<br/>
+                                    • <i>Rơi vào khoảng nghỉ giữa 2 phách (Off-beat):</i> Điệu Reggae hoặc Bossa Nova.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- 📝 BẢNG TRA CỨU BẮT BÀI ĐIỆU NHẠC NHANH -->
+                        <h4 style="color: #9a3412; font-size: 1.05rem; font-weight: 800; margin: 0 0 10px 0;">📝 BẢNG TRA CỨU BẮT BÀI ĐIỆU NHẠC NHANH:</h4>
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 14px; overflow: hidden; font-size: 0.88rem;">
+                                <thead>
+                                    <tr style="background: linear-gradient(135deg, #ea580c, #c2410c); color: white; text-align: left;">
+                                        <th style="padding: 10px 12px;">Tín Hiệu Âm Thanh Nghe Thấy</th>
+                                        <th style="padding: 10px 12px;">Số Nhịp</th>
+                                        <th style="padding: 10px 12px;">Tốc Độ</th>
+                                        <th style="padding: 10px 12px;">Tên Điệu Nhạc (Style)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style="border-bottom: 1px solid #fed7aa;">
+                                        <td style="padding: 8px 12px; font-weight: 700; color: #c2410c;">Bùm - chát - chát</td>
+                                        <td style="padding: 8px 12px;">3/4</td>
+                                        <td style="padding: 8px 12px;">Vừa</td>
+                                        <td style="padding: 8px 12px; font-weight: 800; color: #9a3412;">Valse (Waltz)</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #fed7aa; background: #fff7ed;">
+                                        <td style="padding: 8px 12px; font-weight: 700; color: #c2410c;">Bùm... chát... chát...</td>
+                                        <td style="padding: 8px 12px;">3/4</td>
+                                        <td style="padding: 8px 12px;">Chậm</td>
+                                        <td style="padding: 8px 12px; font-weight: 800; color: #9a3412;">Boston</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #fed7aa;">
+                                        <td style="padding: 8px 12px; font-weight: 700; color: #c2410c;">Bùm 2 3 - Chát 5 6</td>
+                                        <td style="padding: 8px 12px;">6/8</td>
+                                        <td style="padding: 8px 12px;">Chậm</td>
+                                        <td style="padding: 8px 12px; font-weight: 800; color: #9a3412;">Slow Rock</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #fed7aa; background: #fff7ed;">
+                                        <td style="padding: 8px 12px; font-weight: 700; color: #c2410c;">Tỉa nốt rải thong thả</td>
+                                        <td style="padding: 8px 12px;">4/4</td>
+                                        <td style="padding: 8px 12px;">Chậm</td>
+                                        <td style="padding: 8px 12px; font-weight: 800; color: #9a3412;">Ballad / Slow Pop</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #fed7aa;">
+                                        <td style="padding: 8px 12px; font-weight: 700; color: #c2410c;">Bùm... tát-tát-bùm... chát</td>
+                                        <td style="padding: 8px 12px;">4/4</td>
+                                        <td style="padding: 8px 12px;">Chậm</td>
+                                        <td style="padding: 8px 12px; font-weight: 800; color: #9a3412;">Bolero</td>
+                                    </tr>
+                                    <tr style="border-bottom: 1px solid #fed7aa; background: #fff7ed;">
+                                        <td style="padding: 8px 12px; font-weight: 700; color: #c2410c;">Trống dập Bùm! Bùm! Bùm! Bùm!</td>
+                                        <td style="padding: 8px 12px;">4/4</td>
+                                        <td style="padding: 8px 12px;">Nhanh</td>
+                                        <td style="padding: 8px 12px; font-weight: 800; color: #9a3412;">Disco / Dance</td>
+                                    </tr>
+                                    <tr style="background: white;">
+                                        <td style="padding: 8px 12px; font-weight: 700; color: #c2410c;">Đàn giật tưng bừng phách ngược</td>
+                                        <td style="padding: 8px 12px;">4/4</td>
+                                        <td style="padding: 8px 12px;">Vừa</td>
+                                        <td style="padding: 8px 12px; font-weight: 800; color: #9a3412;">Reggae / Funk</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
