@@ -599,6 +599,20 @@
                     ],
                     correctId: 'watermelon',
                     explain: '🍉 WA-TER-ME-LON gồm 4 nốt móc kép chia 1 phách làm 4 phần bằng nhau (Đếm: 1 e & a).'
+                },
+                {
+                    id: 'mango',
+                    questionText: 'Tiết tấu 1 phách vừa vang lên là loại trái cây nào?',
+                    name: '🥭 MAN-GO (Móc đơn chấm + Móc kép - 3/4 + 1/4 phách)',
+                    soundType: 'pattern_mango',
+                    options: [
+                        { id: 'mango', label: '🥭 MAN-GO (Móc đơn chấm + Móc kép - Đếm: 1 a)' },
+                        { id: 'orange', label: '🍊 O-RANGE (Móc kép + Móc đơn chấm - Đếm: 1 e)' },
+                        { id: 'lemon', label: '🍋 LE-MON (2 móc đơn ♫ - Đếm: 1 &)' },
+                        { id: 'watermelon', label: '🍉 WA-TER-ME-LON (4 móc kép ♬♬ - Đếm: 1 e & a)' }
+                    ],
+                    correctId: 'mango',
+                    explain: '🥭 MAN-GO gồm 1 nốt móc đơn chấm dôi ở đầu (3/4 phách) và 1 nốt móc kép giật ở sau (1/4 phách).'
                 }
             ]
         },
@@ -891,6 +905,12 @@
             for (let i = 0; i < 4; i++) {
                 playTone(800, 0.06, 'square', i * 0.1);
             }
+        } else if (soundType === 'pattern_orange') {
+            playTone(800, 0.06, 'square', 0);
+            playTone(800, 0.12, 'square', 0.1);
+        } else if (soundType === 'pattern_mango') {
+            playTone(800, 0.12, 'square', 0);
+            playTone(800, 0.06, 'square', 0.3);
         } else if (soundType === 'pattern_blueberry') {
             playTone(800, 0.08, 'square', 0);
             playTone(800, 0.06, 'square', 0.2);
@@ -3638,7 +3658,8 @@
             { code: 'FC-04', title: '🍇 GRAPE (Nốt đen ♩ - 1 phách tròn)', desc: 'Nốt đen (Quarter note) có giá trị tròn 1 phách.', countText: 'Đếm: "1"', notation: '♩ (1 Nốt Đen)', abc: 'X:1\nM:1/4\nL:1/4\nK:C clef=perc\nc |', soundType: 'pattern_grape', icon: '🍇' },
             { code: 'FC-05', title: '🍋 LE-MON (2 nốt móc đơn dính chùm 1 beam)', desc: '2 nốt móc đơn (Eighth notes) dính chùm chung 1 vạch ngang (beam), chia đều 1 phách làm 2 nửa.', countText: 'Đếm: "1 &"', notation: '♫ (2 móc đơn chung 1 beam)', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\ncc |', soundType: 'pattern_lemon', icon: '🍋' },
             { code: 'FC-06', title: '🍉 WA-TER-ME-LON (4 nốt móc kép dính chùm double beam)', desc: '4 nốt móc kép (Sixteenth notes) dính chùm chung 2 vạch ngang (double beam) nối liền cả 4 nốt trong 1 phách.', countText: 'Đếm: "1 e & a"', notation: '4 móc kép chung 1 beam chính', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\nc/2c/2c/2c/2 |', soundType: 'pattern_watermelon', icon: '🍉' },
-            { code: 'FC-07', title: '🍊 O-RANGE (Móc kép + Móc đơn chấm dính chùm 1 beam)', desc: '1 nốt móc kép (1/4 phách) + 1 nốt móc đơn chấm dôi (3/4 phách) dính chùm chung 1 xà ngang (beam) nối liền 1 phách.', countText: 'Đếm: "1 e..."', notation: 'Móc kép + Móc đơn chấm (chung 1 beam)', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\nc/2c3/2 |', soundType: 'pattern_orange', icon: '🍊' }
+            { code: 'FC-07', title: '🍊 O-RANGE (Móc kép + Móc đơn chấm dính chùm 1 beam)', desc: '1 nốt móc kép (1/4 phách) + 1 nốt móc đơn chấm dôi (3/4 phách) dính chùm chung 1 xà ngang (beam) nối liền 1 phách.', countText: 'Đếm: "1 e..."', notation: 'Móc kép + Móc đơn chấm (chung 1 beam)', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\nc/2c3/2 |', soundType: 'pattern_orange', icon: '🍊' },
+            { code: 'FC-08', title: '🥭 MAN-GO (Móc đơn chấm + Móc kép dính chùm 1 beam)', desc: '1 nốt móc đơn chấm dôi ở đầu (dài 3/4 phách) + 1 nốt móc kép sau giật nảy (1/4 phách) dính chùm chung 1 vạch xà ngang chính (beam).', countText: 'Đếm: "1 a"', notation: 'Móc đơn chấm + Móc kép (chung 1 beam)', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\nc3/2c/2 |', soundType: 'pattern_mango', icon: '🥭' }
         ],
         lvl2: [
             { code: 'FC-08', title: '🫐 BLUE-BER-RY (1 móc đơn + 2 móc kép dính chùm 1 beam)', desc: '1 nốt móc đơn (1/2 phách) + 2 nốt móc kép (1/4 + 1/4) dính chùm chung 1 vạch xà ngang chính (beam) nối liền cả 3 nốt.', countText: 'Đếm: "1 & a"', notation: '1 móc đơn + 2 móc kép (dính chùm 1 beam)', abc: 'X:1\nM:1/4\nL:1/8\nK:C clef=perc\ncc/2c/2 |', soundType: 'pattern_blueberry', icon: '🫐' },
