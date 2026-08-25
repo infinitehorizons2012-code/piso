@@ -41,10 +41,16 @@
           </div>
         </div>
 
-        <!-- TAB 3: Piano Solo -->
-        <button class="nav-tab-btn" id="tab-btn-piano-solo" onclick="window.switchTab('tab-btn-piano-solo', 'tab-piano-solo')" style="padding: 9px 20px; border-radius: 20px; border: 2px solid #f43f5e; background: white; color: #e11d48; font-weight: 800; cursor: pointer; transition: all 0.2s; white-space: nowrap; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.08);">
-          🎹 Piano Solo
-        </button>
+        <!-- DROPDOWN 3: Piano Solo -->
+        <div class="nav-dropdown-wrapper" id="dropdown-piano-wrapper" style="flex-shrink: 0;">
+          <button class="nav-dropdown-btn" id="dropdown-piano-btn" style="border-color: #f43f5e; color: #be123c;">
+            🎹 Piano Solo <span style="font-size: 0.7rem; margin-left: 2px;">▼</span>
+          </button>
+          <div class="dropdown-menu-content">
+            <button class="dropdown-item" onclick="window.switchTab('dropdown-piano-btn', 'tab-piano-solo'); window.switchPianoSubTab('interactive');">🎮 1. Tương Tác (Phím Đàn & Solo)</button>
+            <button class="dropdown-item" onclick="window.switchTab('dropdown-piano-btn', 'tab-piano-solo'); window.switchPianoSubTab('theory');">📚 2. Lý Thuyết (Bách Khoa Toàn Thư Hòa Âm)</button>
+          </div>
+        </div>
 
         <!-- USER PROFILE HEADER SLOT -->
         <div id="user-profile-header-slot" style="white-space: nowrap; flex-shrink: 0;"></div>
@@ -79,16 +85,6 @@
           </div>
         </div>
 
-        <!-- PIANO SOLO SUB-TABS NAVIGATION -->
-        <div style="display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; flex-wrap: wrap;">
-          <button id="piano-subtab-btn-interactive" onclick="window.switchPianoSubTab('interactive')" style="padding: 10px 22px; border-radius: 16px; font-weight: 800; border: none; background: linear-gradient(135deg, #be123c, #881337); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(190,18,60,0.3); font-size: 1rem; transition: all 0.2s;">
-            🎹 1. Tương Tác (Phím Đàn & Solo)
-          </button>
-          <button id="piano-subtab-btn-theory" onclick="window.switchPianoSubTab('theory')" style="padding: 10px 22px; border-radius: 16px; font-weight: 800; border: 2px solid #cbd5e1; background: white; color: #475569; cursor: pointer; font-size: 1rem; transition: all 0.2s;">
-            📚 2. Lý Thuyết: Bách Khoa Toàn Thư Giải Mã & Hòa Âm
-          </button>
-        </div>
-
         <!-- SUB-TAB 1: INTERACTIVE PIANO & SHEET MUSIC PLAYER -->
         <div id="piano-subcontent-interactive" style="display: block;">
           
@@ -116,18 +112,6 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; background: linear-gradient(135deg, #fff1f2, #ffe4e6); padding: 14px 18px; border-radius: 16px; border: 1.5px solid #fecdd3;">
               <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1;">
                 <h3 style="margin: 0; color: #881337; font-size: 1.25rem; font-weight: 800; white-space: nowrap;">🎼 Sheet Nhạc & ABC Editor</h3>
-                
-                <!-- SONG SELECTOR -->
-                <select id="piano-solo-song-select" onchange="window.loadPianoSoloSong(this.value)" style="padding: 8px 14px; border-radius: 12px; border: 1.5px solid #fda4af; font-weight: 800; color: #881337; background: white; font-size: 0.9rem; outline: none; cursor: pointer;">
-                  <option value="fur_elise">🎹 Für Elise (Thư Gửi Elise) - L. v. Beethoven</option>
-                  <option value="canon_in_d">🎶 Canon in D (Piano Solo) - J. Pachelbel</option>
-                  <option value="mariage_damour">💍 Mariage d'Amour (Đám Cưới Hoa) - R. Clayderman</option>
-                  <option value="river_flows_in_you">🌸 River Flows in You - Yiruma</option>
-                  <option value="moonlight_sonata">🌙 Moonlight Sonata (Ánh Trăng) - L. v. Beethoven</option>
-                  <option value="sonata_facile">🎼 Sonata Facile in C Major - W. A. Mozart</option>
-                  <option value="nho_oi">🇻🇳 Nhỏ Ơi (Piano Solo Trang Nhã)</option>
-                  <option value="tinh_don_phuong">🇻🇳 Tình Đơn Phương (Piano Solo Ballad)</option>
-                </select>
               </div>
 
               <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
