@@ -1488,6 +1488,65 @@
         return `X:1\nT: ${lineObj.title}\n${snippetHeader}\n%%score {1 | 2}\nV:1 clef=treble\n${lineNotesAbc}\n${customW ? customW + '\n' : ''}V:2 clef=bass\n${bassBody}`;
     };
 
+    window.generateFullSongGrandStaffAbc = function() {
+        const lines = window.week1State.parsedLines;
+        if (!lines || lines.length === 0) return window.week1State.abcInput;
+
+        const firstLineHeader = lines[0].snippetHeader || 'M:2/4\nL:1/8\nK:C';
+        let fullTrebleNotes = [];
+        let fullLyricRows = [];
+        let fullBassNotes = [];
+
+        lines.forEach((lineObj, lineIdx) => {
+            const measures = window.parseLineMeasures(lineObj.abcContent);
+            measures.forEach((mObj, mIdx) => {
+                const mLines = mObj.text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                let mNotes = [];
+                let mWords = [];
+
+                mLines.forEach(l => {
+                    if (l.startsWith('%')) return;
+                    if (/^w[0-9]*:?/i.test(l)) {
+                        const words = l.replace(/^w[0-9]*:?/i, '').trim();
+                        if (words) mWords.push(words);
+                    } else {
+                        mNotes.push(l);
+                    }
+                });
+
+                fullTrebleNotes.push(mNotes.join(' '));
+
+                mWords.forEach((wStr, rIdx) => {
+                    if (!fullLyricRows[rIdx]) fullLyricRows[rIdx] = [];
+                    const globalMIdx = fullTrebleNotes.length - 1;
+                    fullLyricRows[rIdx][globalMIdx] = wStr;
+                });
+
+                const customBassKey = `${lineIdx}_${mIdx}`;
+                if (window.week1State.step2BassMeasures && window.week1State.step2BassMeasures[customBassKey] !== undefined) {
+                    fullBassNotes.push(` ${window.week1State.step2BassMeasures[customBassKey]} `);
+                } else {
+                    const cfg = window.getMeasureConfig(lineIdx, mIdx, mObj.chord);
+                    const bassNotes = window.getBassRhythmNotes(cfg.chord, cfg.rhythmText, cfg.intervalText);
+                    fullBassNotes.push(` ${bassNotes} `);
+                }
+            });
+        });
+
+        const totalMeasures = fullTrebleNotes.length;
+        fullLyricRows.forEach(row => {
+            for (let i = 0; i < totalMeasures; i++) {
+                if (!row[i]) row[i] = '*';
+            }
+        });
+
+        const trebleBody = fullTrebleNotes.join(' | ');
+        const customW = fullLyricRows.map(row => 'w:' + row.join(' | ')).join('\n');
+        const bassBody = fullBassNotes.join(' | ');
+
+        return `X:1\nT: THẰNG CUỘI (2 TAY PIANO SOLO)\n${firstLineHeader}\n%%score {1 | 2}\nV:1 clef=treble\n${trebleBody}\n${customW ? customW + '\n' : ''}V:2 clef=bass\n${bassBody}`;
+    };
+
     window.toggleWeek1MasterScoreModal = function() {
         const modal = document.getElementById('week1-master-modal');
         if (!modal) return;
@@ -1497,14 +1556,19 @@
         if (isHidden) {
             const paper = document.getElementById('week1-modal-paper');
             const textarea = document.getElementById('week1-modal-abc-text');
-            if (textarea) textarea.value = window.week1State.abcInput;
+
+            const masterAbc = (window.week1State.activeStep === 2)
+                ? window.generateFullSongGrandStaffAbc()
+                : window.week1State.abcInput;
+
+            if (textarea) textarea.value = masterAbc;
 
             if (paper) {
                 paper.innerHTML = '';
                 const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
                 if (abcRenderer) {
                     try {
-                        abcRenderer.renderAbc('week1-modal-paper', window.week1State.abcInput, {
+                        abcRenderer.renderAbc('week1-modal-paper', masterAbc, {
                             responsive: 'resize',
                             scale: 1.1,
                             staffwidth: 760
