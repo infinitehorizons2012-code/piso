@@ -517,58 +517,483 @@
         }
     };
 
-    // --- GAME 2: RHYTHM MATCH ---
-    const RHYTHM_PATTERNS = [
-        { name: '4 Nốt Đen (Quarter Notes)', clicks: [1,1,1,1], abc: 'c c c c |' },
-        { name: '2 Nốt Trắng (Half Notes)', clicks: [1,0,1,0], abc: 'c2 c2 |' },
-        { name: '1 Nốt Đen + 2 Móc Đơn + 2 Đen', clicks: [1,1,1,1,1], abc: 'c cc c c |' },
-        { name: '4 Nốt Móc Đơn + 2 Nốt Đen', clicks: [1,1,1,1,1,1], abc: 'cc cc c c |' }
-    ];
+    // --- GAME 2: RHYTHM MATCH (3-LEVEL FRUIT & GENRE EAR TRAINING) ---
+    const RHYTHM_LEVELS = {
+        lvl1: {
+            title: '☀️ Level 1 (Dễ): Nhịp Đập & Trái Cây Cơ Bản',
+            questions: [
+                {
+                    id: 'time_34',
+                    questionText: 'Bài nhạc/tiết tấu này ở nhịp mấy?',
+                    name: '💃 Nhịp 3/4 (Waltz - Bùm chát chát)',
+                    soundType: 'time_sig_34',
+                    options: [
+                        { id: 'time_34', label: '💃 Nhịp 3/4 (Waltz)' },
+                        { id: 'time_44', label: '🎤 Nhịp 4/4 (Pop/Rock)' },
+                        { id: 'time_24', label: '🎺 Nhịp 2/4 (Hành khúc)' }
+                    ],
+                    correctId: 'time_34',
+                    explain: 'Nhịp 3/4 có 3 phách trong 1 ô nhịp (Bùm - chát - chát).'
+                },
+                {
+                    id: 'time_44',
+                    questionText: 'Bài nhạc/tiết tấu này ở nhịp mấy?',
+                    name: '🎤 Nhịp 4/4 (Pop/Rock - Bùm chát Bùm chát)',
+                    soundType: 'time_sig_44',
+                    options: [
+                        { id: 'time_34', label: '💃 Nhịp 3/4 (Waltz)' },
+                        { id: 'time_44', label: '🎤 Nhịp 4/4 (Pop/Rock)' },
+                        { id: 'time_24', label: '🎺 Nhịp 2/4 (Hành khúc)' }
+                    ],
+                    correctId: 'time_44',
+                    explain: 'Nhịp 4/4 có 4 phách trong 1 ô nhịp (Pop & Rock chuẩn).'
+                },
+                {
+                    id: 'time_24',
+                    questionText: 'Bài nhạc/tiết tấu này ở nhịp mấy?',
+                    name: '🎺 Nhịp 2/4 (Hành khúc - Một hai Một hai)',
+                    soundType: 'time_sig_24',
+                    options: [
+                        { id: 'time_34', label: '💃 Nhịp 3/4 (Waltz)' },
+                        { id: 'time_44', label: '🎤 Nhịp 4/4 (Pop/Rock)' },
+                        { id: 'time_24', label: '🎺 Nhịp 2/4 (Hành khúc)' }
+                    ],
+                    correctId: 'time_24',
+                    explain: 'Nhịp 2/4 có 2 phách trong 1 ô nhịp (Hành quân dồn dập).'
+                },
+                {
+                    id: 'grape',
+                    questionText: 'Tiết tấu 1 phách vừa vang lên là loại trái cây nào?',
+                    name: '🍇 GRAPE (Nốt đen ♩ - 1 phách)',
+                    soundType: 'pattern_grape',
+                    options: [
+                        { id: 'grape', label: '🍇 GRAPE (Nốt đen ♩ - Đếm: 1)' },
+                        { id: 'lemon', label: '🍋 LE-MON (2 móc đơn ♫ - Đếm: 1 &)' },
+                        { id: 'watermelon', label: '🍉 WA-TER-ME-LON (4 móc kép ♬♬ - Đếm: 1 e & a)' }
+                    ],
+                    correctId: 'grape',
+                    explain: '🍇 GRAPE tượng trưng cho Nốt Đen (♩ - 1 phách).'
+                },
+                {
+                    id: 'lemon',
+                    questionText: 'Tiết tấu 1 phách vừa vang lên là loại trái cây nào?',
+                    name: '🍋 LE-MON (2 móc đơn ♫ - 1/2 + 1/2 phách)',
+                    soundType: 'pattern_lemon',
+                    options: [
+                        { id: 'grape', label: '🍇 GRAPE (Nốt đen ♩ - Đếm: 1)' },
+                        { id: 'lemon', label: '🍋 LE-MON (2 móc đơn ♫ - Đếm: 1 &)' },
+                        { id: 'watermelon', label: '🍉 WA-TER-ME-LON (4 móc kép ♬♬ - Đếm: 1 e & a)' }
+                    ],
+                    correctId: 'lemon',
+                    explain: '🍋 LE-MON gồm 2 nốt móc đơn chia đều 1 phách làm 2 nửa (Đếm: 1 &).'
+                },
+                {
+                    id: 'watermelon',
+                    questionText: 'Tiết tấu 1 phách vừa vang lên là loại trái cây nào?',
+                    name: '🍉 WA-TER-ME-LON (4 móc kép ♬♬ - 1/4 × 4 phách)',
+                    soundType: 'pattern_watermelon',
+                    options: [
+                        { id: 'grape', label: '🍇 GRAPE (Nốt đen ♩ - Đếm: 1)' },
+                        { id: 'lemon', label: '🍋 LE-MON (2 móc đơn ♫ - Đếm: 1 &)' },
+                        { id: 'watermelon', label: '🍉 WA-TER-ME-LON (4 móc kép ♬♬ - Đếm: 1 e & a)' }
+                    ],
+                    correctId: 'watermelon',
+                    explain: '🍉 WA-TER-ME-LON gồm 4 nốt móc kép chia 1 phách làm 4 phần bằng nhau (Đếm: 1 e & a).'
+                }
+            ]
+        },
+        lvl2: {
+            title: '🌿 Level 2 (Trung cấp): Nhịp Nội Phách, Củ Quả 2 Phách & Điệu Nhạc Phổ Biến',
+            questions: [
+                {
+                    id: 'blueberry',
+                    questionText: 'Đoạn tiết tấu này ứng với bộ Củ Quả nào?',
+                    name: '🫐 BLUE-BER-RY (1 & a - 1 móc đơn + 2 móc kép)',
+                    soundType: 'pattern_blueberry',
+                    options: [
+                        { id: 'blueberry', label: '🫐 BLUE-BER-RY (1 & a - 1 móc đơn + 2 móc kép)' },
+                        { id: 'coconut', label: '🥥 CO-CO-NUT (1 e & - 2 móc kép + 1 móc đơn)' },
+                        { id: 'cucumber', label: '🥒 CU-CUM-BER (1 e a - Móc kép - Đơn - Kép)' }
+                    ],
+                    correctId: 'blueberry',
+                    explain: '🫐 BLUE-BER-RY gồm 1 móc đơn ở đầu (1/2 phách) và 2 móc kép theo sau (1/4 + 1/4).'
+                },
+                {
+                    id: 'coconut',
+                    questionText: 'Đoạn tiết tấu này ứng với bộ Củ Quả nào?',
+                    name: '🥥 CO-CO-NUT (1 e & - 2 móc kép + 1 móc đơn)',
+                    soundType: 'pattern_coconut',
+                    options: [
+                        { id: 'blueberry', label: '🫐 BLUE-BER-RY (1 & a - 1 móc đơn + 2 móc kép)' },
+                        { id: 'coconut', label: '🥥 CO-CO-NUT (1 e & - 2 móc kép + 1 móc đơn)' },
+                        { id: 'cucumber', label: '🥒 CU-CUM-BER (1 e a - Móc kép - Đơn - Kép)' }
+                    ],
+                    correctId: 'coconut',
+                    explain: '🥥 CO-CO-NUT gồm 2 nốt móc kép ở đầu (1/4 + 1/4) và 1 nốt móc đơn ở sau (1/2).'
+                },
+                {
+                    id: 'cucumber',
+                    questionText: 'Đoạn tiết tấu này ứng với bộ Củ Quả nào?',
+                    name: '🥒 CU-CUM-BER (1 e a - Móc kép + Móc đơn + Móc kép)',
+                    soundType: 'pattern_cucumber',
+                    options: [
+                        { id: 'blueberry', label: '🫐 BLUE-BER-RY (1 & a - 1 móc đơn + 2 móc kép)' },
+                        { id: 'coconut', label: '🥥 CO-CO-NUT (1 e & - 2 móc kép + 1 móc đơn)' },
+                        { id: 'cucumber', label: '🥒 CU-CUM-BER (1 e a - Móc kép - Đơn - Kép)' }
+                    ],
+                    correctId: 'cucumber',
+                    explain: '🥒 CU-CUM-BER là tiết tấu đảo phách: Móc kép (1/4) + Móc đơn (1/2) + Móc kép (1/4).'
+                },
+                {
+                    id: 'ginger',
+                    questionText: 'Đoạn tiết tấu 2 phách này ứng với Củ Quả nào?',
+                    name: '🫚 GIN-GER (2 phách - Nốt đen chấm + nốt móc đơn)',
+                    soundType: 'pattern_ginger',
+                    options: [
+                        { id: 'ginger', label: '🫚 GIN-GER (2 phách - Đen chấm + Móc đơn)' },
+                        { id: 'carrot', label: '🥕 CA-RROT (2 phách - Móc đơn + Đen chấm)' },
+                        { id: 'blueberry', label: '🫐 BLUE-BER-RY (1 phách - Móc đơn + 2 kép)' }
+                    ],
+                    correctId: 'ginger',
+                    explain: '🫚 GIN-GER ngân dài 1.5 phách ở nốt đầu (Đen chấm dôi) rồi nảy nốt móc đơn 0.5 phách.'
+                },
+                {
+                    id: 'carrot',
+                    questionText: 'Đoạn tiết tấu 2 phách này ứng với Củ Quả nào?',
+                    name: '🥕 CA-RROT (2 phách - Nốt móc đơn + nốt đen chấm)',
+                    soundType: 'pattern_carrot',
+                    options: [
+                        { id: 'ginger', label: '🫚 GIN-GER (2 phách - Đen chấm + Móc đơn)' },
+                        { id: 'carrot', label: '🥕 CA-RROT (2 phách - Móc đơn + Đen chấm)' },
+                        { id: 'blueberry', label: '🫐 BLUE-BER-RY (1 phách - Móc đơn + 2 kép)' }
+                    ],
+                    correctId: 'carrot',
+                    explain: '🥕 CA-RROT nảy nhanh nốt móc đơn 0.5 phách ở đầu rồi ngân dài 1.5 phách.'
+                },
+                {
+                    id: 'genre_ballad',
+                    questionText: 'Thám Tử Âm Nhạc: Đoạn nhịp trống này là của Điệu Nhạc nào?',
+                    name: '🎼 Slow Ballad (Nhẹ nhàng, mượt mà)',
+                    soundType: 'genre_ballad',
+                    options: [
+                        { id: 'genre_ballad', label: '🎼 Slow Ballad (Nhẹ nhàng, tình cảm)' },
+                        { id: 'genre_disco', label: '🕺 Disco (Trống dập 4-on-the-floor)' },
+                        { id: 'genre_slowrock', label: '🌊 Slow Rock (Nhịp 6/8 sóng biển)' },
+                        { id: 'genre_bolero', label: '💃 Bolero (Rumba/Bolero tình ca)' }
+                    ],
+                    correctId: 'genre_ballad',
+                    explain: '🎼 Slow Ballad có trống rải êm ái, đặc trưng bài hát Pop Ballad.'
+                },
+                {
+                    id: 'genre_disco',
+                    questionText: 'Thám Tử Âm Nhạc: Đoạn nhịp trống này là của Điệu Nhạc nào?',
+                    name: '🕺 Disco (Trống dập 4-on-the-floor sôi động)',
+                    soundType: 'genre_disco',
+                    options: [
+                        { id: 'genre_ballad', label: '🎼 Slow Ballad (Nhẹ nhàng, tình cảm)' },
+                        { id: 'genre_disco', label: '🕺 Disco (Trống dập 4-on-the-floor)' },
+                        { id: 'genre_slowrock', label: '🌊 Slow Rock (Nhịp 6/8 sóng biển)' },
+                        { id: 'genre_bolero', label: '💃 Bolero (Rumba/Bolero tình ca)' }
+                    ],
+                    correctId: 'genre_disco',
+                    explain: '🕺 Disco nổi bật với nhịp Kick 4-on-the-floor đập dồn dập.'
+                },
+                {
+                    id: 'genre_slowrock',
+                    questionText: 'Thám Tử Âm Nhạc: Đoạn nhịp trống này là của Điệu Nhạc nào?',
+                    name: '🌊 Slow Rock (Nhịp 6/8 sóng biển)',
+                    soundType: 'genre_slowrock',
+                    options: [
+                        { id: 'genre_ballad', label: '🎼 Slow Ballad (Nhẹ nhàng, tình cảm)' },
+                        { id: 'genre_disco', label: '🕺 Disco (Trống dập 4-on-the-floor)' },
+                        { id: 'genre_slowrock', label: '🌊 Slow Rock (Nhịp 6/8 sóng biển)' },
+                        { id: 'genre_bolero', label: '💃 Bolero (Rumba/Bolero tình ca)' }
+                    ],
+                    correctId: 'genre_slowrock',
+                    explain: '🌊 Slow Rock nhịp 6/8 rải chùm 3 nốt dạt dào như sóng biển.'
+                },
+                {
+                    id: 'genre_bolero',
+                    questionText: 'Thám Tử Âm Nhạc: Đoạn nhịp trống này là của Điệu Nhạc nào?',
+                    name: '💃 Bolero / Rumba (Giai điệu da diết tình cảm)',
+                    soundType: 'genre_bolero',
+                    options: [
+                        { id: 'genre_ballad', label: '🎼 Slow Ballad (Nhẹ nhàng, tình cảm)' },
+                        { id: 'genre_disco', label: '🕺 Disco (Trống dập 4-on-the-floor)' },
+                        { id: 'genre_slowrock', label: '🌊 Slow Rock (Nhịp 6/8 sóng biển)' },
+                        { id: 'genre_bolero', label: '💃 Bolero (Rumba/Bolero tình ca)' }
+                    ],
+                    correctId: 'genre_bolero',
+                    explain: '💃 Bolero có nhịp gõ rumba/bolero tình cảm da diết.'
+                }
+            ]
+        },
+        lvl3: {
+            title: '🎷 Level 3 (Cao cấp): Đảo Nhịp, Liên Ba Phức Tạp & Điệu Nhạc Độc Đáo',
+            questions: [
+                {
+                    id: 'banana',
+                    questionText: 'Mô hình tiết tấu cao cấp vừa phát ra là gì?',
+                    name: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba - Triplet)',
+                    soundType: 'pattern_triplet',
+                    options: [
+                        { id: 'banana', label: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba)' },
+                        { id: 'avocado', label: '🥑 A-VO-CA-DO (3 móc kép + 1 móc đơn)' },
+                        { id: 'sweet_potato', label: '🍠 SWEET-PO-TA-TO (1 móc đơn + 3 móc kép)' }
+                    ],
+                    correctId: 'banana',
+                    explain: '🍌 BA-NA-NA chia 1 phách thành 3 phần bằng nhau hoàn hảo (Triplet).'
+                },
+                {
+                    id: 'avocado',
+                    questionText: 'Mô hình tiết tấu cao cấp vừa phát ra là gì?',
+                    name: '🥑 A-VO-CA-DO (Chùm 3 móc kép + 1 móc đơn)',
+                    soundType: 'pattern_avocado',
+                    options: [
+                        { id: 'banana', label: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba)' },
+                        { id: 'avocado', label: '🥑 A-VO-CA-DO (3 móc kép + 1 móc đơn)' },
+                        { id: 'sweet_potato', label: '🍠 SWEET-PO-TA-TO (1 móc đơn + 3 móc kép)' }
+                    ],
+                    correctId: 'avocado',
+                    explain: '🥑 A-VO-CA-DO gồm 3 móc kép dồn dập ở đầu + 1 móc đơn đằng sau.'
+                },
+                {
+                    id: 'sweet_potato',
+                    questionText: 'Mô hình tiết tấu cao cấp vừa phát ra là gì?',
+                    name: '🍠 SWEET-PO-TA-TO (1 móc đơn + Chùm 3 móc kép)',
+                    soundType: 'pattern_potato',
+                    options: [
+                        { id: 'banana', label: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba)' },
+                        { id: 'avocado', label: '🥑 A-VO-CA-DO (3 móc kép + 1 móc đơn)' },
+                        { id: 'sweet_potato', label: '🍠 SWEET-PO-TA-TO (1 móc đơn + 3 móc kép)' }
+                    ],
+                    correctId: 'sweet_potato',
+                    explain: '🍠 SWEET-PO-TA-TO gồm 1 móc đơn ở đầu + 3 móc kép dồn đuôi phía sau.'
+                },
+                {
+                    id: 'genre_reggae',
+                    questionText: 'Thám Tử Âm Nhạc: Đoạn tiết tấu đảo nhịp/nhún nhảy thuộc thể loại nào?',
+                    name: '🌴 Reggae / Funk (Giật phách ngược Off-beat)',
+                    soundType: 'genre_reggae',
+                    options: [
+                        { id: 'genre_reggae', label: '🌴 Reggae / Funk (Off-beat giật phách)' },
+                        { id: 'genre_swing', label: '🎷 Swing / Shuffle (Nhún nhảy Jazz/Blues)' },
+                        { id: 'genre_bossa', label: '🌊 Bossa Nova (Điệu Latin tinh tế)' }
+                    ],
+                    correctId: 'genre_reggae',
+                    explain: '🌴 Reggae & Funk nhấn mạnh phách ngược (Off-beat), giật tưng bừng.'
+                },
+                {
+                    id: 'genre_swing',
+                    questionText: 'Thám Tử Âm Nhạc: Đoạn tiết tấu đảo nhịp/nhún nhảy thuộc thể loại nào?',
+                    name: '🎷 Swing / Shuffle (Nhịp nhún nhảy Jazz/Blues)',
+                    soundType: 'genre_swing',
+                    options: [
+                        { id: 'genre_reggae', label: '🌴 Reggae / Funk (Off-beat giật phách)' },
+                        { id: 'genre_swing', label: '🎷 Swing / Shuffle (Nhún nhảy Jazz/Blues)' },
+                        { id: 'genre_bossa', label: '🌊 Bossa Nova (Điệu Latin tinh tế)' }
+                    ],
+                    correctId: 'genre_swing',
+                    explain: '🎷 Swing & Shuffle có nhịp nẩy lướt dẹt 2:1 đặc trưng nhạc Jazz/Blues.'
+                },
+                {
+                    id: 'genre_bossa',
+                    questionText: 'Thám Tử Âm Nhạc: Đoạn tiết tấu đảo nhịp/nhún nhảy thuộc thể loại nào?',
+                    name: '🌊 Bossa Nova (Điệu Latin tinh tế, lãng mạn)',
+                    soundType: 'genre_bossa',
+                    options: [
+                        { id: 'genre_reggae', label: '🌴 Reggae / Funk (Off-beat giật phách)' },
+                        { id: 'genre_swing', label: '🎷 Swing / Shuffle (Nhún nhảy Jazz/Blues)' },
+                        { id: 'genre_bossa', label: '🌊 Bossa Nova (Điệu Latin tinh tế)' }
+                    ],
+                    correctId: 'genre_bossa',
+                    explain: '🌊 Bossa Nova hòa quyện tiết tấu Samba Brazil nhẹ nhàng với hòa âm Jazz.'
+                }
+            ]
+        }
+    };
 
     function generateRhythmQuestion(cardBody) {
-        const target = RHYTHM_PATTERNS[Math.floor(Math.random() * RHYTHM_PATTERNS.length)];
+        const lvl = window.GameState.level || 1;
+        const lvlData = lvl === 1 ? RHYTHM_LEVELS.lvl1 : (lvl === 2 ? RHYTHM_LEVELS.lvl2 : RHYTHM_LEVELS.lvl3);
+        const pool = lvlData.questions;
+        const target = pool[Math.floor(Math.random() * pool.length)];
         window.GameState.currentQuestion = target;
 
+        const shuffledOptions = [...target.options].sort(() => Math.random() - 0.5);
+
         cardBody.innerHTML = `
-            <div style="background: white; padding: 28px; border-radius: 20px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
-                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.25rem; font-weight: 800;">🥁 Bấm nút âm thanh & chọn nhịp điệu chính xác:</h3>
+            <div style="background: white; padding: 28px; border-radius: 24px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <div style="display: inline-block; background: linear-gradient(135deg, #06b6d4, #0284c7); color: white; padding: 4px 16px; border-radius: 20px; font-weight: 800; font-size: 0.85rem; margin-bottom: 14px;">
+                    ${lvlData.title}
+                </div>
+
+                <h3 style="margin: 0 0 16px 0; color: #0f172a; font-size: 1.3rem; font-weight: 800;">
+                    🥁 ${target.questionText}
+                </h3>
                 
-                <button onclick="window.playRhythmQuestionSound()" style="font-size: 1.15rem; padding: 14px 30px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 15px 0; box-shadow: 0 6px 16px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='none'">
+                <button onclick="window.playRhythmQuestionSound()" style="font-size: 1.15rem; padding: 14px 32px; border-radius: 30px; background: linear-gradient(135deg, #06b6d4, #3b82f6); color: white; border: none; cursor: pointer; font-weight: 800; margin: 10px 0 20px 0; box-shadow: 0 6px 18px rgba(6, 182, 212, 0.4); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
                     🔊 Phát Âm Thanh Nhịp Điệu
                 </button>
 
-                <div id="game-feedback" style="min-height: 32px; font-weight: 800; font-size: 1.2rem; margin: 15px 0;"></div>
+                <div id="game-feedback" style="min-height: 36px; font-weight: 800; font-size: 1.15rem; margin-bottom: 20px;"></div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 15px;">
-                    ${RHYTHM_PATTERNS.map((item, idx) => `
-                        <button onclick="window.checkRhythmAnswer(${idx})" style="padding: 18px; border-radius: 16px; border: 2.5px solid #a5f3fc; background: linear-gradient(135deg, #f0fdf4, #ecfeff); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #0369a1; box-shadow: 0 4px 12px rgba(6,182,212,0.15); transition: all 0.2s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='none'">
-                            ${item.name}
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; max-width: 720px; margin: 0 auto;">
+                    ${shuffledOptions.map((opt) => `
+                        <button onclick="window.checkRhythmAnswer('${opt.id}')" style="padding: 18px 14px; border-radius: 18px; border: 2.5px solid #a5f3fc; background: linear-gradient(135deg, #f0fdf4, #ecfeff); font-weight: 800; font-size: 1.05rem; cursor: pointer; color: #0369a1; box-shadow: 0 4px 12px rgba(6,182,212,0.15); transition: all 0.2s; text-align: center;" onmouseover="this.style.transform='translateY(-4px) scale(1.02)'" onmouseout="this.style.transform='none'">
+                            ${opt.label}
                         </button>
                     `).join('')}
                 </div>
             </div>
         `;
-        window.playRhythmQuestionSound();
+        // Sound is played ONLY when clicking the sound button!
     }
 
     window.playRhythmQuestionSound = function() {
         const q = window.GameState.currentQuestion;
-        if (q) playRhythmClicks(q.clicks, 0.35);
+        if (!q) return;
+        playRhythmAudioByType(q.soundType);
     };
 
-    window.checkRhythmAnswer = function(idx) {
+    function playRhythmAudioByType(soundType) {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+
+        if (soundType === 'time_sig_34') {
+            for (let bar = 0; bar < 2; bar++) {
+                for (let b = 0; b < 3; b++) {
+                    const freq = b === 0 ? 1200 : 700;
+                    playTone(freq, 0.08, 'square', (bar * 3 + b) * 0.45);
+                }
+            }
+        } else if (soundType === 'time_sig_44') {
+            for (let bar = 0; bar < 2; bar++) {
+                for (let b = 0; b < 4; b++) {
+                    const freq = b === 0 ? 1200 : 700;
+                    playTone(freq, 0.08, 'square', (bar * 4 + b) * 0.4);
+                }
+            }
+        } else if (soundType === 'time_sig_24') {
+            for (let bar = 0; bar < 3; bar++) {
+                for (let b = 0; b < 2; b++) {
+                    const freq = b === 0 ? 1200 : 700;
+                    playTone(freq, 0.08, 'square', (bar * 2 + b) * 0.4);
+                }
+            }
+        } else if (soundType === 'pattern_grape') {
+            playTone(800, 0.12, 'square', 0);
+        } else if (soundType === 'pattern_lemon') {
+            playTone(800, 0.08, 'square', 0);
+            playTone(800, 0.08, 'square', 0.2);
+        } else if (soundType === 'pattern_watermelon') {
+            for (let i = 0; i < 4; i++) {
+                playTone(800, 0.06, 'square', i * 0.1);
+            }
+        } else if (soundType === 'pattern_blueberry') {
+            playTone(800, 0.08, 'square', 0);
+            playTone(800, 0.06, 'square', 0.2);
+            playTone(800, 0.06, 'square', 0.3);
+        } else if (soundType === 'pattern_coconut') {
+            playTone(800, 0.06, 'square', 0);
+            playTone(800, 0.06, 'square', 0.1);
+            playTone(800, 0.08, 'square', 0.2);
+        } else if (soundType === 'pattern_cucumber') {
+            playTone(800, 0.06, 'square', 0);
+            playTone(800, 0.08, 'square', 0.1);
+            playTone(800, 0.06, 'square', 0.3);
+        } else if (soundType === 'pattern_ginger') {
+            playTone(800, 0.12, 'square', 0);
+            playTone(800, 0.08, 'square', 0.55);
+        } else if (soundType === 'pattern_carrot') {
+            playTone(800, 0.08, 'square', 0);
+            playTone(800, 0.12, 'square', 0.2);
+        } else if (soundType === 'pattern_triplet') {
+            playTone(800, 0.07, 'square', 0);
+            playTone(800, 0.07, 'square', 0.133);
+            playTone(800, 0.07, 'square', 0.266);
+        } else if (soundType === 'pattern_avocado') {
+            playTone(800, 0.06, 'square', 0);
+            playTone(800, 0.06, 'square', 0.08);
+            playTone(800, 0.06, 'square', 0.16);
+            playTone(800, 0.08, 'square', 0.24);
+        } else if (soundType === 'pattern_potato') {
+            playTone(800, 0.08, 'square', 0);
+            playTone(800, 0.06, 'square', 0.2);
+            playTone(800, 0.06, 'square', 0.28);
+            playTone(800, 0.06, 'square', 0.36);
+        } else if (soundType.startsWith('genre_')) {
+            playGenreRhythmDrumLoop(soundType);
+        }
+    }
+
+    function playGenreRhythmDrumLoop(genre) {
+        const beatLen = 0.35;
+        if (genre === 'genre_ballad') {
+            [0, 1, 2, 3].forEach(b => playTone(600, 0.04, 'square', b * beatLen));
+            playTone(120, 0.15, 'sine', 0);
+            playTone(250, 0.1, 'triangle', 2 * beatLen);
+        } else if (genre === 'genre_disco') {
+            [0, 1, 2, 3].forEach(b => {
+                playTone(150, 0.12, 'sine', b * beatLen);
+                playTone(800, 0.05, 'square', (b + 0.5) * beatLen);
+            });
+        } else if (genre === 'genre_slowrock') {
+            for (let i = 0; i < 6; i++) playTone(700, 0.04, 'square', i * 0.2);
+            playTone(130, 0.15, 'sine', 0);
+            playTone(240, 0.1, 'triangle', 0.6);
+        } else if (genre === 'genre_bolero') {
+            playTone(120, 0.15, 'sine', 0);
+            playTone(600, 0.05, 'square', 0.2);
+            playTone(240, 0.08, 'triangle', 0.4);
+            playTone(120, 0.12, 'sine', 0.7);
+        } else if (genre === 'genre_reggae') {
+            playTone(800, 0.06, 'square', 0.3);
+            playTone(140, 0.15, 'sine', 0.6);
+            playTone(800, 0.06, 'square', 0.9);
+        } else if (genre === 'genre_swing') {
+            [0, 0.35, 0.55, 0.7, 1.05, 1.25].forEach(t => playTone(900, 0.05, 'square', t));
+        } else if (genre === 'genre_bossa') {
+            playTone(120, 0.12, 'sine', 0);
+            playTone(500, 0.06, 'triangle', 0.25);
+            playTone(120, 0.12, 'sine', 0.5);
+            playTone(500, 0.06, 'triangle', 0.75);
+        }
+    }
+
+    window.checkRhythmAnswer = function(selectedId) {
         const q = window.GameState.currentQuestion;
         const feedback = document.getElementById('game-feedback');
         if (!q || !feedback) return;
 
-        if (RHYTHM_PATTERNS[idx].name === q.name) {
+        const activeUser = window.getActiveChildUser ? window.getActiveChildUser() : null;
+        const userId = activeUser ? activeUser.id : 'guest';
+        const storageKey = `rhythm_samples_progress_${userId}`;
+        const userProgress = JSON.parse(localStorage.getItem(storageKey) || '{}');
+
+        const isCorrect = (selectedId === q.correctId);
+
+        if (!userProgress[q.id]) {
+            userProgress[q.id] = { score: 0, stage: 'seed' };
+        }
+        if (isCorrect) {
+            userProgress[q.id].score = Math.min(6, (userProgress[q.id].score || 0) + 2);
+        } else {
+            userProgress[q.id].score = Math.max(0, (userProgress[q.id].score || 0) - 1);
+        }
+        const s = userProgress[q.id].score;
+        userProgress[q.id].stage = s >= 6 ? 'flower' : (s >= 3 ? 'tree' : (s >= 1 ? 'sprout' : 'seed'));
+        localStorage.setItem(storageKey, JSON.stringify(userProgress));
+
+        if (isCorrect) {
             window.GameState.score += 10;
             window.GameState.streak += 1;
-            feedback.innerHTML = `<span style="color: #22c55e;">🎉 Chúc mừng! Tiết tấu chính xác: ${q.name}</span>`;
-            setTimeout(() => renderGameUI(), 900);
+            feedback.innerHTML = `<span style="color: #22c55e;">🎉 Chính xác! Đáp án đúng: ${q.name}<br/><small style="color: #166534; font-weight: 600;">💡 ${q.explain}</small></span>`;
+            setTimeout(() => renderGameUI(), 1200);
         } else {
             window.GameState.streak = 0;
-            feedback.innerHTML = `<span style="color: #ef4444;">❌ Sai rồi! Đáp án đúng là: ${q.name}</span>`;
+            feedback.innerHTML = `<span style="color: #ef4444;">❌ Chưa đúng rồi! Đáp án chính xác là: ${q.name}<br/><small style="color: #991b1b; font-weight: 600;">💡 ${q.explain}</small></span>`;
         }
     };
 
