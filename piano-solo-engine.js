@@ -804,80 +804,109 @@
         }
 
         window.week1State.parsedLines = parsedLines;
+    };
 
-        parsedLines.forEach((l, idx) => {
-            if (!window.week1State.lineConfigs[idx]) {
-                window.week1State.lineConfigs[idx] = {
-                    rhythmPattern: '3_beat',
-                    chordVoicing: '1_5_8_3',
-                    customFingeringStr: '1 - 2 - 3'
-                };
+    window.parseLineMeasures = function(abcContent) {
+        const rawMeasures = abcContent.split('|').map(m => m.trim()).filter(m => m.length > 0);
+        let measures = [];
+        let lastChord = 'None';
+
+        rawMeasures.forEach((mText, idx) => {
+            const chordMatch = mText.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/);
+            let chord = chordMatch ? chordMatch[1] : null;
+
+            if (chord) {
+                lastChord = chord;
             }
+
+            measures.push({
+                index: idx + 1,
+                text: mText,
+                chord: chord || (mText.includes('"') ? 'None' : lastChord),
+                hasExplicitChord: !!chord
+            });
         });
+
+        return measures;
+    };
+
+    window.getMeasureConfig = function(lineIdx, mIdx, defaultChord) {
+        const key = `${lineIdx}_${mIdx}`;
+        if (!window.week1State.measureConfigs[key]) {
+            const isNoChord = (defaultChord === 'None' || !defaultChord);
+            window.week1State.measureConfigs[key] = {
+                chord: defaultChord || 'None',
+                rhythmPattern: isNoChord ? 'none' : '3_beat',
+                chordVoicing: '3_note'
+            };
+        }
+        return window.week1State.measureConfigs[key];
+    };
+
+    window.updateMeasureConfig = function(lineIdx, mIdx, field, value) {
+        const key = `${lineIdx}_${mIdx}`;
+        if (!window.week1State.measureConfigs[key]) {
+            window.week1State.measureConfigs[key] = { chord: 'C', rhythmPattern: '3_beat', chordVoicing: '3_note' };
+        }
+        window.week1State.measureConfigs[key][field] = value;
+
+        if (field === 'chord' && value === 'None') {
+            window.week1State.measureConfigs[key].rhythmPattern = 'none';
+        } else if (field === 'chord' && value !== 'None' && window.week1State.measureConfigs[key].rhythmPattern === 'none') {
+            window.week1State.measureConfigs[key].rhythmPattern = '3_beat';
+        }
+
+        window.renderWeek1Step1Lines();
     };
 
     window.autoApplyWeek1Defaults = function() {
         window.parseWeek1Lines();
-        window.week1State.parsedLines.forEach((l, idx) => {
-            window.week1State.lineConfigs[idx] = {
-                rhythmPattern: '3_beat',
-                chordVoicing: '1_5_8_3',
-                customFingeringStr: '1 - 2 - 3'
-            };
-        });
+        window.week1State.measureConfigs = {};
         window.renderWeek1Step1Lines();
-        alert('⚡ Đã tự động đánh số phách (1 2 3) và tên nốt hợp âm (C E G / A C E) cho tất cả các dòng nhạc!');
+        alert('⚡ Đã tự động cấu hình tiết tấu (1 2 3) và tên nốt hợp âm (C E G / A C E) chuẩn cho từng ô nhịp!');
     };
 
     const CHORD_NOTE_SOLFEGE_MAP = {
-        'C': 'C - E - G',
-        'Am': 'A - C - E',
-        'F': 'F - A - C',
-        'Dm': 'D - F - A',
-        'G': 'G - B - D',
-        'Em': 'E - G - B',
-        'E7': 'E - ^G - B',
-        'Bm': 'B - D - F#',
-        'D': 'D - F# - A'
+        'C': { solfege: 'C - E - G', notes: ['C', 'E', 'G'] },
+        'Am': { solfege: 'A - C - E', notes: ['A', 'C', 'E'] },
+        'F': { solfege: 'F - A - C', notes: ['F', 'A', 'C'] },
+        'Dm': { solfege: 'D - F - A', notes: ['D', 'F', 'A'] },
+        'G': { solfege: 'G - B - D', notes: ['G', 'B', 'D'] },
+        'Em': { solfege: 'E - G - B', notes: ['E', 'G', 'B'] },
+        'E7': { solfege: 'E - ^G - B', notes: ['E', '^G', 'B'] },
+        'Bm': { solfege: 'B - D - F#', notes: ['B', 'D', 'F#'] },
+        'D': { solfege: 'D - F# - A', notes: ['D', 'F#', 'A'] },
+        'None': { solfege: '', notes: [] }
     };
 
-    function generateStep1AnnotatedAbc(lineObj, cfg) {
+    function generateStep1AnnotatedAbc(lineObj, lineIdx) {
         const snippetHeader = lineObj.snippetHeader || 'M: 2/4\nL: 1/8\nK: C';
-        const lineAbc = lineObj.abcContent;
+        const measures = window.parseLineMeasures(lineObj.abcContent);
 
-        const measures = lineAbc.split('|');
         let numberLyrics = [];
         let chordNoteLyrics = [];
 
-        let currentChord = 'C';
-        const rhythmPattern = cfg.rhythmPattern || '3_beat';
+        measures.forEach((mObj, mIdx) => {
+            const cfg = window.getMeasureConfig(lineIdx, mIdx, mObj.chord);
+            const chordKey = cfg.chord || 'C';
+            const chordObj = CHORD_NOTE_SOLFEGE_MAP[chordKey] || CHORD_NOTE_SOLFEGE_MAP['C'];
 
-        measures.forEach(m => {
-            const trimmed = m.trim();
-            if (!trimmed) return;
-
-            const chordMatch = trimmed.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/);
-            if (chordMatch) {
-                currentChord = chordMatch[1];
-            }
-
-            const chordNotes = CHORD_NOTE_SOLFEGE_MAP[currentChord] || 'C - E - G';
-
-            if (rhythmPattern === '4_beat') {
-                numberLyrics.push(' 1  2  3  4 ');
-            } else if (rhythmPattern === '3_beat') {
-                numberLyrics.push(' 1  2  3 ');
+            if (cfg.rhythmPattern === 'none' || chordKey === 'None') {
+                numberLyrics.push(' ');
+                chordNoteLyrics.push(' ');
+            } else if (cfg.rhythmPattern === '4_beat') {
+                numberLyrics.push(' 1 2 3 4 ');
+                chordNoteLyrics.push(` ${chordObj.notes.join(' ')} ${chordObj.notes[0]} `);
             } else {
-                numberLyrics.push(' 1  2  3 ');
+                numberLyrics.push(' 1 2 3 ');
+                chordNoteLyrics.push(` ${chordObj.notes.join(' ')} `);
             }
-
-            chordNoteLyrics.push(` ${chordNotes} `);
         });
 
         const w1 = 'w:' + numberLyrics.join('|');
         const w2 = 'w:' + chordNoteLyrics.join('|');
 
-        return `${snippetHeader}\n${lineAbc}\n${w1}\n${w2}`;
+        return `${snippetHeader}\n${lineObj.abcContent}\n${w1}\n${w2}`;
     }
 
     window.renderWeek1Step1Lines = function() {
@@ -892,7 +921,7 @@
         }
 
         lines.forEach((lineObj, idx) => {
-            const cfg = window.week1State.lineConfigs[idx] || {};
+            const measures = window.parseLineMeasures(lineObj.abcContent);
 
             const card = document.createElement('div');
             card.style.cssText = `
@@ -903,9 +932,46 @@
                 box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             `;
 
-            const chordMatches = lineObj.abcContent.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/g) || [];
-            const chordsList = Array.from(new Set(chordMatches.map(c => c.replace(/"/g, ''))));
-            const chordNamesStr = chordsList.length > 0 ? chordsList.join(' - ') : 'C';
+            const activeChords = measures.map((m, mIdx) => {
+                const c = window.getMeasureConfig(idx, mIdx, m.chord).chord;
+                return c !== 'None' ? c : null;
+            }).filter(Boolean);
+            const chordsList = Array.from(new Set(activeChords));
+            const chordNamesStr = chordsList.length > 0 ? chordsList.join(' - ') : 'None';
+
+            const measureControlsHtml = measures.map((mObj, mIdx) => {
+                const cfg = window.getMeasureConfig(idx, mIdx, mObj.chord);
+                return `
+                    <div style="background: white; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+                      <div style="font-weight: 800; color: #0369a1; font-size: 0.88rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <span>🎼 Ô Nhịp ${mObj.index}</span>
+                        <span style="font-size: 0.78rem; background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 8px;">${mObj.text}</span>
+                      </div>
+
+                      <div style="margin-bottom: 8px;">
+                        <label style="display: block; font-weight: 700; color: #475569; font-size: 0.78rem; margin-bottom: 3px;">🎸 Hợp Âm Ô Này:</label>
+                        <select onchange="window.updateMeasureConfig(${idx}, ${mIdx}, 'chord', this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #94a3b8; font-weight: 700; font-size: 0.82rem; outline: none; cursor: pointer;">
+                          <option value="None" ${cfg.chord === 'None' ? 'selected' : ''}>None (Không có / Ô lướt)</option>
+                          <option value="C" ${cfg.chord === 'C' ? 'selected' : ''}>C (Đô Trưởng: C - E - G)</option>
+                          <option value="Am" ${cfg.chord === 'Am' ? 'selected' : ''}>Am (La Thứ: A - C - E)</option>
+                          <option value="F" ${cfg.chord === 'F' ? 'selected' : ''}>F (Fa Trưởng: F - A - C)</option>
+                          <option value="Dm" ${cfg.chord === 'Dm' ? 'selected' : ''}>Dm (Rê Thứ: D - F - A)</option>
+                          <option value="G" ${cfg.chord === 'G' ? 'selected' : ''}>G (Sol Trưởng: G - B - D)</option>
+                          <option value="Em" ${cfg.chord === 'Em' ? 'selected' : ''}>Em (Mi Thứ: E - G - B)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style="display: block; font-weight: 700; color: #475569; font-size: 0.78rem; margin-bottom: 3px;">🥁 Tiết Tấu Tay Trái:</label>
+                        <select onchange="window.updateMeasureConfig(${idx}, ${mIdx}, 'rhythmPattern', this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #94a3b8; font-weight: 700; font-size: 0.82rem; outline: none; cursor: pointer;">
+                          <option value="none" ${cfg.rhythmPattern === 'none' ? 'selected' : ''}>Nghỉ (Không chọn gì hết)</option>
+                          <option value="3_beat" ${cfg.rhythmPattern === '3_beat' ? 'selected' : ''}>Tiết tấu 3 nốt (1-2-3 ➔ C-E-G)</option>
+                          <option value="4_beat" ${cfg.rhythmPattern === '4_beat' ? 'selected' : ''}>Tiết tấu 4 nốt (1-2-3-4 ➔ C-E-G-C)</option>
+                        </select>
+                      </div>
+                    </div>
+                `;
+            }).join('');
 
             card.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
@@ -915,26 +981,10 @@
 
                 <div id="week1-step1-paper-${idx}" style="background: white; border-radius: 14px; padding: 12px; border: 1.5px solid #cbd5e1; margin-bottom: 14px; min-height: 90px;"></div>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; background: white; padding: 14px; border-radius: 14px; border: 1.5px solid #e2e8f0;">
-                  <div>
-                    <label style="display: block; font-weight: 800; color: #475569; font-size: 0.85rem; margin-bottom: 4px;">🥁 Đổi Tiết Tấu & Số Phách Đếm:</label>
-                    <select onchange="window.updateWeek1LineRhythm(${idx}, this.value)" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #94a3b8; font-weight: 700; color: #1e293b; outline: none; cursor: pointer;">
-                      <option value="3_beat" ${cfg.rhythmPattern === '3_beat' ? 'selected' : ''}>Phách 2/4 - 3 Nốt (1 - 2 - 3)</option>
-                      <option value="4_beat" ${cfg.rhythmPattern === '4_beat' ? 'selected' : ''}>Phách 4/4 - 4 Nốt (1 - 2 - 3 - 4)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style="display: block; font-weight: 800; color: #475569; font-size: 0.85rem; margin-bottom: 4px;">🎹 Tên Nốt Hợp Âm Tay Trái:</label>
-                    <select onchange="window.updateWeek1LineChord(${idx}, this.value)" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #94a3b8; font-weight: 700; color: #1e293b; outline: none; cursor: pointer;">
-                      <option value="1_5_8_3" ${cfg.chordVoicing === '1_5_8_3' ? 'selected' : ''}>Thế 3 Nốt Chuẩn Bội Ngọc (C - E - G / A - C - E)</option>
-                      <option value="root_triad" ${cfg.chordVoicing === 'root_triad' ? 'selected' : ''}>Ba Âm Gốc (1 - 3 - 5)</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label style="display: block; font-weight: 800; color: #475569; font-size: 0.85rem; margin-bottom: 4px;">🖐 Thế Bấm Ngón Tay (Fingering):</label>
-                    <input type="text" value="${cfg.customFingeringStr || '1 - 2 - 3'}" onchange="window.updateWeek1LineFingering(${idx}, this.value)" style="width: 100%; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #94a3b8; font-weight: 700; color: #1e293b; outline: none;">
+                <div style="background: white; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 14px;">
+                  <h4 style="margin: 0 0 10px 0; color: #0369a1; font-size: 0.9rem; font-weight: 800;">⚙️ Cấu Hình Tiết Tấu & Hợp Âm Từng Ô Nhịp (Dòng này có ${measures.length} ô nhịp):</h4>
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px;">
+                    ${measureControlsHtml}
                   </div>
                 </div>
             `;
@@ -944,7 +994,7 @@
             setTimeout(() => {
                 const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
                 if (abcRenderer) {
-                    const fullSnippetAbc = generateStep1AnnotatedAbc(lineObj, cfg);
+                    const fullSnippetAbc = generateStep1AnnotatedAbc(lineObj, idx);
                     try {
                         abcRenderer.renderAbc(`week1-step1-paper-${idx}`, fullSnippetAbc, {
                             responsive: 'resize',
@@ -958,21 +1008,6 @@
                 }
             }, 30);
         });
-    };
-
-    window.updateWeek1LineRhythm = function(lineIdx, rhythmVal) {
-        if (!window.week1State.lineConfigs[lineIdx]) window.week1State.lineConfigs[lineIdx] = {};
-        window.week1State.lineConfigs[lineIdx].rhythmPattern = rhythmVal;
-    };
-
-    window.updateWeek1LineChord = function(lineIdx, chordVal) {
-        if (!window.week1State.lineConfigs[lineIdx]) window.week1State.lineConfigs[lineIdx] = {};
-        window.week1State.lineConfigs[lineIdx].chordVoicing = chordVal;
-    };
-
-    window.updateWeek1LineFingering = function(lineIdx, fingerVal) {
-        if (!window.week1State.lineConfigs[lineIdx]) window.week1State.lineConfigs[lineIdx] = {};
-        window.week1State.lineConfigs[lineIdx].customFingeringStr = fingerVal;
     };
 
     window.renderWeek1Step2Lines = function() {
