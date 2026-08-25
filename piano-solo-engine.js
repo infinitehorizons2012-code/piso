@@ -685,6 +685,12 @@
         const textarea = document.getElementById('week1-abc-input');
         if (textarea) textarea.value = p.abc;
         window.renderWeek1MasterPreview();
+        window.parseWeek1Lines();
+        if (window.week1State.activeStep === 1) {
+            window.renderWeek1Step1Lines();
+        } else if (window.week1State.activeStep === 2) {
+            window.renderWeek1Step2Lines();
+        }
     };
 
     window.renderWeek1MasterPreview = function() {
@@ -692,6 +698,8 @@
         if (textarea) {
             window.week1State.abcInput = textarea.value;
         }
+
+        window.parseWeek1Lines();
 
         const paper = document.getElementById('week1-master-preview-paper');
         if (!paper) return;
@@ -787,7 +795,7 @@
             const fullNotesAbc = noteLines.join(' ');
             const rawMeasures = fullNotesAbc.split('|').map(m => m.trim()).filter(m => m.length > 0);
 
-            if (rawMeasures.length <= 4 || currentTitle) {
+            if (rawMeasures.length <= 4) {
                 parsedLines.push({
                     id: `line_${lineCounter}`,
                     title: currentTitle || `DÒNG ${lineCounter}`,
@@ -822,7 +830,7 @@
 
                     parsedLines.push({
                         id: `line_${lineCounter}`,
-                        title: `DÒNG ${lineCounter}`,
+                        title: currentTitle ? `${currentTitle} (${i / 4 + 1})` : `DÒNG ${lineCounter}`,
                         abcContent: chunkText,
                         headerStr: headerStr,
                         snippetHeader: snippetHeader
@@ -860,6 +868,8 @@
     };
 
     window.parseLineMeasures = function(abcContent) {
+        if (!abcContent || !abcContent.trim()) return [];
+
         const lines = abcContent.split('\n').map(l => l.trim()).filter(l => l.length > 0);
         let noteLines = [];
         let lyricLines = [];
@@ -873,8 +883,16 @@
             }
         });
 
-        const fullNotesAbc = noteLines.join(' ');
-        const noteMeasures = fullNotesAbc.split('|').map(m => m.trim()).filter(m => m.length > 0);
+        const fullNotesAbc = noteLines.join(' ').trim();
+        if (!fullNotesAbc) return [];
+
+        let noteMeasures = [];
+        if (fullNotesAbc.includes('|')) {
+            noteMeasures = fullNotesAbc.split('|').map(m => m.trim()).filter(m => m.length > 0);
+        } else {
+            noteMeasures = [fullNotesAbc];
+        }
+
         const lyricRows = lyricLines.map(line => line.split('|').map(m => m.trim()));
 
         let measures = [];
