@@ -859,6 +859,26 @@
         window.renderWeek1Step1Lines();
     };
 
+    window.updateStep1Paper = function(lineIdx) {
+        const lineObj = window.week1State.parsedLines[lineIdx];
+        if (!lineObj) return;
+
+        const abcRenderer = window.abcjs || window.ABCJS || (typeof abcjs !== 'undefined' ? abcjs : null);
+        if (abcRenderer) {
+            const fullSnippetAbc = generateStep1AnnotatedAbc(lineObj, lineIdx);
+            try {
+                abcRenderer.renderAbc(`week1-step1-paper-${lineIdx}`, fullSnippetAbc, {
+                    responsive: 'resize',
+                    scale: 1.15,
+                    staffwidth: 720,
+                    add_classes: true
+                });
+            } catch (e) {
+                console.warn(`Error rendering Step 1 snippet ${lineIdx}:`, e);
+            }
+        }
+    };
+
     window.updateMeasureAbcText = function(lineIdx, mIdx, newText) {
         const lineObj = window.week1State.parsedLines[lineIdx];
         if (!lineObj) return;
@@ -885,7 +905,7 @@
         const inputEl = document.getElementById('week1-abc-input');
         if (inputEl) inputEl.value = window.week1State.abcInput;
 
-        window.renderWeek1Step1Lines();
+        window.updateStep1Paper(lineIdx);
     };
 
     window.autoApplyWeek1Defaults = function() {
@@ -1030,7 +1050,7 @@
 
                       <div style="margin-bottom: 8px;">
                         <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">📝 Mã ABC Notation Ô Nhịp ${mObj.index}:</label>
-                        <textarea rows="2" onchange="window.updateMeasureAbcText(${idx}, ${mIdx}, this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.84rem; color: #0f172a; outline: none; background: #f0f9ff; resize: vertical;">${mObj.text}</textarea>
+                        <textarea rows="2" oninput="window.updateMeasureAbcText(${idx}, ${mIdx}, this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.84rem; color: #0f172a; outline: none; background: #f0f9ff; resize: vertical;">${mObj.text}</textarea>
                       </div>
 
                       <div style="margin-bottom: 8px;">
