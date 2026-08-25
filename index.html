@@ -79,65 +79,287 @@
           </div>
         </div>
 
-        <!-- VISUAL INTERACTIVE PIANO KEYBOARD (5 OCTAVES C2 -> C7) -->
-        <div style="margin-bottom: 28px; background: linear-gradient(135deg, #0f172a, #1e293b); padding: 22px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: white; flex-wrap: wrap; gap: 10px;">
-            <span style="font-weight: 800; font-size: 1.1rem; color: #fde047;">🎹 BÀN PHÍM PIANO TỔNG THỂ 2 TAY (C2 ➔ C7)</span>
-            
-            <!-- Hand position legend -->
-            <div style="display: flex; gap: 12px; font-size: 0.85rem; font-weight: 800;">
-              <span style="background: #0284c7; color: white; padding: 4px 12px; border-radius: 12px; box-shadow: 0 2px 6px rgba(2,132,199,0.4);">🫲 TAY TRÁI (Khóa Fa / Bass)</span>
-              <span style="background: #e11d48; color: white; padding: 4px 12px; border-radius: 12px; box-shadow: 0 2px 6px rgba(225,29,72,0.4);">🫱 TAY PHẢI (Khóa Sol / Treble)</span>
+        <!-- PIANO SOLO SUB-TABS NAVIGATION -->
+        <div style="display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; flex-wrap: wrap;">
+          <button id="piano-subtab-btn-interactive" onclick="window.switchPianoSubTab('interactive')" style="padding: 10px 22px; border-radius: 16px; font-weight: 800; border: none; background: linear-gradient(135deg, #be123c, #881337); color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(190,18,60,0.3); font-size: 1rem; transition: all 0.2s;">
+            🎹 1. Tương Tác (Phím Đàn & Solo)
+          </button>
+          <button id="piano-subtab-btn-theory" onclick="window.switchPianoSubTab('theory')" style="padding: 10px 22px; border-radius: 16px; font-weight: 800; border: 2px solid #cbd5e1; background: white; color: #475569; cursor: pointer; font-size: 1rem; transition: all 0.2s;">
+            📚 2. Lý Thuyết: Bách Khoa Toàn Thư Giải Mã & Hòa Âm
+          </button>
+        </div>
+
+        <!-- SUB-TAB 1: INTERACTIVE PIANO & SHEET MUSIC PLAYER -->
+        <div id="piano-subcontent-interactive" style="display: block;">
+          
+          <!-- VISUAL INTERACTIVE PIANO KEYBOARD (5 OCTAVES C2 -> C7) -->
+          <div style="margin-bottom: 28px; background: linear-gradient(135deg, #0f172a, #1e293b); padding: 22px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: white; flex-wrap: wrap; gap: 10px;">
+              <span style="font-weight: 800; font-size: 1.1rem; color: #fde047;">🎹 BÀN PHÍM PIANO TỔNG THỂ 2 TAY (C2 ➔ C7)</span>
+              
+              <!-- Hand position legend -->
+              <div style="display: flex; gap: 12px; font-size: 0.85rem; font-weight: 800;">
+                <span style="background: #0284c7; color: white; padding: 4px 12px; border-radius: 12px; box-shadow: 0 2px 6px rgba(2,132,199,0.4);">🫲 TAY TRÁI (Khóa Fa / Bass)</span>
+                <span style="background: #e11d48; color: white; padding: 4px 12px; border-radius: 12px; box-shadow: 0 2px 6px rgba(225,29,72,0.4);">🫱 TAY PHẢI (Khóa Sol / Treble)</span>
+              </div>
+            </div>
+
+            <!-- PIANO KEYBOARD WRAPPER -->
+            <div id="piano-solo-keyboard" style="position: relative; display: flex; justify-content: center; height: 170px; user-select: none; padding-bottom: 10px; overflow-x: auto;">
+              <!-- Keys generated dynamically by JS -->
             </div>
           </div>
 
-          <!-- PIANO KEYBOARD WRAPPER -->
-          <div id="piano-solo-keyboard" style="position: relative; display: flex; justify-content: center; height: 170px; user-select: none; padding-bottom: 10px; overflow-x: auto;">
-            <!-- Keys generated dynamically by JS -->
+          <!-- SHEET MUSIC DISPLAY CONTAINER (GRAND STAFF) -->
+          <div style="background: white; border-radius: 20px; border: 2px solid #e2e8f0; padding: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; background: linear-gradient(135deg, #fff1f2, #ffe4e6); padding: 14px 18px; border-radius: 16px; border: 1.5px solid #fecdd3;">
+              <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1;">
+                <h3 style="margin: 0; color: #881337; font-size: 1.25rem; font-weight: 800; white-space: nowrap;">🎼 Sheet Nhạc & ABC Editor</h3>
+                
+                <!-- SONG SELECTOR -->
+                <select id="piano-solo-song-select" onchange="window.loadPianoSoloSong(this.value)" style="padding: 8px 14px; border-radius: 12px; border: 1.5px solid #fda4af; font-weight: 800; color: #881337; background: white; font-size: 0.9rem; outline: none; cursor: pointer;">
+                  <option value="fur_elise">🎹 Für Elise (Thư Gửi Elise) - L. v. Beethoven</option>
+                  <option value="canon_in_d">🎶 Canon in D (Piano Solo) - J. Pachelbel</option>
+                  <option value="mariage_damour">💍 Mariage d'Amour (Đám Cưới Hoa) - R. Clayderman</option>
+                  <option value="river_flows_in_you">🌸 River Flows in You - Yiruma</option>
+                  <option value="moonlight_sonata">🌙 Moonlight Sonata (Ánh Trăng) - L. v. Beethoven</option>
+                  <option value="sonata_facile">🎼 Sonata Facile in C Major - W. A. Mozart</option>
+                  <option value="nho_oi">🇻🇳 Nhỏ Ơi (Piano Solo Trang Nhã)</option>
+                  <option value="tinh_don_phuong">🇻🇳 Tình Đơn Phương (Piano Solo Ballad)</option>
+                </select>
+              </div>
+
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button onclick="window.playPianoSoloSong()" id="btn-play-sheet-abc" style="padding: 10px 22px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.35); font-size: 0.98rem; display: flex; align-items: center; gap: 6px;">
+                  ▶️ Nghe Độc Tấu Sheet ABC Này
+                </button>
+                <button onclick="window.stopPianoSoloSong()" style="padding: 10px 16px; border-radius: 16px; font-weight: 800; background: #ef4444; color: white; border: none; cursor: pointer; font-size: 0.9rem;">
+                  ⏹️ Dừng
+                </button>
+                <button onclick="window.togglePianoSoloEditor()" id="btn-toggle-piano-editor" style="padding: 10px 16px; border-radius: 16px; background: white; color: #334155; border: 1.5px solid #cbd5e1; font-weight: 700; cursor: pointer; font-size: 0.88rem;">
+                  ✏️ Bật/Tắt Trình Soạn Thảo ABC
+                </button>
+              </div>
+            </div>
+
+            <!-- ABC SHEET MUSIC PAPER -->
+            <div id="piano-solo-paper" style="min-height: 240px; background: #f8fafc; border-radius: 16px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 16px;"></div>
+
+            <!-- EDITABLE ABC TEXTAREA (COLLAPSIBLE) -->
+            <div id="piano-solo-editor-container" style="display: none; margin-top: 14px;">
+              <label style="display: block; font-weight: 800; color: #475569; margin-bottom: 6px; font-size: 0.9rem;">📝 Chỉnh sửa Mã ABC Trực Tiếp (Có Ngoặc Nhọn {} Cho Piano Grand Staff):</label>
+              <textarea id="piano-solo-abc-editor" oninput="window.renderPianoSoloAbcFromEditor()" style="width: 100%; height: 140px; padding: 12px; border-radius: 12px; border: 1.5px solid #cbd5e1; font-family: monospace; font-size: 0.95rem; outline: none; background: #fafafa; color: #1e293b; line-height: 1.5;"></textarea>
+            </div>
           </div>
         </div>
 
-        <!-- SHEET MUSIC DISPLAY CONTAINER (GRAND STAFF) -->
-        <div style="background: white; border-radius: 20px; border: 2px solid #e2e8f0; padding: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
+        <!-- SUB-TAB 2: THEORY ENCYCLOPEDIA (BÁCH KHOA TOÀN THƯ GIẢI MÃ & HÒA ÂM BÀI HÁT) -->
+        <div id="piano-subcontent-theory" style="display: none; line-height: 1.7; color: #1e293b;">
           
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; background: linear-gradient(135deg, #fff1f2, #ffe4e6); padding: 14px 18px; border-radius: 16px; border: 1.5px solid #fecdd3;">
-            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex: 1;">
-              <h3 style="margin: 0; color: #881337; font-size: 1.25rem; font-weight: 800; white-space: nowrap;">🎼 Sheet Nhạc & ABC Editor</h3>
+          <!-- INTRO BANNER -->
+          <div style="background: linear-gradient(135deg, #4c1d95, #6d28d9); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(109, 40, 217, 0.3);">
+            <span style="background: #fde047; color: #431407; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">📚 BÁCH KHOA TOÀN THƯ ÂM NHẠC ĐỈNH CAO</span>
+            <h2 style="margin: 10px 0 6px 0; font-size: 1.8rem; font-weight: 800; color: white;">Quy Trình Giải Mã & Hòa Âm Bài Hát (Song Decoding & Harmonization Algorithm)</h2>
+            <p style="margin: 0; color: #ddd6fe; font-size: 1.02rem; font-weight: 600;">Bản tổng hợp đúc kết thuật toán tư duy đỉnh cao của các nhạc công chuyên nghiệp. Giúp bạn chuyển từ việc <i>"đánh vẹt theo sheet nhạc"</i> sang tự do giải mã, đặt hợp âm và sáng tạo bản phối cho bất kỳ bài hát nào trên đời!</p>
+          </div>
+
+          <!-- SECTION 1: QUY TRÌNH 4 BƯỚC BẮT BÀI -->
+          <div style="background: white; border: 2px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-bottom: 28px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
+            <h3 style="margin-top: 0; color: #5b21b6; font-size: 1.4rem; font-weight: 800; border-bottom: 2.5px solid #ddd6fe; padding-bottom: 10px;">
+              🎬 1. QUY TRÌNH 4 BƯỚC "BẮT BÀI" MỌI BẢN NHẠC TRÊN ĐỜI
+            </h3>
+
+            <!-- ALGORITHM FLOWCHART -->
+            <div style="background: linear-gradient(135deg, #f3e8ff, #fae8ff); border: 2px dashed #c084fc; border-radius: 18px; padding: 18px; margin: 18px 0 24px 0; text-align: center;">
+              <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; font-weight: 800; font-size: 0.95rem;">
+                <span style="background: #9333ea; color: white; padding: 8px 16px; border-radius: 14px; box-shadow: 0 4px 10px rgba(147,51,234,0.3);">[BƯỚC 1: ĐIỆU]<br><small style="font-weight:600; opacity:0.9;">Cách tay đệm</small></span>
+                <span style="color: #a855f7; font-size: 1.3rem;">➔</span>
+                <span style="background: #7e22ce; color: white; padding: 8px 16px; border-radius: 14px; box-shadow: 0 4px 10px rgba(126,34,206,0.3);">[BƯỚC 2: GIỌNG]<br><small style="font-weight:600; opacity:0.9;">Bộ 7 Hợp âm</small></span>
+                <span style="color: #a855f7; font-size: 1.3rem;">➔</span>
+                <span style="background: #6b21a8; color: white; padding: 8px 16px; border-radius: 14px; box-shadow: 0 4px 10px rgba(107,33,168,0.3);">[BƯỚC 3: GIAI ĐIỆU]<br><small style="font-weight:600; opacity:0.9;">Dò nốt bằng Quãng</small></span>
+                <span style="color: #a855f7; font-size: 1.3rem;">➔</span>
+                <span style="background: #581c87; color: white; padding: 8px 16px; border-radius: 14px; box-shadow: 0 4px 10px rgba(88,28,135,0.3);">[BƯỚC 4: HỢP ÂM]<br><small style="font-weight:600; opacity:0.9;">Lắp phách mạnh</small></span>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+              <div style="background: #f8fafc; padding: 16px; border-radius: 16px; border-left: 5px solid #9333ea;">
+                <h4 style="margin: 0 0 6px 0; color: #6b21a8; font-size: 1.1rem; font-weight: 800;">1. Nắm ĐIỆU (Style & Rhythm) — Bối cảnh động</h4>
+                <p style="margin: 0; font-size: 0.95rem; color: #475569;">Nghe bài hát để biết nó là Ballad, Disco, Waltz, Slow Rock...<br><b>👉 Mục đích:</b> Để biết tay trái/tay phải phải dập nhịp, tỉa nốt hay quạt chả theo tiết tấu nào.</p>
+              </div>
+
+              <div style="background: #f8fafc; padding: 16px; border-radius: 16px; border-left: 5px solid #7e22ce;">
+                <h4 style="margin: 0 0 6px 0; color: #581c87; font-size: 1.1rem; font-weight: 800;">2. Nắm GIỌNG (Key & Scale) — Bản đồ an toàn</h4>
+                <p style="margin: 0; font-size: 0.95rem; color: #475569;">Nghe ra bài hát ở giọng gì (Ví dụ: Đô Trưởng - C).<br><b>👉 Mục đích:</b> Lập tức tải bộ 7 Hợp Âm Gia Đình (C - Dm - Em - F - G - Am - Bdim) xuống tay. Từ đây không bao giờ sợ bấm phô nữa!</p>
+              </div>
+
+              <div style="background: #f8fafc; padding: 16px; border-radius: 16px; border-left: 5px solid #6b21a8;">
+                <h4 style="margin: 0 0 6px 0; color: #4c1d95; font-size: 1.1rem; font-weight: 800;">3. Dò GIAI ĐIỆU theo INTERVALS — Linh hồn</h4>
+                <p style="margin: 0; font-size: 0.95rem; color: #475569;">Lấy nốt gốc của Giọng, nghe khoảng cách Quãng (Interval) giữa các nốt để bắt trọn vẹn câu hát của ca sĩ.</p>
+              </div>
+
+              <div style="background: #f8fafc; padding: 16px; border-radius: 16px; border-left: 5px solid #581c87;">
+                <h4 style="margin: 0 0 6px 0; color: #3b0764; font-size: 1.1rem; font-weight: 800;">4. Lắp HỢP ÂM vào PHÁCH MẠNH — Xương sống</h4>
+                <p style="margin: 0; font-size: 0.95rem; color: #475569;"><b>Quy tắc vàng:</b> Hợp âm thường sẽ đổi ngay tại Phách 1 (hoặc Phách 3) của mỗi ô nhịp (đó là các Phách Mạnh).<br>Nhìn vào nốt giai điệu vang lên ở Phách Mạnh đó, bốc Hợp âm gia đình nào có chứa nốt đó lắp vào! <i>(Ví dụ: Nốt giai điệu ở Phách 1 là nốt Mi (E) ➔ Lắp Hợp âm C (C-E-G) hoặc Am (A-C-E) vào là êm ru ngay!)</i></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: 4 QUY TẮC VÀNG TỰ ĐẶT HỢP ÂM -->
+          <div style="background: white; border: 2px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-bottom: 28px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
+            <h3 style="margin-top: 0; color: #b45309; font-size: 1.4rem; font-weight: 800; border-bottom: 2.5px solid #fde68a; padding-bottom: 10px;">
+              🌟 2. 4 QUY TẮC VÀNG TỰ ĐẶT HỢP ÂM CHO BÀI HÁT (Harmonization Rules)
+            </h3>
+            <p style="color: #64748b; font-weight: 600; margin-bottom: 20px;">Tự do trong âm nhạc không phải là đánh bừa, mà là sáng tạo dựa trên CÁC QUY TẮC VÀNG:</p>
+
+            <!-- RULE 1 -->
+            <div style="background: #fffbeb; border: 2px solid #fde68a; border-radius: 18px; padding: 20px; margin-bottom: 20px;">
+              <h4 style="margin: 0 0 10px 0; color: #92400e; font-size: 1.2rem; font-weight: 800;">
+                🌟 Quy Tắc 1 (QUAN TRỌNG NHẤT): Nốt Giai Điệu ở Phách Mạnh phải NẰM TRONG Hợp Âm
+              </h4>
+              <p style="margin: 0 0 12px 0; font-size: 0.98rem; color: #78350f;">Đây là luật bất di bất dịch! Nhìn vào nốt nhạc vang lên tại Phách 1 (Phách Mạnh) của ô nhịp. Hợp âm bạn chọn <b>BẮT BUỘC PHẢI CHỨA NỐT ĐÓ</b>.</p>
+
+              <div style="background: white; border: 1.5px solid #fcd34d; border-radius: 14px; padding: 16px;">
+                <strong style="color: #b45309; display: block; margin-bottom: 6px;">Ví dụ thực tế bài Thằng Cuội (Dòng 1):</strong>
+                <p style="margin: 0 0 8px 0; font-size: 0.95rem;">Ô nhịp thứ 2: Nốt phách mạnh là nốt <b>Sol (G)</b>.<br>Ta lọc trong 7 hợp âm gia đình Đô Trưởng xem hợp âm nào chứa nốt Sol:</p>
+                <ul style="margin: 0; padding-left: 20px; font-size: 0.95rem; color: #451a03;">
+                  <li>Hợp âm <b>C (C - E - G)</b> ➔ Có nốt Sol! <span style="color: #16a34a; font-weight: bold;">(CHỌN ĐƯỢC)</span></li>
+                  <li>Hợp âm <b>Em (E - G - B)</b> ➔ Có nốt Sol! <span style="color: #16a34a; font-weight: bold;">(CHỌN ĐƯỢC)</span></li>
+                  <li>Hợp âm <b>G (G - B - D)</b> ➔ Có nốt Sol! <span style="color: #16a34a; font-weight: bold;">(CHỌN ĐƯỢC)</span></li>
+                  <li>Hợp âm <b>F (F - A - C)</b> ➔ <b>KHÔNG</b> có nốt Sol! <span style="color: #dc2626; font-weight: bold;">(LOẠI - Đặt F vào sẽ bị chói tai ngay)</span></li>
+                </ul>
+                <p style="margin: 10px 0 0 0; font-size: 0.95rem; color: #92400e; font-weight: 700;">👉 Kết luận: Ô nhịp đó bạn có quyền chọn C, Em hoặc G. Tác giả chọn C vì nó an toàn nhất!</p>
+              </div>
+            </div>
+
+            <!-- RULE 2, 3, 4 GRID -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+              <div style="background: #fefce8; border: 1.5px solid #fef08a; padding: 18px; border-radius: 16px;">
+                <h4 style="margin: 0 0 8px 0; color: #854d0e; font-size: 1.1rem; font-weight: 800;">🌟 Quy Tắc 2: Chỉ bốc Hợp Âm trong Bộ Gia Đình (Diatonic)</h4>
+                <p style="margin: 0; font-size: 0.95rem; color: #713f12;">Nếu bài hát ở Tông Đô Trưởng, 95% thời gian bạn chỉ được chọn 1 trong 7 Hợp âm gia đình của nó: <b>C, Dm, Em, F, G, Am, Bdim</b>. Không tự dưng chèn hợp âm ngoài tông như Fm, Ab, E... trừ khi cố tình hòa âm lại nâng cao.</p>
+              </div>
+
+              <div style="background: #fefce8; border: 1.5px solid #fef08a; padding: 18px; border-radius: 16px;">
+                <h4 style="margin: 0 0 8px 0; color: #854d0e; font-size: 1.1rem; font-weight: 800;">🌟 Quy Tắc 3: Lực Hút Hòa Âm (Hành Trình Về Nhà)</h4>
+                <p style="margin: 0 0 8px 0; font-size: 0.95rem; color: #713f12;">Các hợp âm trong bộ gia đình được chia làm 3 nhóm chức năng:</p>
+                <ul style="margin: 0 0 8px 0; padding-left: 18px; font-size: 0.9rem; color: #713f12;">
+                  <li><b>Nhóm Về Nhà (Tonic):</b> C và Am (Cảm giác an toàn, nghỉ ngơi).</li>
+                  <li><b>Nhóm Đi Dạo (Subdominant):</b> F và Dm (Cảm giác mở rộng, đi xa nhà).</li>
+                  <li><b>Nhóm Căng Thẳng (Dominant):</b> G hoặc G7 (Căng thẳng, đòi hỏi quay về Nhà).</li>
+                </ul>
+                <span style="font-weight: 800; color: #a16207; font-size: 0.9rem;">👉 Luật chuyển động: Nhà (C) ➔ Đi dạo (F/Dm) ➔ Căng thẳng (G/G7) ➔ Về Nhà (C).</span>
+              </div>
+
+              <div style="background: #fefce8; border: 1.5px solid #fef08a; padding: 18px; border-radius: 16px;">
+                <h4 style="margin: 0 0 8px 0; color: #854d0e; font-size: 1.1rem; font-weight: 800;">🌟 Quy Tắc 4: Nhịp Đổi Hợp Âm (Harmonic Rhythm)</h4>
+                <p style="margin: 0; font-size: 0.95rem; color: #713f12;">Hợp âm thường chỉ đổi ở Phách 1 (hoặc Phách 3) của ô nhịp. Thông thường 1 ô nhịp chỉ dùng 1 hợp âm (hoặc cùng lắm là 2 hợp âm).</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: 3 CẤP ĐỘ THAY ĐỔI HỢP ÂM (REHARMONIZATION) -->
+          <div style="background: white; border: 2px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-bottom: 28px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
+            <h3 style="margin-top: 0; color: #047857; font-size: 1.4rem; font-weight: 800; border-bottom: 2.5px solid #a7f3d0; padding-bottom: 10px;">
+              🎨 3. 3 CẤP ĐỘ THAY ĐỔI HỢP ÂM (Biến Tấu & Phối Khí - Reharmonization)
+            </h3>
+            <p style="color: #64748b; font-weight: 600; margin-bottom: 20px;">Âm nhạc không gò bó. Các hợp âm ghi sẵn trên sheet nhạc chỉ là <i>"Vùng An Toàn Nhất"</i>. Bạn hoàn toàn có quyền thay đổi theo 3 cấp độ:</p>
+
+            <div style="display: flex; flex-direction: column; gap: 16px;">
               
-              <!-- SONG SELECTOR -->
-              <select id="piano-solo-song-select" onchange="window.loadPianoSoloSong(this.value)" style="padding: 8px 14px; border-radius: 12px; border: 1.5px solid #fda4af; font-weight: 800; color: #881337; background: white; font-size: 0.9rem; outline: none; cursor: pointer;">
-                <option value="fur_elise">🎹 Für Elise (Thư Gửi Elise) - L. v. Beethoven</option>
-                <option value="canon_in_d">🎶 Canon in D (Piano Solo) - J. Pachelbel</option>
-                <option value="mariage_damour">💍 Mariage d'Amour (Đám Cưới Hoa) - R. Clayderman</option>
-                <option value="river_flows_in_you">🌸 River Flows in You - Yiruma</option>
-                <option value="moonlight_sonata">🌙 Moonlight Sonata (Ánh Trăng) - L. v. Beethoven</option>
-                <option value="sonata_facile">🎼 Sonata Facile in C Major - W. A. Mozart</option>
-                <option value="nho_oi">🇻🇳 Nhỏ Ơi (Piano Solo Trang Nhã)</option>
-                <option value="tinh_don_phuong">🇻🇳 Tình Đơn Phương (Piano Solo Ballad)</option>
-              </select>
-            </div>
+              <!-- LEVEL 1 -->
+              <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 16px; padding: 18px;">
+                <h4 style="margin: 0 0 8px 0; color: #15803d; font-size: 1.15rem; font-weight: 800;">
+                  🟢 CẤP ĐỘ 1: Thay thế bằng Hợp âm "Anh Em Song Sinh" (Thay thế trong Tông)
+                </h4>
+                <p style="margin: 0 0 8px 0; font-size: 0.95rem; color: #166534;">Tráo đổi các hợp âm có cùng tính chất và dùng chung nốt trong bộ gia đình:</p>
+                <ul style="margin: 0 0 10px 0; padding-left: 20px; font-size: 0.93rem; color: #14532d;">
+                  <li>Thay vì đánh "C", thay bằng "Am" (cặp giọng song song).</li>
+                  <li>Thay vì đánh "F", thay bằng "Dm".</li>
+                </ul>
+                <div style="background: white; padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; color: #15803d; border: 1px solid #bbf7d0;">
+                  <b>👉 Ví dụ ở Dòng 2 bài Thằng Cuội:</b><br>
+                  Code gốc: <code>"Am" E3 G | "F" C2 (A,C) |</code><br>
+                  Bạn đổi thành: <code>"Am" E3 G | "Dm" C2 (A,C) |</code> ➔ Giai điệu nghe mềm mại và sâu lắng hơn!
+                </div>
+              </div>
 
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-              <button onclick="window.playPianoSoloSong()" id="btn-play-sheet-abc" style="padding: 10px 22px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.35); font-size: 0.98rem; display: flex; align-items: center; gap: 6px;">
-                ▶️ Nghe Độc Tấu Sheet ABC Này
-              </button>
-              <button onclick="window.stopPianoSoloSong()" style="padding: 10px 16px; border-radius: 16px; font-weight: 800; background: #ef4444; color: white; border: none; cursor: pointer; font-size: 0.9rem;">
-                ⏹️ Dừng
-              </button>
-              <button onclick="window.togglePianoSoloEditor()" id="btn-toggle-piano-editor" style="padding: 10px 16px; border-radius: 16px; background: white; color: #334155; border: 1.5px solid #cbd5e1; font-weight: 700; cursor: pointer; font-size: 0.88rem;">
-                ✏️ Bật/Tắt Trình Soạn Thảo ABC
-              </button>
+              <!-- LEVEL 2 -->
+              <div style="background: #fefce8; border: 1.5px solid #fef08a; border-radius: 16px; padding: 18px;">
+                <h4 style="margin: 0 0 8px 0; color: #a16207; font-size: 1.15rem; font-weight: 800;">
+                  🟡 CẤP ĐỘ 2: Nâng cấp "Màu Sắc" Hợp âm (Thêm gia vị Maj7, add9, 7)
+                </h4>
+                <p style="margin: 0 0 8px 0; font-size: 0.95rem; color: #854d0e;">Giữ nguyên nốt gốc nhưng nâng cấp cấu trúc hợp âm để nghe sang trọng, hiện đại:</p>
+                <ul style="margin: 0 0 10px 0; padding-left: 20px; font-size: 0.93rem; color: #713f12;">
+                  <li>Thay "C" ➔ Thành "CMaj7" hoặc "Cadd9" (bay bổng, hiện đại).</li>
+                  <li>Thay "Am" ➔ Thành "Am7" (mượt mà R&B).</li>
+                  <li>Thay "G" ➔ Thành "Gsus4" rồi mới về "G" (lơ lửng chờ đợi).</li>
+                </ul>
+                <div style="background: white; padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; color: #a16207; border: 1px solid #fef08a;">
+                  <b>👉 Ví dụ ở Dòng 1 bài Thằng Cuội:</b><br>
+                  Code gốc: <code>"C" G3 A | "C" C3 G | "Am" E2 (ED)</code><br>
+                  Bạn nâng cấp: <code>"Cadd9" G3 A | "CMaj7" C3 G | "Am7" E2 (ED)</code> ➔ Bài hát biến thành bản nhạc Lo-fi Chill cực kỳ "sang xịn mịn"!
+                </div>
+              </div>
+
+              <!-- LEVEL 3 -->
+              <div style="background: #fff1f2; border: 1.5px solid #fecdd3; border-radius: 16px; padding: 18px;">
+                <h4 style="margin: 0 0 8px 0; color: #be123c; font-size: 1.15rem; font-weight: 800;">
+                  🔴 CẤP ĐỘ 3: Hòa Âm Lại Hoàn Toàn (Reharmonization - Đổi Màu Cảm Xúc)
+                </h4>
+                <p style="margin: 0 0 8px 0; font-size: 0.95rem; color: #9f1239;">Cố tình chèn các Hợp âm Lạ (Hợp âm ngoài Tông) để tạo sự giật gân, biến bài hát thành một phiên bản hoàn toàn mới.</p>
+                <div style="background: white; padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; color: #be123c; border: 1px solid #fecdd3;">
+                  <b>👉 Ví dụ ở Dòng 4 bài Thằng Cuội:</b><br>
+                  Code gốc: <code>"F" c2 c2 | "G" (cd) (GA) | "C" c4- |</code><br>
+                  Bạn phối lại: <code>"F" c2 c2 | "Fm" (cd) (GA) | "C" c4- |</code> <i>(Thay G bằng Fm - Fa thứ ngoài Tông)</i><br>
+                  <b>👉 KẾT QUẢ:</b> Câu hát <i>"Ở cung trăng mãi làm chi?"</i> nghe bỗng nhiên da diết, xoáy sâu vào tâm khảm và mang một nỗi buồn khắc khoải cực kỳ đắt giá!
+                </div>
+              </div>
+
             </div>
           </div>
 
-          <!-- ABC SHEET MUSIC PAPER -->
-          <div id="piano-solo-paper" style="min-height: 240px; background: #f8fafc; border-radius: 16px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 16px;"></div>
+          <!-- SECTION 4: KỸ THUẬT ĐỆM PIANO RẢI GIÃN TAY -->
+          <div style="background: white; border: 2px solid #e2e8f0; border-radius: 20px; padding: 24px; margin-bottom: 28px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
+            <h3 style="margin-top: 0; color: #0284c7; font-size: 1.4rem; font-weight: 800; border-bottom: 2.5px solid #bae6fd; padding-bottom: 10px;">
+              🎹 4. KỸ THUẬT ĐỆM PIANO: TỪ HỢP ÂM ĐẾN CÂU RẢI GIÃN TAY
+            </h3>
+            <p style="color: #64748b; font-weight: 600; margin-bottom: 18px;">Khi lên đàn Piano, bạn không bấm hợp âm đứng yên mà sẽ rải ngón theo 3 bước:</p>
 
-          <!-- EDITABLE ABC TEXTAREA (COLLAPSIBLE) -->
-          <div id="piano-solo-editor-container" style="display: none; margin-top: 14px;">
-            <label style="display: block; font-weight: 800; color: #475569; margin-bottom: 6px; font-size: 0.9rem;">📝 Chỉnh sửa Mã ABC Trực Tiếp (Có Ngoặc Nhọn {} Cho Piano Grand Staff):</label>
-            <textarea id="piano-solo-abc-editor" oninput="window.renderPianoSoloAbcFromEditor()" style="width: 100%; height: 140px; padding: 12px; border-radius: 12px; border: 1.5px solid #cbd5e1; font-family: monospace; font-size: 0.95rem; outline: none; background: #fafafa; color: #1e293b; line-height: 1.5;"></textarea>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+              <div style="background: #f0f9ff; border-left: 5px solid #0284c7; padding: 16px; border-radius: 14px;">
+                <strong style="color: #0369a1; font-size: 1.05rem; display: block; margin-bottom: 4px;">1. Chọn Điệu (Rhythm):</strong>
+                <span style="font-size: 0.93rem; color: #0c4a6e;">Biết một ô nhịp rải mấy nốt (Ballad 4/4 rải 8 nốt, Slow Rock 6/8 rải 6 nốt).</span>
+              </div>
+
+              <div style="background: #f0f9ff; border-left: 5px solid #0369a1; padding: 16px; border-radius: 14px;">
+                <strong style="color: #075985; font-size: 1.05rem; display: block; margin-bottom: 4px;">2. Chọn Thế Giãn Tay (Voicing):</strong>
+                <span style="font-size: 0.93rem; color: #0c4a6e;">Thay vì chụm ngón 1-3-5, tay trái giãn rộng ngón theo <b>Thế Giãn Tay Quãng 10 (1 - 5 - 8 - 3)</b> để âm thanh nghe mênh mông, bay bổng.</span>
+              </div>
+
+              <div style="background: #f0f9ff; border-left: 5px solid #0c4a6e; padding: 16px; border-radius: 14px;">
+                <strong style="color: #082f49; font-size: 1.05rem; display: block; margin-bottom: 4px;">3. Ghép Tiết Tấu + Thế Giãn Tay:</strong>
+                <span style="font-size: 0.93rem; color: #0c4a6e;">Chạy các nốt <code>1 ➔ 5 ➔ 8 ➔ 3 ➔ 5 ➔ 3 ➔ 8 ➔ 5</code> theo nhịp đập!</span>
+              </div>
+            </div>
           </div>
+
+          <!-- SECTION 5: MASTER SUMMARY BADGES -->
+          <div style="background: linear-gradient(135deg, #1e1b4b, #312e81); color: white; border-radius: 20px; padding: 24px; box-shadow: 0 10px 25px rgba(49, 46, 129, 0.3); text-align: center;">
+            <h3 style="margin-top: 0; color: #fde047; font-size: 1.4rem; font-weight: 800;">
+              👑 BỘ BẮT BÀI & BÁCH KHOA TOÀN THƯ ÂM NHẠC TOÀN DIỆN CỦA BẠN
+            </h3>
+            <p style="color: #c7d2fe; font-size: 0.98rem; margin-bottom: 20px;">Chúc mừng bạn! Từ hôm nay, âm nhạc đối với bạn đã trở thành một ngôn ngữ minh bạch, logic và vô cùng thú vị để khám phá!</p>
+
+            <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+              <span style="background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fde047; padding: 10px 18px; border-radius: 16px; font-weight: 800; font-size: 0.92rem;">🎯 Quy Trình Giải Mã & Hòa Âm Bài Hát</span>
+              <span style="background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #38bdf8; padding: 10px 18px; border-radius: 16px; font-weight: 800; font-size: 0.92rem;">📏 Quãng (Interval) — Khoảng cách & ADN</span>
+              <span style="background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #4ade80; padding: 10px 18px; border-radius: 16px; font-weight: 800; font-size: 0.92rem;">🎹 Âm Giai (Scale) — Tông nhạc</span>
+              <span style="background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #f43f5e; padding: 10px 18px; border-radius: 16px; font-weight: 800; font-size: 0.92rem;">🎸 Hợp Âm (Chord) — Hòa âm</span>
+              <span style="background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fbbf24; padding: 10px 18px; border-radius: 16px; font-weight: 800; font-size: 0.92rem;">🥁 Tiết Tấu (Rhythm) — Nhịp tim</span>
+            </div>
+          </div>
+
         </div>
 
       </section>

@@ -633,6 +633,45 @@
         if (btnPlay) btnPlay.innerHTML = '▶️ Nghe Độc Tấu Sheet ABC Này';
     };
 
+    window.switchPianoSubTab = function(tabName) {
+        const btnInteractive = document.getElementById('piano-subtab-btn-interactive');
+        const btnTheory = document.getElementById('piano-subtab-btn-theory');
+        const contentInteractive = document.getElementById('piano-subcontent-interactive');
+        const contentTheory = document.getElementById('piano-subcontent-theory');
+
+        if (tabName === 'interactive') {
+            if (contentInteractive) contentInteractive.style.display = 'block';
+            if (contentTheory) contentTheory.style.display = 'none';
+            if (btnInteractive) {
+                btnInteractive.style.background = 'linear-gradient(135deg, #be123c, #881337)';
+                btnInteractive.style.color = 'white';
+                btnInteractive.style.border = 'none';
+                btnInteractive.style.boxShadow = '0 4px 12px rgba(190,18,60,0.3)';
+            }
+            if (btnTheory) {
+                btnTheory.style.background = 'white';
+                btnTheory.style.color = '#475569';
+                btnTheory.style.border = '2px solid #cbd5e1';
+                btnTheory.style.boxShadow = 'none';
+            }
+        } else {
+            if (contentInteractive) contentInteractive.style.display = 'none';
+            if (contentTheory) contentTheory.style.display = 'block';
+            if (btnTheory) {
+                btnTheory.style.background = 'linear-gradient(135deg, #be123c, #881337)';
+                btnTheory.style.color = 'white';
+                btnTheory.style.border = 'none';
+                btnTheory.style.boxShadow = '0 4px 12px rgba(190,18,60,0.3)';
+            }
+            if (btnInteractive) {
+                btnInteractive.style.background = 'white';
+                btnInteractive.style.color = '#475569';
+                btnInteractive.style.border = '2px solid #cbd5e1';
+                btnInteractive.style.boxShadow = 'none';
+            }
+        }
+    };
+
     window.initPianoSoloView = function() {
         setTimeout(() => {
             window.renderVirtualPianoKeyboard();
