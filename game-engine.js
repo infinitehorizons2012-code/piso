@@ -3629,6 +3629,232 @@
         `;
     }
 
+    // --- 23 GRANULAR RHYTHM KNOWLEDGE-UNIT FLASHCARDS ---
+    const RHYTHM_FLASHCARDS = {
+        lvl1: [
+            { code: 'FC-01', title: '🎺 Nhịp 2/4 (March - Hành khúc 1-2)', desc: '2 phách trong 1 ô nhịp. Phách 1 mạnh, phách 2 nhẹ (Một - Hai, Một - Hai).', countText: 'Đếm: "1 - 2"', notation: '2/4 (Hành khúc)', soundType: 'time_sig_24', icon: '🎺' },
+            { code: 'FC-02', title: '💃 Nhịp 3/4 (Waltz - Dìu dặt 1-2-3)', desc: '3 phách trong 1 ô nhịp. Phách 1 mạnh, phách 2 & 3 nhẹ (Bùm - chát - chát).', countText: 'Đếm: "1 - 2 - 3"', notation: '3/4 (Waltz)', soundType: 'time_sig_34', icon: '💃' },
+            { code: 'FC-03', title: '🎤 Nhịp 4/4 (Pop - Nhịp 4 phách quốc dân)', desc: '4 phách trong 1 ô nhịp. Phách 1 mạnh, phách 2 nhẹ, phách 3 vừa, phách 4 nhẹ.', countText: 'Đếm: "1 - 2 - 3 - 4"', notation: '4/4 (Pop/Rock)', soundType: 'time_sig_44', icon: '🎤' },
+            { code: 'FC-04', title: '🍇 GRAPE (Nốt đen ♩ - 1 phách tròn)', desc: 'Nốt đen (Quarter note) có giá trị tròn 1 phách.', countText: 'Đếm: "1"', notation: '♩ (Nốt đen)', soundType: 'pattern_grape', icon: '🍇' },
+            { code: 'FC-05', title: '🍋 LE-MON (2 móc đơn ♫ - 1 &)', desc: '2 nốt móc đơn (Eighth notes) chia đều 1 phách thành 2 nửa.', countText: 'Đếm: "1 &"', notation: '♫ (2 móc đơn)', soundType: 'pattern_lemon', icon: '🍋' },
+            { code: 'FC-06', title: '🍉 WA-TER-ME-LON (4 móc kép ♬♬ - 1 e & a)', desc: '4 nốt móc kép (Sixteenth notes) chia nhỏ 1 phách thành 4 phần bằng nhau.', countText: 'Đếm: "1 e & a"', notation: '♬♬ (4 móc kép)', soundType: 'pattern_watermelon', icon: '🍉' },
+            { code: 'FC-07', title: '🍊 O-RANGE (Móc kép + Móc đơn chấm - 1 e)', desc: '1 nốt móc kép ở đầu (1/4 phách) + 1 nốt móc đơn chấm dôi phía sau (3/4 phách).', countText: 'Đếm: "1 e..."', notation: '♬ 🎵. (Móc kép + Móc đơn chấm)', soundType: 'pattern_orange', icon: '🍊' }
+        ],
+        lvl2: [
+            { code: 'FC-08', title: '🫐 BLUE-BER-RY (1 móc đơn + 2 móc kép - 1 & a)', desc: '1 nốt móc đơn ở đầu (1/2 phách) + 2 nốt móc kép nối đằng sau (1/4 + 1/4).', countText: 'Đếm: "1 & a"', notation: '🎵♬ (1 móc đơn + 2 móc kép)', soundType: 'pattern_blueberry', icon: '🫐' },
+            { code: 'FC-09', title: '🥥 CO-CO-NUT (2 móc kép + 1 móc đơn - 1 e &)', desc: '2 nốt móc kép ở đầu (1/4 + 1/4) + 1 nốt móc đơn nối đằng sau (1/2).', countText: 'Đếm: "1 e &"', notation: '♬🎵 (2 móc kép + 1 móc đơn)', soundType: 'pattern_coconut', icon: '🥥' },
+            { code: 'FC-10', title: '🥒 CU-CUM-BER (1 móc kép - 1 móc đơn - 1 móc kép)', desc: 'Tiết tấu đảo phách: 1 móc kép (1/4) + 1 móc đơn ở giữa (1/2) + 1 móc kép (1/4).', countText: 'Đếm: "1 e a"', notation: '♬🎵♬ (Móc kép - Đơn - Kép)', soundType: 'pattern_cucumber', icon: '🥒' },
+            { code: 'FC-11', title: '🫚 GIN-GER (2 phách: Đen chấm + Móc đơn)', desc: 'Nốt đen chấm dôi ngân dài 1.5 phách + nốt móc đơn nảy 0.5 phách ở cuối phách 2.', countText: 'Đếm: "1 . 2 &"', notation: '♩. 🎵 (2 phách)', soundType: 'pattern_ginger', icon: '🫚' },
+            { code: 'FC-12', title: '🥕 CA-RROT (2 phách: Móc đơn + Đen chấm)', desc: 'Nốt móc đơn nảy 0.5 phách ở đầu + nốt đen chấm dôi ngân 1.5 phách vắt qua phách 2.', countText: 'Đếm: "1 & 2 ."', notation: '🎵 ♩. (2 phách)', soundType: 'pattern_carrot', icon: '🥕' },
+            { code: 'FC-13', title: '🌊 Điệu Slow Rock (6/8 sóng biển 1-2-3-4-5-6)', desc: 'Nhịp 6/8 rải chùm 3 nốt dạt dào như làn sóng biển nhấp nhô.', countText: 'Đếm: "1-2-3 4-5-6"', notation: 'Nhịp 6/8 Slow Rock', soundType: 'genre_slowrock', icon: '🌊' },
+            { code: 'FC-14', title: '🎼 Điệu Ballad (Tỉa rải thong thả)', desc: 'Trống tỉa rải nhẹ nhàng, mượt mà, hòa quyện với giai điệu Pop Ballad.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Pop Ballad', soundType: 'genre_ballad', icon: '🎼' },
+            { code: 'FC-15', title: '🕺 Điệu Disco (Trống dập 4-on-the-floor)', desc: 'Trống Kick đập dồn dập 4 nốt liên tục + Hi-hat mở chát chát sôi động.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Disco / Dance Beat', soundType: 'genre_disco', icon: '🕺' },
+            { code: 'FC-16', title: '💃 Điệu Bolero (Lắc lư trữ tình)', desc: 'Tiết tấu rumba/bolero trữ tình, da diết, thân thuộc với nhạc Việt.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Bolero / Rumba', soundType: 'genre_bolero', icon: '💃' }
+        ],
+        lvl3: [
+            { code: 'FC-17', title: '🍌 BA-NA-NA / PINE-AP-PLE (Chùm 3 Liên ba 1 phách)', desc: 'Chùm 3 nốt liên ba (Triplet) chia 1 phách làm 3 phần đều nhau hoàn hảo.', countText: 'Đếm: "1-thị-trưởng / 1-2-3"', notation: '(3♫ (Chùm 3 Liên ba)', soundType: 'pattern_triplet', icon: '🍌' },
+            { code: 'FC-18', title: '🥑 A-VO-CA-DO (Chùm 3 móc kép + 1 móc đơn)', desc: '3 nốt móc kép chạy dồn dập ở đầu + 1 nốt móc đơn lót phía sau.', countText: 'Đếm: "1 e & - a"', notation: '♬♬🎵 (3 kép + 1 đơn)', soundType: 'pattern_avocado', icon: '🥑' },
+            { code: 'FC-19', title: '🍠 SWEET-PO-TA-TO (1 móc đơn + Chùm 3 móc kép)', desc: '1 nốt móc đơn đứng ở đầu + 3 nốt móc kép dồn dập lót phía sau.', countText: 'Đếm: "1 - e & a"', notation: '🎵♬♬ (1 đơn + 3 kép)', soundType: 'pattern_potato', icon: '🍠' },
+            { code: 'FC-20', title: '🍍 PINE-AP-PLE 2 Phách (Chùm 3 nốt đen 2 phách)', desc: 'Chùm 3 nốt đen (Quarter note triplets) dồn đều trong không gian 2 phách.', countText: 'Đếm: "1 - 2 - 3 (trên 2 phách)"', notation: '(3♩♩♩ (Chùm 3 đen)', soundType: 'pattern_triplet_2beat', icon: '🍍' },
+            { code: 'FC-21', title: '🌴 Điệu Reggae / Funk (Giật phách ngược Off-beat)', desc: 'Nhấn mạnh phách ngược (Off-beat phách 2 & 4), giật tưng bừng phóng khoáng.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Reggae / Funk Off-beat', soundType: 'genre_reggae', icon: '🌴' },
+            { code: 'FC-22', title: '🎷 Điệu Swing / Shuffle (Nhịp nhún nhảy Jazz)', desc: 'Chia cặp phách theo tỉ lệ dẹt 2:1 (dài - ngắn), nhún nhảy lả lướt Jazz/Blues.', countText: 'Đếm: "1--a 2--a"', notation: 'Swing / Shuffle 8th', soundType: 'genre_swing', icon: '🎷' },
+            { code: 'FC-23', title: '🌊 Điệu Bossa Nova (Điệu Latin tinh tế)', desc: 'Hòa quyện tiết tấu Samba Brazil giật nhẹ tinh tế với hòa âm Jazz lãng mạn.', countText: 'Đếm: "1 & 2 & 3 & 4 &"', notation: 'Bossa Nova Latin', soundType: 'genre_bossa', icon: '🌊' }
+        ]
+    };
+
+    function renderRhythmFlashcardsView() {
+        const cardBody = document.getElementById('game-card-body');
+        if (!cardBody) return;
+
+        const lvl = window.GameState.level || 1;
+        const pool = lvl === 1 ? RHYTHM_FLASHCARDS.lvl1 : (lvl === 2 ? RHYTHM_FLASHCARDS.lvl2 : RHYTHM_FLASHCARDS.lvl3);
+        
+        if (window.GameState.rhythmFlashcardIndex >= pool.length) {
+            window.GameState.rhythmFlashcardIndex = 0;
+        }
+
+        const idx = window.GameState.rhythmFlashcardIndex || 0;
+        const card = pool[idx];
+        const isFlipped = window.GameState.rhythmFlashcardFlipped || false;
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 24px; border: 2px solid #e2e8f0; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 1.3rem; font-weight: 800;">
+                    🎴 Thẻ Học Tiết Tấu (23 Flashcards Kiến Thức)
+                </h3>
+                <p style="margin: 0 0 18px 0; color: #0284c7; font-weight: 700; font-size: 0.95rem;">
+                    Bấm vào thẻ để lật xem ký hiệu nốt nhạc & tiếng đếm phách!
+                </p>
+
+                <!-- 3D Flip Container -->
+                <div onclick="window.toggleRhythmFlashcardFlip()" style="perspective: 1000px; width: 100%; max-width: 500px; margin: 0 auto 22px auto; height: 320px; cursor: pointer;">
+                    <div id="flashcard-rhythm-inner" style="position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; ${isFlipped ? 'transform: rotateY(180deg);' : ''}">
+                        
+                        <!-- Front Face -->
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #ecfeff, #cff4fc); border-radius: 24px; border: 3px solid #a5f3fc; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; align-items: center; box-shadow: 0 10px 25px rgba(6,182,212,0.15);">
+                            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="background: #06b6d4; color: white; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">THẺ ${card.code}</span>
+                                <span style="background: white; color: #0284c7; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">Thẻ ${idx + 1} / ${pool.length}</span>
+                            </div>
+
+                            <div>
+                                <div style="font-size: 3.8rem; margin-bottom: 6px;">${card.icon}</div>
+                                <h3 style="margin: 0; color: #0e7490; font-size: 1.45rem; font-weight: 800;">${card.title}</h3>
+                                <div style="margin-top: 8px; font-weight: 800; color: #0284c7; background: white; padding: 6px 14px; border-radius: 12px; display: inline-block;">
+                                    ${card.countText}
+                                </div>
+                            </div>
+
+                            <button onclick="event.stopPropagation(); window.playRhythmFlashcardSound();" style="background: white; border: 2.5px solid #06b6d4; color: #0891b2; font-weight: 800; padding: 8px 20px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+                                🔊 Nghe Tiết Tấu
+                            </button>
+                        </div>
+
+                        <!-- Back Face -->
+                        <div style="position: absolute; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-radius: 24px; border: 3px solid #86efac; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; align-items: center; transform: rotateY(180deg); box-shadow: 0 10px 25px rgba(34,197,94,0.15);">
+                            <div style="width: 100%; text-align: left;">
+                                <span style="background: #bbf7d0; color: #166534; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.82rem;">CHI TIẾT TIẾT TẤU</span>
+                            </div>
+
+                            <div style="width: 100%;">
+                                <div style="font-weight: 800; color: #15803d; font-size: 1.2rem; margin-bottom: 6px;">🎼 Ký Hiệu: ${card.notation}</div>
+                                <div style="background: white; padding: 12px; border-radius: 14px; border: 1.5px solid #86efac; color: #166534; font-weight: 700; font-size: 0.98rem; line-height: 1.6;">
+                                    💡 ${card.desc}
+                                </div>
+                            </div>
+
+                            <button onclick="event.stopPropagation(); window.playRhythmFlashcardSound();" style="background: white; border: 2.5px solid #16a34a; color: #15803d; font-weight: 800; padding: 8px 20px; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='none'">
+                                🔊 Nghe Tiết Tấu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Bar -->
+                <div style="display: flex; gap: 12px; justify-content: center; align-items: center; max-width: 500px; margin: 0 auto; flex-wrap: wrap;">
+                    <button onclick="window.prevRhythmFlashcard()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #f1f5f9, #e2e8f0); color: #334155; border: 2px solid #cbd5e1; cursor: pointer; transition: all 0.2s; flex: 1; min-width: 100px;">⬅️ Thẻ Trước</button>
+                    <button onclick="window.toggleRhythmFlashcardFlip()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #facc15, #eab308); color: #431407; border: 2px solid #fde047; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(250,204,21,0.3); flex: 1; min-width: 100px;">🔄 Lật Thẻ</button>
+                    <button onclick="window.shuffleRhythmFlashcards()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #a855f7, #9333ea); color: white; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(168,85,247,0.3); flex: 1; min-width: 100px;">🔀 Ngẫu Nhiên</button>
+                    <button onclick="window.nextRhythmFlashcard()" style="padding: 12px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 12px rgba(2,132,199,0.3); flex: 1; min-width: 100px;">➡️ Thẻ Tiếp</button>
+                </div>
+            </div>
+        `;
+    }
+
+    window.toggleRhythmFlashcardFlip = function() {
+        window.GameState.rhythmFlashcardFlipped = !window.GameState.rhythmFlashcardFlipped;
+        renderGameUI();
+    };
+
+    window.nextRhythmFlashcard = function() {
+        const lvl = window.GameState.level || 1;
+        const pool = lvl === 1 ? RHYTHM_FLASHCARDS.lvl1 : (lvl === 2 ? RHYTHM_FLASHCARDS.lvl2 : RHYTHM_FLASHCARDS.lvl3);
+        window.GameState.rhythmFlashcardIndex = ((window.GameState.rhythmFlashcardIndex || 0) + 1) % pool.length;
+        window.GameState.rhythmFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.prevRhythmFlashcard = function() {
+        const lvl = window.GameState.level || 1;
+        const pool = lvl === 1 ? RHYTHM_FLASHCARDS.lvl1 : (lvl === 2 ? RHYTHM_FLASHCARDS.lvl2 : RHYTHM_FLASHCARDS.lvl3);
+        window.GameState.rhythmFlashcardIndex = ((window.GameState.rhythmFlashcardIndex || 0) - 1 + pool.length) % pool.length;
+        window.GameState.rhythmFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.shuffleRhythmFlashcards = function() {
+        const lvl = window.GameState.level || 1;
+        const pool = lvl === 1 ? RHYTHM_FLASHCARDS.lvl1 : (lvl === 2 ? RHYTHM_FLASHCARDS.lvl2 : RHYTHM_FLASHCARDS.lvl3);
+        window.GameState.rhythmFlashcardIndex = Math.floor(Math.random() * pool.length);
+        window.GameState.rhythmFlashcardFlipped = false;
+        renderGameUI();
+    };
+
+    window.playRhythmFlashcardSound = function() {
+        const lvl = window.GameState.level || 1;
+        const pool = lvl === 1 ? RHYTHM_FLASHCARDS.lvl1 : (lvl === 2 ? RHYTHM_FLASHCARDS.lvl2 : RHYTHM_FLASHCARDS.lvl3);
+        const card = pool[window.GameState.rhythmFlashcardIndex || 0];
+        if (card) playRhythmAudioByType(card.soundType);
+    };
+
+    function renderRhythmProgressReportView() {
+        const cardBody = document.getElementById('game-card-body');
+        if (!cardBody) return;
+
+        const lvl = window.GameState.level || 1;
+        const flashcardsPool = lvl === 1 ? RHYTHM_FLASHCARDS.lvl1 : (lvl === 2 ? RHYTHM_FLASHCARDS.lvl2 : RHYTHM_FLASHCARDS.lvl3);
+        const activeUser = window.getActiveChildUser ? window.getActiveChildUser() : null;
+        const userNameStr = activeUser ? activeUser.childName : 'Bé (Chưa đăng nhập)';
+        const userId = activeUser ? activeUser.id : 'guest';
+        const storageKey = `rhythm_samples_progress_${userId}`;
+        const userProgress = JSON.parse(localStorage.getItem(storageKey) || '{}');
+
+        const MAX_PER_CARD = 6;
+        const totalMax = flashcardsPool.length * MAX_PER_CARD;
+        let totalEarned = 0;
+
+        const microCardsHTML = flashcardsPool.map(card => {
+            const p = userProgress[card.code] || userProgress[card.soundType] || { score: 0, stage: 'seed' };
+            totalEarned += (p.score || 0);
+
+            let stageIcon = '🌱';
+            let stageBadgeStyle = 'background: #fef3c7; color: #b45309; border: 1px solid #fde047;';
+            if (p.stage === 'sprout') {
+                stageIcon = '🌿';
+                stageBadgeStyle = 'background: #dcfce7; color: #15803d; border: 1px solid #86efac;';
+            } else if (p.stage === 'tree') {
+                stageIcon = '🌳';
+                stageBadgeStyle = 'background: #bbf7d0; color: #166534; border: 1.5px solid #4ade80; font-weight: 800;';
+            } else if (p.stage === 'flower') {
+                stageIcon = '🌸';
+                stageBadgeStyle = 'background: #fce7f3; color: #be185d; border: 2px solid #f472b6; font-weight: 800; box-shadow: 0 2px 8px rgba(244,114,182,0.3);';
+            }
+
+            return `
+                <div style="background: white; border-radius: 16px; border: 1.5px solid #e2e8f0; padding: 14px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-size: 1.3rem;">${card.icon}</span>
+                        <span style="font-size: 0.75rem; font-weight: 800; padding: 2px 8px; border-radius: 8px; ${stageBadgeStyle}">${p.score || 0}/6pt</span>
+                    </div>
+                    <div style="font-weight: 800; color: #0284c7; font-size: 0.95rem; margin: 4px 0;">${card.code}: ${card.title}</div>
+                    <div style="font-size: 0.78rem; color: #475569; font-weight: 700;">🎼 ${card.notation} | ${card.countText}</div>
+                </div>
+            `;
+        }).join('');
+
+        const percentage = Math.round((totalEarned / totalMax) * 100) || 0;
+        const lvlTitle = lvl === 1 ? '☀️ Level 1 (Nhập Môn — 7 Thẻ)' : (lvl === 2 ? '🌿 Level 2 (Trung Cấp — 9 Thẻ)' : '🎷 Level 3 (Cao Cấp — 7 Thẻ)');
+
+        cardBody.innerHTML = `
+            <div style="background: white; padding: 28px; border-radius: 24px; border: 2px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <!-- MASTER HEADER BANNER -->
+                <div style="background: linear-gradient(135deg, #06b6d4, #0284c7); color: white; padding: 24px; border-radius: 20px; margin-bottom: 28px; box-shadow: 0 10px 25px rgba(6,182,212,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+                        <div>
+                            <span style="background: #e0f2fe; color: #0369a1; font-weight: 800; padding: 4px 14px; border-radius: 14px; font-size: 0.85rem;">📊 BÁO CÁO TIẾN ĐỘ THẺ TIẾT TẤU (RHYTHM MATCH)</span>
+                            <h2 style="margin: 8px 0 0 0; color: white; font-size: 1.65rem; font-weight: 800;">Bảng Ma Trận 23 Thẻ Tiết Tấu — ${userNameStr}</h2>
+                            <p style="margin: 4px 0 0 0; color: #e0f2fe; font-weight: 600; font-size: 0.95rem;">${lvlTitle} — Làm bài test để nâng stage từ 🌱 Hạt ➔ 🌸 Hoa!</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #facc15;">${percentage}%</div>
+                            <span style="background: rgba(255,255,255,0.25); color: white; font-weight: 800; padding: 4px 12px; border-radius: 12px; font-size: 0.85rem;">${totalEarned} / ${totalMax} pt</span>
+                        </div>
+                    </div>
+
+                    <!-- Main Progress Bar -->
+                    <div style="width: 100%; height: 14px; background: rgba(255,255,255,0.2); border-radius: 8px; overflow: hidden;">
+                        <div style="width: ${percentage}%; height: 100%; background: #facc15; border-radius: 8px; transition: width 0.5s;"></div>
+                    </div>
+                </div>
+
+                <!-- Micro Cards Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px;">
+                    ${microCardsHTML}
+                </div>
+            </div>
+        `;
+    }
+
     function renderFlashcardView() {
         if (window.GameState.activeGame === 'interval') {
             renderIntervalFlashcardsView();
@@ -3636,6 +3862,8 @@
             renderScaleFlashcardsView();
         } else if (window.GameState.activeGame === 'chord') {
             renderChordFlashcardsView();
+        } else if (window.GameState.activeGame === 'rhythm') {
+            renderRhythmFlashcardsView();
         } else {
             renderNoteFlashcardsView();
         }
@@ -3649,6 +3877,8 @@
             renderScaleProgressReportView();
         } else if (window.GameState.activeGame === 'chord') {
             renderChordProgressReportView();
+        } else if (window.GameState.activeGame === 'rhythm') {
+            renderRhythmProgressReportView();
         } else {
             renderNoteProgressReportView();
         }
