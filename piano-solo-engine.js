@@ -924,8 +924,9 @@
 
             lines.forEach(l => {
                 if (l.startsWith('%')) return;
-                if (l.startsWith('w:')) {
-                    lyricParts.push(l.replace(/^w:/, '').trim());
+                if (/^w[0-9]*:?/i.test(l)) {
+                    const cleanWords = l.replace(/^w[0-9]*:?/i, '').trim();
+                    if (cleanWords) lyricParts.push(cleanWords);
                 } else {
                     notesParts.push(l);
                 }
