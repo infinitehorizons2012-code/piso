@@ -167,7 +167,7 @@
         return 440 * Math.pow(2, (midi - 69) / 12);
     };
 
-    // Render Full Visual Piano 5-Octave Keyboard (C2 to C7: MIDI 36 to 96) for Complete 2-Hand Visibility
+    // Render Full Visual Piano 5-Octave Keyboard (C2 to C7: MIDI 36 to 96) with 100% Precise Nested Black Keys
     window.renderVirtualPianoKeyboard = function() {
         const keyboardElem = document.getElementById('piano-solo-keyboard');
         if (!keyboardElem) return;
@@ -178,7 +178,6 @@
         const endMidi = 96;   // C7 (High Treble - Right Hand)
 
         const notesInOctave = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-        let whiteKeyOffset = 0;
 
         for (let midi = startMidi; midi <= endMidi; midi++) {
             const noteIdx = midi % 12;
@@ -186,9 +185,13 @@
             const noteName = notesInOctave[noteIdx];
             const fullName = `${noteName}${octave}`;
             const isBlack = noteName.includes('#');
+
+            // Skip black keys in outer loop because they are nested inside their preceding white key parent!
+            if (isBlack) continue;
+
             const isLeftHandRange = (midi < 60);
 
-            // Find key binding
+            // Find key binding for white key
             let keyBindStr = '';
             for (const [k, v] of Object.entries(KEY_BOARD_MAP)) {
                 if (v.midi === midi) {
@@ -197,71 +200,105 @@
                 }
             }
 
-            const keyDiv = document.createElement('div');
-            keyDiv.id = `piano-key-${midi}`;
-            keyDiv.dataset.midi = midi;
-            keyDiv.dataset.note = fullName;
-
-            if (isBlack) {
-                keyDiv.className = 'black-key';
-                keyDiv.style.cssText = `
-                    position: absolute;
-                    left: ${whiteKeyOffset * 26 - 9}px;
-                    width: 18px;
-                    height: 100px;
-                    background: linear-gradient(180deg, #1e293b, #0f172a);
-                    border: 1px solid #020617;
-                    border-radius: 0 0 5px 5px;
-                    z-index: 2;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-                    cursor: pointer;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: flex-end;
-                    align-items: center;
-                    padding-bottom: 6px;
-                    color: ${isLeftHandRange ? '#38bdf8' : '#facc15'};
-                    font-size: 0.62rem;
-                    font-weight: 800;
-                    transition: background 0.1s, transform 0.1s;
-                `;
-            } else {
-                keyDiv.className = 'white-key';
-                keyDiv.style.cssText = `
-                    position: relative;
-                    width: 25px;
-                    height: 160px;
-                    margin-right: 1px;
-                    background: linear-gradient(180deg, #ffffff, #f1f5f9);
-                    border: 1.5px solid #cbd5e1;
-                    border-radius: 0 0 7px 7px;
-                    z-index: 1;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-                    cursor: pointer;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: flex-end;
-                    align-items: center;
-                    padding-bottom: 10px;
-                    color: #1e293b;
-                    font-size: 0.7rem;
-                    font-weight: 800;
-                    transition: background 0.1s, transform 0.1s;
-                `;
-                whiteKeyOffset++;
-            }
-
-            keyDiv.innerHTML = `
-                ${showKeyLabels ? `<span style="font-size: 0.65rem; color: ${isLeftHandRange ? '#0284c7' : '#e11d48'}; font-weight: 800;">${fullName}</span>` : ''}
-                ${keyBindStr ? `<span style="font-size: 0.62rem; opacity: 0.85; font-weight: bold; background: ${isBlack ? 'rgba(255,255,255,0.2)' : '#e2e8f0'}; padding: 1px 3px; border-radius: 3px; margin-top: 2px;">${keyBindStr}</span>` : ''}
+            const whiteKeyDiv = document.createElement('div');
+            whiteKeyDiv.id = `piano-key-${midi}`;
+            whiteKeyDiv.className = 'white-key';
+            whiteKeyDiv.dataset.midi = midi;
+            whiteKeyDiv.dataset.note = fullName;
+            whiteKeyDiv.style.cssText = `
+                position: relative;
+                width: 25px;
+                height: 160px;
+                margin-right: 1px;
+                background: linear-gradient(180deg, #ffffff, #f1f5f9);
+                border: 1.5px solid #cbd5e1;
+                border-radius: 0 0 7px 7px;
+                z-index: 1;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                align-items: center;
+                padding-bottom: 10px;
+                color: #1e293b;
+                font-size: 0.7rem;
+                font-weight: 800;
+                user-select: none;
+                transition: background 0.1s, transform 0.1s;
             `;
 
-            keyDiv.addEventListener('mousedown', (e) => {
+            whiteKeyDiv.innerHTML = `
+                ${showKeyLabels ? `<span style="font-size: 0.65rem; color: ${isLeftHandRange ? '#0284c7' : '#e11d48'}; font-weight: 800; pointer-events: none;">${fullName}</span>` : ''}
+                ${keyBindStr ? `<span style="font-size: 0.62rem; opacity: 0.85; font-weight: bold; background: #e2e8f0; padding: 1px 3px; border-radius: 3px; margin-top: 2px; pointer-events: none;">${keyBindStr}</span>` : ''}
+            `;
+
+            whiteKeyDiv.addEventListener('mousedown', (e) => {
+                if (e.target.classList.contains('black-key') || e.target.closest('.black-key')) return;
                 e.preventDefault();
                 window.triggerPianoKey(midi, 400, isLeftHandRange ? 'left' : 'right');
             });
 
-            keyboardElem.appendChild(keyDiv);
+            // CHECK IF NEXT NOTE IS A BLACK KEY AND NEST IT INSIDE THIS WHITE KEY
+            if (midi + 1 <= endMidi) {
+                const nextNoteName = notesInOctave[(midi + 1) % 12];
+                if (nextNoteName.includes('#')) {
+                    const blackMidi = midi + 1;
+                    const blackFullName = `${nextNoteName}${octave}`;
+                    const isBlackLeftHand = (blackMidi < 60);
+
+                    let blackKeyBindStr = '';
+                    for (const [k, v] of Object.entries(KEY_BOARD_MAP)) {
+                        if (v.midi === blackMidi) {
+                            blackKeyBindStr = k.toUpperCase();
+                            break;
+                        }
+                    }
+
+                    const blackKeyDiv = document.createElement('div');
+                    blackKeyDiv.id = `piano-key-${blackMidi}`;
+                    blackKeyDiv.className = 'black-key';
+                    blackKeyDiv.dataset.midi = blackMidi;
+                    blackKeyDiv.dataset.note = blackFullName;
+                    blackKeyDiv.style.cssText = `
+                        position: absolute;
+                        top: -1px;
+                        right: -9px;
+                        width: 17px;
+                        height: 100px;
+                        background: linear-gradient(180deg, #1e293b, #0f172a);
+                        border: 1px solid #020617;
+                        border-radius: 0 0 5px 5px;
+                        z-index: 10;
+                        box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+                        cursor: pointer;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: flex-end;
+                        align-items: center;
+                        padding-bottom: 6px;
+                        color: ${isBlackLeftHand ? '#38bdf8' : '#facc15'};
+                        font-size: 0.6rem;
+                        font-weight: 800;
+                        transition: background 0.1s, transform 0.1s;
+                    `;
+
+                    blackKeyDiv.innerHTML = `
+                        ${showKeyLabels ? `<span style="font-size: 0.6rem; color: ${isBlackLeftHand ? '#38bdf8' : '#fde047'}; font-weight: 800; pointer-events: none;">${blackFullName}</span>` : ''}
+                        ${blackKeyBindStr ? `<span style="font-size: 0.58rem; opacity: 0.85; font-weight: bold; background: rgba(255,255,255,0.2); padding: 1px 3px; border-radius: 3px; margin-top: 2px; pointer-events: none;">${blackKeyBindStr}</span>` : ''}
+                    `;
+
+                    blackKeyDiv.addEventListener('mousedown', (e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        window.triggerPianoKey(blackMidi, 400, isBlackLeftHand ? 'left' : 'right');
+                    });
+
+                    whiteKeyDiv.appendChild(blackKeyDiv);
+                }
+            }
+
+            keyboardElem.appendChild(whiteKeyDiv);
         }
     };
 
