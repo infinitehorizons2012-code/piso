@@ -169,15 +169,22 @@
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
               <h3 style="margin: 0; color: #0369a1; font-size: 1.25rem; font-weight: 800;">📄 Tab 0: Nạp Mã ABC Notation & Xem Sheet Tổng Thể</h3>
               
-              <div style="display: flex; gap: 10px; align-items: center;">
-                <label style="font-weight: 800; color: #475569; font-size: 0.9rem;">Chọn Bài Mẫu:</label>
-                <select id="week1-preset-song-select" onchange="window.loadWeek1PresetSong(this.value)" style="padding: 8px 14px; border-radius: 12px; border: 1.5px solid #38bdf8; font-weight: 800; color: #0369a1; background: white; outline: none; cursor: pointer;">
-                  <option value="thang_cuoi">🇻🇳 Thằng Cuội (Bội Ngọc Solo Method - Tuần 1)</option>
-                  <option value="proud_of_you">🎶 Proud Of You (Bội Ngọc Solo Method - Tuần 1)</option>
-                  <option value="endless_love">💕 Endless Love (Bội Ngọc Solo Method - Tuần 1)</option>
-                  <option value="ban_nhac_cua_be">🎼 Bản Nhạc Của Bé (Đô Trưởng C)</option>
-                  <option value="fur_elise">🎹 Für Elise - Beethoven</option>
+              <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                <label style="font-weight: 800; color: #475569; font-size: 0.9rem;">Nạp Bài Hát:</label>
+                <select id="week1-preset-song-select" onchange="window.loadWeek1PresetSong(this.value)" style="padding: 8px 14px; border-radius: 12px; border: 1.5px solid #38bdf8; font-weight: 800; color: #0369a1; background: white; outline: none; cursor: pointer; max-width: 340px;">
+                  <optgroup label="🎶 Bài Mẫu Mặc Định">
+                    <option value="thang_cuoi">🇻🇳 Thằng Cuội (Bội Ngọc Solo Method - Tuần 1)</option>
+                    <option value="proud_of_you">🎶 Proud Of You (Bội Ngọc Solo Method - Tuần 1)</option>
+                    <option value="endless_love">💕 Endless Love (Bội Ngọc Solo Method - Tuần 1)</option>
+                    <option value="ban_nhac_cua_be">🎼 Bản Nhạc Của Bé (Đô Trưởng C)</option>
+                    <option value="fur_elise">🎹 Für Elise - Beethoven</option>
+                  </optgroup>
+                  <optgroup id="week1-library-optgroup" label="📚 Bài Từ Thư Viện Bản Nhạc">
+                  </optgroup>
                 </select>
+                <button onclick="window.populateWeek1LibraryDropdown()" title="Cập Nhật Danh Sách Từ Thư Viện Cloud & Máy" style="padding: 8px 12px; border-radius: 10px; border: 1.5px solid #38bdf8; background: #e0f2fe; color: #0369a1; font-weight: 800; cursor: pointer; font-size: 0.84rem; display: flex; align-items: center; gap: 4px;">
+                  🔄 Cập Nhật Thư Viện
+                </button>
               </div>
             </div>
 

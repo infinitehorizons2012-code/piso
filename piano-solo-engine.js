@@ -680,11 +680,56 @@
         masterModalOpen: false
     };
 
+    window.populateWeek1LibraryDropdown = function() {
+        const optgroup = document.getElementById('week1-library-optgroup');
+        if (!optgroup) return;
+
+        let libraryItems = [];
+        try {
+            const cached = localStorage.getItem('piso_library_cache');
+            if (cached) libraryItems = JSON.parse(cached);
+        } catch (e) {
+            console.warn('Error reading piso_library_cache:', e);
+        }
+
+        if (!libraryItems || libraryItems.length === 0) {
+            optgroup.innerHTML = `<option disabled value="">(Chưa có bài lưu trong Thư Viện)</option>`;
+            return;
+        }
+
+        optgroup.innerHTML = libraryItems.map(item => {
+            const title = item.title || item.name || 'Bản Nhạc Không Tên';
+            const folder = item.folderPath ? ` [${item.folderPath}]` : '';
+            return `<option value="lib_${item.id}">📚 ${title}${folder}</option>`;
+        }).join('');
+    };
+
     window.loadWeek1PresetSong = function(presetKey) {
-        const p = WEEK1_PRESETS[presetKey] || WEEK1_PRESETS.thang_cuoi;
-        window.week1State.abcInput = p.abc;
+        let abcContent = '';
+
+        if (presetKey && presetKey.startsWith('lib_')) {
+            const songId = presetKey.replace('lib_', '');
+            let libraryItems = [];
+            try {
+                const cached = localStorage.getItem('piso_library_cache');
+                if (cached) libraryItems = JSON.parse(cached);
+            } catch (e) {}
+
+            const targetSong = libraryItems.find(item => String(item.id) === String(songId));
+            if (targetSong && targetSong.abc) {
+                abcContent = targetSong.abc;
+            } else {
+                alert('Không tìm thấy dữ liệu bài hát này trong Thư Viện!');
+                return;
+            }
+        } else {
+            const p = WEEK1_PRESETS[presetKey] || WEEK1_PRESETS.thang_cuoi;
+            abcContent = p.abc;
+        }
+
+        window.week1State.abcInput = abcContent;
         const textarea = document.getElementById('week1-abc-input');
-        if (textarea) textarea.value = p.abc;
+        if (textarea) textarea.value = abcContent;
         window.renderWeek1MasterPreview();
         window.parseWeek1Lines();
         if (window.week1State.activeStep === 1) {
@@ -1651,6 +1696,7 @@
             if (data.success) {
                 alert(`🎉 Đã lưu bản nhạc '${titleName}' thành công vào Thư viện Cloud!`);
                 if (typeof window.fetchLibrary === 'function') window.fetchLibrary(true);
+                setTimeout(() => { window.populateWeek1LibraryDropdown(); }, 500);
             } else {
                 throw new Error(data.error || 'Server error');
             }
@@ -1662,6 +1708,7 @@
             localStorage.setItem('piso_library_cache', JSON.stringify(items));
             alert(`🎉 Đã lưu bản nhạc '${titleName}' vào Thư Viện!`);
             if (typeof window.renderLibraryCurrentView === 'function') window.renderLibraryCurrentView();
+            window.populateWeek1LibraryDropdown();
         }
     };
 
