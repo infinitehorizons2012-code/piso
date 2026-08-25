@@ -933,18 +933,18 @@
         const measures = window.parseLineMeasures(lineObj.abcContent);
 
         let noteMeasures = [];
-        let customLyricMeasures = [];
+        let lyricRows = [];
 
         measures.forEach((mObj, mIdx) => {
             const lines = mObj.text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
             let notesParts = [];
-            let lyricParts = [];
+            let mLyrics = [];
 
             lines.forEach(l => {
                 if (l.startsWith('%')) return;
                 if (/^w[0-9]*:?/i.test(l)) {
                     const cleanWords = l.replace(/^w[0-9]*:?/i, '').trim();
-                    if (cleanWords) lyricParts.push(cleanWords);
+                    if (cleanWords) mLyrics.push(cleanWords);
                 } else {
                     notesParts.push(l);
                 }
@@ -953,18 +953,23 @@
             const mNotesText = notesParts.join(' ');
             noteMeasures.push(mNotesText);
 
-            if (lyricParts.length > 0) {
-                customLyricMeasures.push(lyricParts.join(' '));
-            } else {
-                customLyricMeasures.push('*');
+            mLyrics.forEach((wStr, rIdx) => {
+                if (!lyricRows[rIdx]) lyricRows[rIdx] = [];
+                lyricRows[rIdx][mIdx] = wStr;
+            });
+        });
+
+        const numMeasures = measures.length;
+        lyricRows.forEach(row => {
+            for (let i = 0; i < numMeasures; i++) {
+                if (!row[i]) row[i] = '*';
             }
         });
 
         const lineNotesAbc = noteMeasures.join(' | ');
-        const hasCustomLyrics = customLyricMeasures.some(m => m !== '*');
-        const customW = hasCustomLyrics ? ('w:' + customLyricMeasures.join(' | ') + '\n') : '';
+        const customW = lyricRows.map(row => 'w:' + row.join(' | ')).join('\n');
 
-        return `${snippetHeader}\n${lineNotesAbc}\n${customW}`;
+        return `${snippetHeader}\n${lineNotesAbc}\n${customW ? customW + '\n' : ''}`;
     }
 
     window.renderWeek1Step1Lines = function() {
