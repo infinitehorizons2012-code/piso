@@ -749,7 +749,7 @@
         const lines = rawAbc.split('\n');
 
         let headerLines = [];
-        let bodyLines = [];
+        let contentLines = [];
 
         for (let line of lines) {
             const trimmed = line.trim();
@@ -757,85 +757,104 @@
                 trimmed.startsWith('L:') || trimmed.startsWith('Q:') || trimmed.startsWith('K:') ||
                 trimmed.startsWith('C:') || trimmed.startsWith('V:')) {
                 headerLines.push(trimmed);
-            } else if (trimmed.length > 0) {
-                bodyLines.push(line);
+            } else {
+                contentLines.push(line);
             }
         }
 
         const headerStr = headerLines.join('\n');
         const snippetHeader = headerLines.filter(l => !l.startsWith('T:') && !l.startsWith('X:')).join('\n');
 
-        const parsedLines = [];
+        let parsedLines = [];
         let lineCounter = 1;
+        let currentTitle = null;
+        let currentBlockLines = [];
 
-        const hasExplicitLineComments = bodyLines.some(l => /^%\s*-*\s*DÒNG/i.test(l.trim()));
+        function flushBlock() {
+            if (currentBlockLines.length === 0) return;
 
-        if (hasExplicitLineComments) {
-            let currentTitle = null;
-            let currentAbcLines = [];
+            const noteLines = currentBlockLines.filter(l => {
+                const t = l.trim();
+                return t.length > 0 && !t.startsWith('%') && !/^w[0-9]*:?/i.test(t);
+            });
 
-            for (let line of bodyLines) {
-                const trimmed = line.trim();
-                if (trimmed.match(/^%\s*---?\s*DÒNG/i) || trimmed.match(/^%\s*DÒNG/i)) {
-                    const text = currentAbcLines.join('\n').trim();
-                    if (text.includes('|') || text.match(/[A-Ga-g]/)) {
-                        parsedLines.push({
-                            id: `line_${lineCounter}`,
-                            title: currentTitle || `DÒNG ${lineCounter}`,
-                            abcContent: text,
-                            headerStr: headerStr,
-                            snippetHeader: snippetHeader
-                        });
-                        lineCounter++;
-                    }
-                    currentTitle = trimmed.replace(/^%\s*-*\s*/, '').replace(/\s*-*$/, '').toUpperCase();
-                    currentAbcLines = [];
-                } else {
-                    currentAbcLines.push(line);
-                }
+            if (noteLines.length === 0) {
+                currentBlockLines = [];
+                return;
             }
 
-            const text = currentAbcLines.join('\n').trim();
-            if (text.includes('|') || text.match(/[A-Ga-g]/)) {
+            const blockText = currentBlockLines.join('\n').trim();
+            const fullNotesAbc = noteLines.join(' ');
+            const rawMeasures = fullNotesAbc.split('|').map(m => m.trim()).filter(m => m.length > 0);
+
+            if (rawMeasures.length <= 4 || currentTitle) {
                 parsedLines.push({
                     id: `line_${lineCounter}`,
                     title: currentTitle || `DÒNG ${lineCounter}`,
-                    abcContent: text,
+                    abcContent: blockText,
                     headerStr: headerStr,
                     snippetHeader: snippetHeader
                 });
-            }
-        } else {
-            // Auto-split multi-line ABC or single long line into 4-measure chunks
-            const cleanBodyLines = bodyLines.filter(l => !l.trim().startsWith('%') && l.trim().length > 0);
+                lineCounter++;
+            } else {
+                let lyricLines = [];
+                currentBlockLines.forEach(l => {
+                    const t = l.trim();
+                    if (/^w[0-9]*:?/i.test(t)) {
+                        lyricLines.push(t.replace(/^w[0-9]*:?/i, '').trim());
+                    }
+                });
 
-            cleanBodyLines.forEach(lText => {
-                const rawMeasures = lText.split('|').map(m => m.trim()).filter(m => m.length > 0);
-                if (rawMeasures.length <= 4) {
+                const lyricRows = lyricLines.map(line => line.split('|').map(m => m.trim()));
+
+                for (let i = 0; i < rawMeasures.length; i += 4) {
+                    const chunkNotes = rawMeasures.slice(i, i + 4).join(' | ');
+                    let chunkLyricRows = [];
+
+                    lyricRows.forEach(row => {
+                        const sliced = row.slice(i, i + 4);
+                        if (sliced.some(w => w && w !== '*')) {
+                            chunkLyricRows.push('w: ' + sliced.join(' | '));
+                        }
+                    });
+
+                    const chunkText = chunkNotes + (chunkLyricRows.length > 0 ? ('\n' + chunkLyricRows.join('\n')) : '');
+
                     parsedLines.push({
                         id: `line_${lineCounter}`,
                         title: `DÒNG ${lineCounter}`,
-                        abcContent: lText.trim(),
+                        abcContent: chunkText,
                         headerStr: headerStr,
                         snippetHeader: snippetHeader
                     });
                     lineCounter++;
-                } else {
-                    // Group every 4 measures into a new DÒNG card!
-                    for (let i = 0; i < rawMeasures.length; i += 4) {
-                        const chunk = rawMeasures.slice(i, i + 4).join(' | ');
-                        parsedLines.push({
-                            id: `line_${lineCounter}`,
-                            title: `DÒNG ${lineCounter}`,
-                            abcContent: chunk,
-                            headerStr: headerStr,
-                            snippetHeader: snippetHeader
-                        });
-                        lineCounter++;
-                    }
                 }
-            });
+            }
+
+            currentBlockLines = [];
+            currentTitle = null;
         }
+
+        for (let line of contentLines) {
+            const trimmed = line.trim();
+            if (trimmed.match(/^%\s*---?\s*DÒNG/i) || trimmed.match(/^%\s*DÒNG/i)) {
+                flushBlock();
+                currentTitle = trimmed.replace(/^%\s*-*\s*/, '').replace(/\s*-*$/, '').toUpperCase();
+            } else if (trimmed.length > 0) {
+                const isNoteLine = !trimmed.startsWith('%') && !/^w[0-9]*:?/i.test(trimmed);
+                const hasNoteLineInBlock = currentBlockLines.some(l => {
+                    const t = l.trim();
+                    return t.length > 0 && !t.startsWith('%') && !/^w[0-9]*:?/i.test(t);
+                });
+
+                if (isNoteLine && hasNoteLineInBlock && !currentTitle) {
+                    flushBlock();
+                }
+
+                currentBlockLines.push(line);
+            }
+        }
+        flushBlock();
 
         window.week1State.parsedLines = parsedLines;
     };
