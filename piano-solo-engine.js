@@ -680,6 +680,170 @@
         masterModalOpen: false
     };
 
+    window.week1LibCurrentFolder = '/';
+
+    window.openWeek1LibraryModal = function() {
+        const modal = document.getElementById('week1-library-modal');
+        if (modal) modal.style.display = 'flex';
+        if (typeof window.fetchLibrary === 'function') {
+            window.fetchLibrary(true);
+        }
+        window.renderWeek1LibraryModalFolder(window.week1LibCurrentFolder || '/');
+    };
+
+    window.closeWeek1LibraryModal = function() {
+        const modal = document.getElementById('week1-library-modal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    window.renderWeek1LibraryModalFolder = function(folderPath = '/') {
+        window.week1LibCurrentFolder = folderPath;
+        const listEl = document.getElementById('week1-library-modal-list');
+        const breadcrumbEl = document.getElementById('week1-library-modal-breadcrumb');
+        const searchVal = (document.getElementById('week1-library-modal-search')?.value || '').trim().toLowerCase();
+
+        if (!listEl) return;
+
+        // 1. Render Breadcrumbs
+        if (breadcrumbEl) {
+            breadcrumbEl.innerHTML = '';
+            const parts = folderPath.split('/').filter(Boolean);
+
+            const homeBtn = document.createElement('span');
+            homeBtn.style = 'cursor: pointer; color: #0284c7; transition: all 0.2s;';
+            homeBtn.innerHTML = '🏠 Gốc';
+            homeBtn.onclick = () => window.renderWeek1LibraryModalFolder('/');
+            breadcrumbEl.appendChild(homeBtn);
+
+            let pathAccumulator = '';
+            parts.forEach((part, index) => {
+                pathAccumulator += '/' + part;
+                const targetPath = pathAccumulator;
+                const sep = document.createElement('span');
+                sep.innerHTML = ' ❯ ';
+                sep.style.color = '#94a3b8';
+                breadcrumbEl.appendChild(sep);
+
+                const partBtn = document.createElement('span');
+                partBtn.style = `cursor: pointer; color: ${index === parts.length - 1 ? '#0f172a' : '#0284c7'}; font-weight: 800;`;
+                partBtn.innerHTML = `📁 ${part}`;
+                partBtn.onclick = () => window.renderWeek1LibraryModalFolder(targetPath);
+                breadcrumbEl.appendChild(partBtn);
+            });
+        }
+
+        // 2. Get Cached Library Items
+        let libraryItems = [];
+        try {
+            const cached = localStorage.getItem('piso_library_cache');
+            if (cached) libraryItems = JSON.parse(cached);
+        } catch (e) {}
+
+        listEl.innerHTML = '';
+
+        // 3. Filter Items
+        let displayItems = [];
+        if (searchVal) {
+            displayItems = libraryItems.filter(item => 
+                (item.title || item.name || '').toLowerCase().includes(searchVal)
+            );
+        } else {
+            displayItems = libraryItems.filter(item => {
+                const itemFolder = item.folderPath || '/';
+                return itemFolder === folderPath;
+            });
+        }
+
+        // Show Parent Back Button
+        if (folderPath !== '/' && !searchVal) {
+            const backDiv = document.createElement('div');
+            backDiv.style = 'display: flex; align-items: center; padding: 10px 16px; background: #e0f2fe; border-radius: 12px; cursor: pointer; font-weight: 800; color: #0369a1; border: 1.5px dashed #38bdf8; transition: all 0.2s; font-size: 0.9rem;';
+            backDiv.innerHTML = '<span>⬆ Quay lại thư mục cha</span>';
+            backDiv.onclick = () => {
+                const parts = folderPath.split('/').filter(Boolean);
+                parts.pop();
+                const parentPath = parts.length > 0 ? '/' + parts.join('/') : '/';
+                window.renderWeek1LibraryModalFolder(parentPath);
+            };
+            listEl.appendChild(backDiv);
+        }
+
+        if (displayItems.length === 0) {
+            listEl.innerHTML += searchVal 
+                ? '<p style="text-align: center; color: #64748b; padding: 30px; font-weight: 700;">Không tìm thấy bản nhạc hoặc thư mục khớp với từ khóa.</p>'
+                : '<p style="text-align: center; color: #64748b; padding: 30px; font-weight: 700;">Thư mục này hiện tại chưa có bản nhạc. Hãy lưu bản nhạc ở Bước 1 & Bước 2 để xuất hiện tại đây!</p>';
+            return;
+        }
+
+        // Sort: Folders first, then Songs
+        displayItems.sort((a, b) => {
+            if (a.type === 'folder' && b.type !== 'folder') return -1;
+            if (a.type !== 'folder' && b.type === 'folder') return 1;
+            return (a.title || '').localeCompare(b.title || '');
+        });
+
+        // Render Cards
+        displayItems.forEach(item => {
+            const isFolder = item.type === 'folder';
+            const icon = isFolder ? '📁' : '🎵';
+            
+            const div = document.createElement('div');
+            div.style = 'display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: white; border-radius: 14px; border: 1.5px solid #e2e8f0; box-shadow: 0 2px 6px rgba(0,0,0,0.02); transition: all 0.2s;';
+
+            const infoDiv = document.createElement('div');
+            infoDiv.style = 'display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;';
+            if (isFolder) {
+                infoDiv.onclick = () => {
+                    const newPath = (item.folderPath === '/' ? '' : item.folderPath) + '/' + item.title;
+                    window.renderWeek1LibraryModalFolder(newPath);
+                };
+            }
+
+            infoDiv.innerHTML = `
+                <span style="font-size: 1.6rem;">${icon}</span>
+                <div>
+                    <h4 style="margin: 0; font-size: 0.95rem; color: ${isFolder ? '#0369a1' : '#0f172a'}; font-weight: 800;">${item.title || 'Bản Nhạc'}</h4>
+                    <small style="color: #64748b; font-weight: 600;">${isFolder ? 'Thư mục' : (item.createdAt ? new Date(item.createdAt).toLocaleString() : 'Bản nhạc Thư viện')}</small>
+                </div>
+            `;
+
+            div.appendChild(infoDiv);
+
+            if (!isFolder) {
+                const selectBtn = document.createElement('button');
+                selectBtn.style = 'padding: 8px 16px; border-radius: 12px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; font-size: 0.88rem; box-shadow: 0 3px 10px rgba(16,185,129,0.25); display: flex; align-items: center; gap: 6px;';
+                selectBtn.innerHTML = '✅ Nạp Bài Này';
+                selectBtn.onclick = () => {
+                    if (item.abc) {
+                        window.populateWeek1LibraryDropdown();
+                        const select = document.getElementById('week1-preset-song-select');
+                        if (select) {
+                            const val = String(item.id).startsWith('lib_') ? String(item.id) : `lib_${item.id}`;
+                            select.value = val;
+                        }
+                        window.loadWeek1PresetSong(`lib_${item.id}`);
+                        window.closeWeek1LibraryModal();
+                        alert(`🎉 Đã nạp thành công bản nhạc '${item.title}' từ Thư Viện vào Thực Hành!`);
+                    } else {
+                        alert('Bản nhạc này không chứa dữ liệu ABC notation!');
+                    }
+                };
+                div.appendChild(selectBtn);
+            } else {
+                const openFolderBtn = document.createElement('button');
+                openFolderBtn.style = 'padding: 6px 14px; border-radius: 10px; font-weight: 800; background: #e0f2fe; color: #0369a1; border: 1.5px solid #38bdf8; cursor: pointer; font-size: 0.84rem;';
+                openFolderBtn.innerHTML = '📂 Mở';
+                openFolderBtn.onclick = () => {
+                    const newPath = (item.folderPath === '/' ? '' : item.folderPath) + '/' + item.title;
+                    window.renderWeek1LibraryModalFolder(newPath);
+                };
+                div.appendChild(openFolderBtn);
+            }
+
+            listEl.appendChild(div);
+        });
+    };
+
     window.populateWeek1LibraryDropdown = function() {
         const select = document.getElementById('week1-preset-song-select');
         if (!select) return;
