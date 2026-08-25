@@ -859,6 +859,35 @@
         window.renderWeek1Step1Lines();
     };
 
+    window.updateMeasureAbcText = function(lineIdx, mIdx, newText) {
+        const lineObj = window.week1State.parsedLines[lineIdx];
+        if (!lineObj) return;
+
+        const measures = window.parseLineMeasures(lineObj.abcContent);
+        if (measures[mIdx]) {
+            measures[mIdx].text = newText;
+            const chordMatch = newText.match(/"([A-Ga-g][#b]?[a-zA-Z0-9]*)"/);
+            if (chordMatch) {
+                const key = `${lineIdx}_${mIdx}`;
+                if (!window.week1State.measureConfigs[key]) {
+                    window.week1State.measureConfigs[key] = { chord: chordMatch[1], rhythmPattern: '3_beat', chordVoicing: '3_note' };
+                } else {
+                    window.week1State.measureConfigs[key].chord = chordMatch[1];
+                }
+            }
+        }
+
+        lineObj.abcContent = measures.map(m => m.text).join(' | ');
+
+        const allLineContents = window.week1State.parsedLines.map(l => l.abcContent);
+        window.week1State.abcInput = `${lineObj.headerStr}\n${allLineContents.join('\n')}`;
+
+        const inputEl = document.getElementById('week1-abc-input');
+        if (inputEl) inputEl.value = window.week1State.abcInput;
+
+        window.renderWeek1Step1Lines();
+    };
+
     window.autoApplyWeek1Defaults = function() {
         window.parseWeek1Lines();
         window.week1State.measureConfigs = {};
@@ -967,7 +996,12 @@
                     <div style="background: white; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
                       <div style="font-weight: 800; color: #0369a1; font-size: 0.88rem; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
                         <span>🎼 Ô Nhịp ${mObj.index}</span>
-                        <span style="font-size: 0.78rem; background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 8px;">${mObj.text}</span>
+                        <span style="font-size: 0.76rem; background: #e0f2fe; color: #0284c7; padding: 2px 8px; border-radius: 8px; font-weight: 800;">Mã ABC Ô Này</span>
+                      </div>
+
+                      <div style="margin-bottom: 8px;">
+                        <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">📝 Mã ABC Notation Ô Nhịp ${mObj.index}:</label>
+                        <input type="text" value="${mObj.text.replace(/"/g, '&quot;')}" onchange="window.updateMeasureAbcText(${idx}, ${mIdx}, this.value)" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-family: monospace; font-weight: 700; font-size: 0.84rem; color: #0f172a; outline: none; background: #f0f9ff;">
                       </div>
 
                       <div style="margin-bottom: 8px;">
