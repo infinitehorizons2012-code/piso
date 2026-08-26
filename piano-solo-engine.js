@@ -1227,7 +1227,7 @@
         }
         const key = `${lineIdx}_${mIdx}`;
         if (!window.week1State.measureConfigs[key]) {
-            window.week1State.measureConfigs[key] = { chord: 'C', rhythmText: '1 đơn - 2 đơn - 3 đen', intervalText: '1 - 3 - 5', fingeringText: '1 3 5' };
+            window.week1State.measureConfigs[key] = { chord: 'C', rhythmText: '1 đơn 2 đơn 3 đen', intervalText: '3-3-5 / 1-3-5', fingeringText: '1 3 5' };
         }
         window.week1State.measureConfigs[key][field] = value;
     };
@@ -1696,13 +1696,35 @@
                       </div>
 
                       <div style="margin-bottom: 8px;">
-                        <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.78rem; margin-bottom: 3px;">🥁 Tiết Tấu Tay Trái:</label>
-                        <input type="text" value="${cfg.rhythmText || '1 đơn - 2 đơn - 3 đen'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'rhythmText', this.value)" placeholder="Ví dụ: 1 đơn - 2 đơn - 3 đen..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #f43f5e; font-weight: 700; font-size: 0.82rem; color: #881337; outline: none; background: #fff1f2;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                          <label style="font-weight: 700; color: #be123c; font-size: 0.78rem;">🥁 Tiết Tấu Tay Trái:</label>
+                          <select onchange="const inp=this.parentElement.nextElementSibling; inp.value=this.value; window.updateMeasureConfig(${idx}, ${mIdx}, 'rhythmText', this.value);" style="padding: 2px 6px; border-radius: 6px; border: 1px solid #f43f5e; font-size: 0.74rem; font-weight: 800; color: #be123c; background: #fff1f2; cursor: pointer; outline: none; max-width: 145px;">
+                            <option value="">⚡ Chọn Tiết tấu...</option>
+                            <option value="1 đơn 2 đơn 3 đen" ${cfg.rhythmText === '1 đơn 2 đơn 3 đen' ? 'selected' : ''}>1 đơn 2 đơn 3 đen (3 nốt)</option>
+                            <option value="1 đơn 2 đơn 3 đơn 4 đơn" ${cfg.rhythmText === '1 đơn 2 đơn 3 đơn 4 đơn' ? 'selected' : ''}>1 đơn 2 đơn 3 đơn 4 đơn (4 nốt)</option>
+                            <option value="1 đơn 2 đơn 3 đơn 4 đơn 5 đen" ${cfg.rhythmText === '1 đơn 2 đơn 3 đơn 4 đơn 5 đen' ? 'selected' : ''}>1 đơn 2 đơn 3 đơn 4 đơn 5 đen (5 nốt)</option>
+                            <option value="1 đơn 2 đơn 3 đơn 4 đơn 5 đơn 6 đơn 7 đen" ${cfg.rhythmText === '1 đơn 2 đơn 3 đơn 4 đơn 5 đơn 6 đơn 7 đen' ? 'selected' : ''}>1 đơn 2 đơn 3 đơn 4 đơn 5 đơn 6 đơn 7 đen (7 nốt)</option>
+                            <option value="1 đơn 2 đơn 3 đơn 4 đơn 5 đơn 6 đơn 7 đơn 8 đơn" ${cfg.rhythmText === '1 đơn 2 đơn 3 đơn 4 đơn 5 đơn 6 đơn 7 đơn 8 đơn' ? 'selected' : ''}>1 đơn 2 đơn 3 đơn 4 đơn 5 đơn 6 đơn 7 đơn 8 đơn (8 nốt)</option>
+                          </select>
+                        </div>
+                        <input type="text" value="${cfg.rhythmText || '1 đơn 2 đơn 3 đen'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'rhythmText', this.value)" placeholder="Ví dụ: 1 đơn 2 đơn 3 đen..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #f43f5e; font-weight: 700; font-size: 0.82rem; color: #881337; outline: none; background: #fff1f2;">
                       </div>
 
                       <div>
-                        <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.78rem; margin-bottom: 3px;">🎼 Quãng / Bậc Nốt Đệm:</label>
-                        <input type="text" value="${cfg.intervalText || '1 - 3 - 5'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'intervalText', this.value)" placeholder="Ví dụ: 1 - 3 - 5 hoặc 3 - 3 - 5..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-weight: 700; font-size: 0.82rem; color: #0369a1; outline: none; background: #f0f9ff;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                          <label style="font-weight: 700; color: #0369a1; font-size: 0.78rem;">🎼 Quãng / Bậc Nốt Đệm:</label>
+                          <select onchange="const inp=this.parentElement.nextElementSibling; inp.value=this.value; window.updateMeasureConfig(${idx}, ${mIdx}, 'intervalText', this.value);" style="padding: 2px 6px; border-radius: 6px; border: 1px solid #38bdf8; font-size: 0.74rem; font-weight: 800; color: #0284c7; background: #e0f2fe; cursor: pointer; outline: none; max-width: 145px;">
+                            <option value="">⚡ Chọn Quãng/Bậc...</option>
+                            <option value="3-3-5 / 1-3-5" ${cfg.intervalText === '3-3-5 / 1-3-5' ? 'selected' : ''}>3-3-5 / 1-3-5 (Thế 3 nốt cơ bản)</option>
+                            <option value="5-4-8 / 1-5-8" ${cfg.intervalText === '5-4-8 / 1-5-8' ? 'selected' : ''}>5-4-8 / 1-5-8 (Thế 3 nốt giãn ngón)</option>
+                            <option value="5-4-4 / 1-5-1 cao-5" ${cfg.intervalText === '5-4-4 / 1-5-1 cao-5' ? 'selected' : ''}>5-4-4 / 1-5-1 cao-5 (Thế 4 nốt K1)</option>
+                            <option value="3-3-4 / 1-3-5-1 cao" ${cfg.intervalText === '3-3-4 / 1-3-5-1 cao' ? 'selected' : ''}>3-3-4 / 1-3-5-1 cao (Thế 4 nốt K2)</option>
+                            <option value="5-4-4-6 / 1-5-1 cao-5-3 cao" ${cfg.intervalText === '5-4-4-6 / 1-5-1 cao-5-3 cao' ? 'selected' : ''}>5-4-4-6 / 1-5-1 cao-5-3 cao (Thế 5 nốt)</option>
+                            <option value="5-4-4-6-6-4 / 1-5-1 cao-5-3 cao-5-1 cao" ${cfg.intervalText === '5-4-4-6-6-4 / 1-5-1 cao-5-3 cao-5-1 cao' ? 'selected' : ''}>5-4-4-6-6-4 / 1-5-1 cao-5-3 cao-5-1 cao (Thế 7 nốt)</option>
+                            <option value="5-4-4-6-6-4-4 / 1-5-1 cao-5-3 cao-5-1 cao-5" ${cfg.intervalText === '5-4-4-6-6-4-4 / 1-5-1 cao-5-3 cao-5-1 cao-5' ? 'selected' : ''}>5-4-4-6-6-4-4 / 1-5-1 cao-5-3 cao-5-1 cao-5 (Thế 8 nốt)</option>
+                          </select>
+                        </div>
+                        <input type="text" value="${cfg.intervalText || '3-3-5 / 1-3-5'}" oninput="window.updateMeasureConfig(${idx}, ${mIdx}, 'intervalText', this.value)" placeholder="Ví dụ: 3-3-5 / 1-3-5 hoặc 5-4-8 / 1-5-8..." style="width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid #38bdf8; font-weight: 700; font-size: 0.82rem; color: #0369a1; outline: none; background: #f0f9ff;">
                       </div>
                     </div>
                 `;
