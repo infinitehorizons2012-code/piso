@@ -2137,7 +2137,10 @@ window.parseAbcToVisualStructure = function(abcText) {
         }
 
         // 4. Music note lines
-        const measures = trimmed.split('|').map(m => m.trim()).filter((m, idx, arr) => !(idx === arr.length - 1 && m === ''));
+        const measures = trimmed.split('|')
+            .map(m => m.trim())
+            .filter(m => m.length > 0 && m !== ':' && m !== '::' && m !== ']' && m !== '[')
+            .map(m => m.replace(/^:\s*/, '').replace(/\s*:$/, '').trim());
         if (curTrebleMeasures.length === 0) {
             curTrebleMeasures = measures;
         } else if (curBassMeasures.length === 0) {
