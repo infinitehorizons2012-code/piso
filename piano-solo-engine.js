@@ -547,7 +547,7 @@
             const noteEvents = [];
 
             if (tune.lines) {
-                tune.lines.forEach((line) => {
+                tune.lines.forEach((line, lineIdx) => {
                     if (!line.staff) return;
                     line.staff.forEach((staff, sIdx) => {
                         const isBassClef = (staff.clef && staff.clef.type === 'bass');
@@ -559,8 +559,13 @@
                             }
                             const isLeftHand = isBassClef || vIdx === 1;
 
+                            let currentMeasureIdx = 0;
+
                             voice.forEach((elem) => {
                                 const dur = elem.duration || 0;
+                                if (elem.el_type === 'bar') {
+                                    currentMeasureIdx++;
+                                }
                                 if (elem.el_type === 'note' && elem.pitches) {
                                     elem.pitches.forEach((p) => {
                                         const midi = pitchToMidi(p, keySig);
@@ -569,7 +574,9 @@
                                             midi: midi,
                                             hand: noteHand,
                                             timeMs: Math.round(voiceTimeMap[vKey] * quarterMs * 4),
-                                            durMs: Math.max(150, Math.round(dur * quarterMs * 4))
+                                            durMs: Math.max(150, Math.round(dur * quarterMs * 4)),
+                                            lineIdx: lineIdx,
+                                            measureIdx: currentMeasureIdx
                                         });
                                     });
                                 }
@@ -592,69 +599,23 @@
     window.getInteractiveParsedLines = function() {
         const textarea = document.getElementById('piano-solo-abc-editor');
         const abcCode = textarea && textarea.value.trim() ? textarea.value : PIANO_SOLO_SONGS.fur_elise.abc;
+        const parsed = parseAbcToNoteEvents(abcCode);
+
+        // Extract unique line indices
+        const lineIndices = Array.from(new Set(parsed.map(n => n.lineIdx))).sort((a, b) => a - b);
         
-        const rawLines = abcCode.split('\n');
-        let headerLines = [];
-        let contentLines = [];
-
-        rawLines.forEach(l => {
-            const trimmed = l.trim();
-            if (/^[XTMKLQVw:]/i.test(trimmed) || trimmed.startsWith('%%') || trimmed.startsWith('V:')) {
-                if (!trimmed.startsWith('w:')) {
-                    headerLines.push(trimmed);
-                }
-            } else if (trimmed.length > 0) {
-                contentLines.push(trimmed);
-            }
-        });
-
-        const headerStr = headerLines.join('\n');
-
-        let lineBlocks = [];
-        let currentBlock = [];
-
-        contentLines.forEach(l => {
-            if (l.startsWith('% --- DÒNG') || l.startsWith('% DÒNG')) {
-                if (currentBlock.length > 0) {
-                    lineBlocks.push(currentBlock.join('\n'));
-                    currentBlock = [];
-                }
-            }
-            currentBlock.push(l);
-        });
-        if (currentBlock.length > 0) {
-            lineBlocks.push(currentBlock.join('\n'));
+        if (lineIndices.length === 0) {
+            return [{ index: 1, title: '📌 Dòng 1', measuresCount: 4 }];
         }
 
-        if (lineBlocks.length <= 1 && contentLines.length > 1) {
-            lineBlocks = contentLines;
-        }
-        if (lineBlocks.length === 0) {
-            lineBlocks = [abcCode];
-        }
-
-        return lineBlocks.map((blockStr, idx) => {
-            const cleanContent = blockStr.replace(/%[^\n]*/g, '').trim();
-            let rawMeasures = [];
-            if (cleanContent.includes('|')) {
-                rawMeasures = cleanContent.split('|').map(m => m.trim()).filter(m => m.length > 0 && /[A-Ga-gZz0-9]/.test(m));
-            }
-            if (rawMeasures.length === 0) {
-                rawMeasures = [cleanContent];
-            }
-
-            const measures = rawMeasures.map((mText, mIdx) => ({
-                index: mIdx + 1,
-                text: mText,
-                notes: mText
-            }));
-
+        return lineIndices.map((lIdx, idx) => {
+            const lineNotes = parsed.filter(n => n.lineIdx === lIdx);
+            const maxMIdx = Math.max(0, ...lineNotes.map(n => n.measureIdx));
+            const measuresCount = maxMIdx + 1;
             return {
-                index: idx + 1,
-                title: `📌 Dòng ${idx + 1} (${measures.length} ô nhịp)`,
-                snippetHeader: headerStr,
-                abcContent: blockStr,
-                measures: measures
+                index: lIdx,
+                title: `📌 Dòng ${idx + 1}`,
+                measuresCount: measuresCount
             };
         });
     };
@@ -677,14 +638,14 @@
             measureSelect.style.display = 'none';
 
             lineSelect.innerHTML = parsedLines.map((l, idx) => 
-                `<option value="${idx}">${l.title}</option>`
+                `<option value="${l.index}">${l.title}</option>`
             ).join('');
         } else if (mode === 'measure') {
             lineSelect.style.display = 'inline-block';
             measureSelect.style.display = 'inline-block';
 
             lineSelect.innerHTML = parsedLines.map((l, idx) => 
-                `<option value="${idx}">${l.title}</option>`
+                `<option value="${l.index}">${l.title}</option>`
             ).join('');
 
             window.updateInteractiveMeasureDropdown();
@@ -698,15 +659,14 @@
 
         const lineIdx = parseInt(lineSelect.value, 10) || 0;
         const parsedLines = window.getInteractiveParsedLines();
-        const targetLine = parsedLines[lineIdx];
+        const targetLine = parsedLines.find(l => l.index === lineIdx) || parsedLines[0];
 
-        if (targetLine && targetLine.measures) {
-            measureSelect.innerHTML = targetLine.measures.map((m, mIdx) => 
-                `<option value="${mIdx}">🎼 Ô Nhịp ${m.index}</option>`
-            ).join('');
-        } else {
-            measureSelect.innerHTML = `<option value="0">🎼 Ô Nhịp 1</option>`;
+        const count = targetLine ? targetLine.measuresCount : 4;
+        let optionsHtml = '';
+        for (let i = 0; i < count; i++) {
+            optionsHtml += `<option value="${i}">🎼 Ô Nhịp ${i + 1}</option>`;
         }
+        measureSelect.innerHTML = optionsHtml;
     };
 
     // Auto Play Piano Solo Song (Parses current ABC string & plays actual notes on Piano Virtual Keyboard based on selected range)
@@ -723,36 +683,37 @@
         const measureSelect = document.getElementById('interactive-measure-select');
         const mode = modeSelect ? modeSelect.value : 'all';
 
-        let abcToPlay = abcCode;
-        let playLabel = 'Cả Bài';
+        const allEvents = parseAbcToNoteEvents(abcCode);
 
-        if (mode !== 'all') {
-            const parsedLines = window.getInteractiveParsedLines();
-            const lineIdx = lineSelect ? (parseInt(lineSelect.value, 10) || 0) : 0;
-            const targetLine = parsedLines[lineIdx];
-
-            if (targetLine) {
-                const headerStr = targetLine.snippetHeader || 'M: 2/4\nL: 1/8\nK: C';
-                if (mode === 'line') {
-                    abcToPlay = `${headerStr}\n${targetLine.abcContent}`;
-                    playLabel = `Dòng ${lineIdx + 1}`;
-                } else if (mode === 'measure') {
-                    const mIdx = measureSelect ? (parseInt(measureSelect.value, 10) || 0) : 0;
-                    const measures = window.parseLineMeasures(targetLine.abcContent);
-                    if (measures[mIdx]) {
-                        abcToPlay = `${headerStr}\n${measures[mIdx].notes || measures[mIdx].text}`;
-                        playLabel = `Ô ${mIdx + 1} - Dòng ${lineIdx + 1}`;
-                    }
-                }
-            }
-        }
-
-        const noteEvents = parseAbcToNoteEvents(abcToPlay);
-
-        if (noteEvents.length === 0) {
-            alert('Không tìm thấy nốt nhạc hợp lệ trong phạm vi đã chọn! Vui lòng kiểm tra lại.');
+        if (allEvents.length === 0) {
+            alert('Không tìm thấy nốt nhạc hợp lệ trong mã ABC! Vui lòng kiểm tra lại.');
             return;
         }
+
+        let filteredEvents = allEvents;
+        let playLabel = 'Cả Bài';
+
+        if (mode === 'line') {
+            const targetLineIdx = lineSelect ? (parseInt(lineSelect.value, 10) || 0) : 0;
+            filteredEvents = allEvents.filter(n => n.lineIdx === targetLineIdx);
+            playLabel = `Dòng ${targetLineIdx + 1}`;
+        } else if (mode === 'measure') {
+            const targetLineIdx = lineSelect ? (parseInt(lineSelect.value, 10) || 0) : 0;
+            const targetMeasureIdx = measureSelect ? (parseInt(measureSelect.value, 10) || 0) : 0;
+            filteredEvents = allEvents.filter(n => n.lineIdx === targetLineIdx && n.measureIdx === targetMeasureIdx);
+            playLabel = `Ô ${targetMeasureIdx + 1} - Dòng ${targetLineIdx + 1}`;
+        }
+
+        if (filteredEvents.length === 0) {
+            filteredEvents = allEvents;
+        }
+
+        // Shift timestamps so playback starts immediately at 0ms
+        const minTimeMs = Math.min(...filteredEvents.map(n => n.timeMs));
+        const noteEvents = filteredEvents.map(n => ({
+            ...n,
+            timeMs: Math.max(0, n.timeMs - minTimeMs)
+        }));
 
         isPlayingSong = true;
         const btnPlay = document.getElementById('btn-play-sheet-abc');
