@@ -6,6 +6,27 @@
     <title>Music - Viết Nhạc Nhanh</title>
     <!-- Add Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+      /* ALWAYS VISIBLE PROMINENT SCROLLBAR FOR SHEET MUSIC PAPER */
+      #piano-solo-paper::-webkit-scrollbar {
+        width: 14px;
+        display: block !important;
+      }
+      #piano-solo-paper::-webkit-scrollbar-track {
+        background: #e2e8f0;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+      }
+      #piano-solo-paper::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, #0284c7, #0369a1);
+        border-radius: 10px;
+        border: 2.5px solid #ffffff;
+        box-shadow: 0 2px 6px rgba(2,132,199,0.4);
+      }
+      #piano-solo-paper::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, #0369a1, #075985);
+      }
+    </style>
   </head>
   <body>
     <header class="app-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 35px; margin-bottom: 15px;">
@@ -139,8 +160,8 @@
           <!-- SHEET MUSIC DISPLAY CONTAINER (GRAND STAFF) -->
           <div style="background: white; border-radius: 20px; border: 2px solid #e2e8f0; padding: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
 
-            <!-- ABC SHEET MUSIC PAPER (INTERNAL SCROLLABLE CONTAINER) -->
-            <div id="piano-solo-paper" style="min-height: 240px; max-height: 480px; overflow-y: auto; scroll-behavior: smooth; background: #f8fafc; border-radius: 16px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 16px;"></div>
+            <!-- ABC SHEET MUSIC PAPER (ALWAYS VISIBLE SCROLLBAR CONTAINER) -->
+            <div id="piano-solo-paper" style="min-height: 240px; max-height: 350px; overflow-y: scroll; scroll-behavior: smooth; background: #f8fafc; border-radius: 16px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 16px;"></div>
 
             <!-- EDITABLE ABC TEXTAREA (ALWAYS ON BY DEFAULT) -->
             <div id="piano-solo-editor-container" style="display: block; margin-top: 14px;">
