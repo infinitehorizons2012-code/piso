@@ -445,8 +445,7 @@
         window.renderPianoSoloSheet(song.abc);
     };
 
-    // Renders ABC sheet music dynamically as user types or selects a song
-    window.renderPianoSoloSheet = function(abcCode) {
+    window.renderPianoSoloSheet = function(abcCode, isInternal = false) {
         const paper = document.getElementById('piano-solo-paper');
         if (!paper) return;
         paper.innerHTML = '';
@@ -467,15 +466,19 @@
             console.warn('ABC Render error:', err);
         }
 
-        if (typeof window.updateInteractivePlayControls === 'function') {
+        if (!isInternal && typeof window.updateInteractivePlayControls === 'function') {
             window.updateInteractivePlayControls();
         }
     };
 
     window.renderPianoSoloAbcFromEditor = function() {
-        const textarea = document.getElementById('piano-solo-abc-editor');
-        if (textarea) {
-            window.renderPianoSoloSheet(textarea.value);
+        if (typeof window.refreshInteractiveSheetDisplay === 'function') {
+            window.refreshInteractiveSheetDisplay();
+        } else {
+            const textarea = document.getElementById('piano-solo-abc-editor');
+            if (textarea) {
+                window.renderPianoSoloSheet(textarea.value);
+            }
         }
     };
 
@@ -639,6 +642,78 @@
         paper.scrollTop = lineIdx * 160;
     };
 
+    window.sliceAbcByRange = function(abcCode, mode, targetLineIdx, targetMeasureIdx) {
+        if (!mode || mode === 'all') return abcCode;
+
+        const lines = abcCode.split('\n');
+        const headerLines = [];
+        const lineBlocks = [];
+        let currentBlock = [];
+
+        for (let line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('X:') || trimmed.startsWith('T:') || trimmed.startsWith('M:') || 
+                trimmed.startsWith('L:') || trimmed.startsWith('Q:') || trimmed.startsWith('K:') || 
+                trimmed.startsWith('%%') || (trimmed.startsWith('V:') && trimmed.includes('clef='))) {
+                headerLines.push(line);
+            } else if (trimmed.startsWith('% --- DÒNG') || (trimmed.startsWith('%') && !trimmed.startsWith('%%'))) {
+                if (currentBlock.length > 0) {
+                    lineBlocks.push([...currentBlock]);
+                    currentBlock = [];
+                }
+            } else if (trimmed.length > 0) {
+                currentBlock.push(line);
+            }
+        }
+        if (currentBlock.length > 0) {
+            lineBlocks.push([...currentBlock]);
+        }
+
+        if (lineBlocks.length === 0) return abcCode;
+
+        const selectedBlock = lineBlocks[Math.min(targetLineIdx, lineBlocks.length - 1)] || lineBlocks[0];
+
+        if (mode === 'line') {
+            return [...headerLines, `% --- CHỈ HIỂN THỊ DÒNG ${targetLineIdx + 1} ---`, selectedBlock.join('\n')].join('\n');
+        }
+
+        if (mode === 'measure') {
+            const slicedLines = selectedBlock.map(l => {
+                if (!l.includes('|')) return l;
+                let prefix = '';
+                let musicStr = l;
+                const vMatch = l.match(/^(\[V:\d+\]|V:\d+)\s*(.*)/);
+                if (vMatch) {
+                    prefix = vMatch[1] + ' ';
+                    musicStr = vMatch[2];
+                }
+                const measures = musicStr.split('|').map(m => m.trim()).filter(m => m.length > 0);
+                const targetM = measures[Math.min(targetMeasureIdx, measures.length - 1)] || measures[0] || '';
+                return prefix + targetM + ' |';
+            });
+
+            return [...headerLines, `% --- CHỈ HIỂN THỊ Ô ${targetMeasureIdx + 1} (DÒNG ${targetLineIdx + 1}) ---`, slicedLines.join('\n')].join('\n');
+        }
+
+        return abcCode;
+    };
+
+    window.refreshInteractiveSheetDisplay = function() {
+        const textarea = document.getElementById('piano-solo-abc-editor');
+        const fullAbc = textarea && textarea.value.trim() ? textarea.value : PIANO_SOLO_SONGS.fur_elise.abc;
+
+        const modeSelect = document.getElementById('interactive-play-mode-select');
+        const lineSelect = document.getElementById('interactive-line-select');
+        const measureSelect = document.getElementById('interactive-measure-select');
+
+        const mode = modeSelect ? modeSelect.value : 'all';
+        const lineIdx = lineSelect ? (parseInt(lineSelect.value, 10) || 0) : 0;
+        const measureIdx = measureSelect ? (parseInt(measureSelect.value, 10) || 0) : 0;
+
+        const slicedAbc = window.sliceAbcByRange(fullAbc, mode, lineIdx, measureIdx);
+        window.renderPianoSoloSheet(slicedAbc, true);
+    };
+
     window.updateInteractivePlayControls = function() {
         const modeSelect = document.getElementById('interactive-play-mode-select');
         const lineSelect = document.getElementById('interactive-line-select');
@@ -671,7 +746,10 @@
             ).join('');
 
             window.updateInteractiveMeasureDropdown();
+            return;
         }
+
+        window.refreshInteractiveSheetDisplay();
     };
 
     window.updateInteractiveMeasureDropdown = function() {
@@ -690,6 +768,7 @@
         }
         measureSelect.innerHTML = optionsHtml;
         window.scrollToInteractiveLine(lineIdx);
+        window.refreshInteractiveSheetDisplay();
     };
 
     // Auto Play Piano Solo Song (Parses current ABC string & plays actual notes on Piano Virtual Keyboard based on selected range)
