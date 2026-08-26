@@ -2065,6 +2065,7 @@ window.parseAbcToVisualStructure = function(abcText) {
     let currentLineTitle = 'DÒNG 1';
     let lineBlocks = [];
     let curTrebleMeasures = [];
+    let curTrebleLyrics = [];
     let curBassMeasures = [];
 
     rawLines.forEach(l => {
@@ -2096,9 +2097,11 @@ window.parseAbcToVisualStructure = function(abcText) {
                     lineBlocks.push({
                         title: currentLineTitle,
                         trebleMeasures: curTrebleMeasures,
+                        trebleLyrics: curTrebleLyrics,
                         bassMeasures: curBassMeasures
                     });
                     curTrebleMeasures = [];
+                    curTrebleLyrics = [];
                     curBassMeasures = [];
                 }
                 currentLineTitle = cleanComment;
@@ -2106,7 +2109,15 @@ window.parseAbcToVisualStructure = function(abcText) {
             return; // ALWAYS ignore comment lines from being parsed as music notes!
         }
 
-        // 3. Music note lines
+        // 3. Lyrics (w: or W:)
+        if (trimmed.toLowerCase().startsWith('w:')) {
+            const lyricStr = trimmed.replace(/^[wW]:\s*/, '');
+            const lyricMeasures = lyricStr.split('|').map(m => m.trim());
+            curTrebleLyrics = lyricMeasures;
+            return; // NEVER treat lyrics lines as bass measures!
+        }
+
+        // 4. Music note lines
         const measures = trimmed.split('|').map(m => m.trim()).filter((m, idx, arr) => !(idx === arr.length - 1 && m === ''));
         if (curTrebleMeasures.length === 0) {
             curTrebleMeasures = measures;
@@ -2116,9 +2127,11 @@ window.parseAbcToVisualStructure = function(abcText) {
             lineBlocks.push({
                 title: currentLineTitle,
                 trebleMeasures: curTrebleMeasures,
+                trebleLyrics: curTrebleLyrics,
                 bassMeasures: curBassMeasures
             });
             curTrebleMeasures = measures;
+            curTrebleLyrics = [];
             curBassMeasures = [];
         }
     });
@@ -2127,9 +2140,26 @@ window.parseAbcToVisualStructure = function(abcText) {
         lineBlocks.push({
             title: currentLineTitle,
             trebleMeasures: curTrebleMeasures,
+            trebleLyrics: curTrebleLyrics,
             bassMeasures: curBassMeasures
         });
     }
+
+    // Merge trebleLyrics into trebleMeasures text for each measure card so Tay Phải displays both notes & lyrics!
+    lineBlocks.forEach(block => {
+        const numM = Math.max(block.trebleMeasures.length, block.bassMeasures.length, 1);
+        let mergedTreble = [];
+        for (let i = 0; i < numM; i++) {
+            let note = block.trebleMeasures[i] || '';
+            let lyric = block.trebleLyrics && block.trebleLyrics[i] !== undefined ? block.trebleLyrics[i] : '';
+            if (lyric) {
+                mergedTreble.push(`${note}\nw: ${lyric}`.trim());
+            } else {
+                mergedTreble.push(note);
+            }
+        }
+        block.trebleMeasures = mergedTreble;
+    });
 
     if (lineBlocks.length === 0) {
         lineBlocks.push({
@@ -2392,16 +2422,40 @@ window.compileVisualStructureToAbc = function(headerLines, lineBlocks) {
         output.push(`% ===================================`);
 
         const numM = Math.max(block.trebleMeasures.length, block.bassMeasures.length, 1);
-        let trebleParts = [];
+        let trebleNotes = [];
+        let trebleLyrics = [];
         let bassParts = [];
 
         for (let i = 0; i < numM; i++) {
-            trebleParts.push((block.trebleMeasures[i] || 'z4').trim());
+            let tRaw = (block.trebleMeasures[i] || 'z4').trim();
+            let noteStr = tRaw;
+            let lyricStr = '';
+
+            if (tRaw.includes('\nw:')) {
+                const parts = tRaw.split('\nw:');
+                noteStr = parts[0].trim();
+                lyricStr = parts[1].trim();
+            } else if (tRaw.includes('\nW:')) {
+                const parts = tRaw.split('\nW:');
+                noteStr = parts[0].trim();
+                lyricStr = parts[1].trim();
+            } else if (tRaw.startsWith('w:') || tRaw.startsWith('W:')) {
+                lyricStr = tRaw.replace(/^[wW]:\s*/, '').trim();
+                noteStr = 'z4';
+            }
+
+            trebleNotes.push(noteStr || 'z4');
+            if (lyricStr) trebleLyrics.push(lyricStr);
+
             bassParts.push((block.bassMeasures[i] || 'z4').trim());
         }
 
         output.push('V:1 clef=treble');
-        output.push(trebleParts.join(' | ') + ' |');
+        output.push(trebleNotes.join(' | ') + ' |');
+        if (trebleLyrics.length > 0) {
+            output.push('w: ' + trebleLyrics.join(' | '));
+        }
+
         output.push('V:2 clef=bass');
         output.push(bassParts.join(' | ') + ' |');
     });
