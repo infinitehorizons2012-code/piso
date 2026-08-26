@@ -139,8 +139,8 @@
           <!-- SHEET MUSIC DISPLAY CONTAINER (GRAND STAFF) -->
           <div style="background: white; border-radius: 20px; border: 2px solid #e2e8f0; padding: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.03);">
 
-            <!-- ABC SHEET MUSIC PAPER -->
-            <div id="piano-solo-paper" style="min-height: 240px; background: #f8fafc; border-radius: 16px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 16px;"></div>
+            <!-- ABC SHEET MUSIC PAPER (INTERNAL SCROLLABLE CONTAINER) -->
+            <div id="piano-solo-paper" style="min-height: 240px; max-height: 480px; overflow-y: auto; scroll-behavior: smooth; background: #f8fafc; border-radius: 16px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 16px;"></div>
 
             <!-- EDITABLE ABC TEXTAREA (ALWAYS ON BY DEFAULT) -->
             <div id="piano-solo-editor-container" style="display: block; margin-top: 14px;">

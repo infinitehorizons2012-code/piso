@@ -620,6 +620,25 @@
         });
     };
 
+    window.scrollToInteractiveLine = function(lineIdx) {
+        const paper = document.getElementById('piano-solo-paper');
+        if (!paper) return;
+        if (lineIdx === undefined || lineIdx === null || lineIdx < 0) {
+            paper.scrollTop = 0;
+            return;
+        }
+
+        const systems = paper.querySelectorAll('.abcjs-system, svg > g');
+        if (systems && systems.length > 0) {
+            const target = systems[Math.min(lineIdx, systems.length - 1)];
+            if (target && target.scrollIntoView) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                return;
+            }
+        }
+        paper.scrollTop = lineIdx * 160;
+    };
+
     window.updateInteractivePlayControls = function() {
         const modeSelect = document.getElementById('interactive-play-mode-select');
         const lineSelect = document.getElementById('interactive-line-select');
@@ -633,6 +652,7 @@
         if (mode === 'all') {
             lineSelect.style.display = 'none';
             measureSelect.style.display = 'none';
+            window.scrollToInteractiveLine(0);
         } else if (mode === 'line') {
             lineSelect.style.display = 'inline-block';
             measureSelect.style.display = 'none';
@@ -640,6 +660,8 @@
             lineSelect.innerHTML = parsedLines.map((l, idx) => 
                 `<option value="${l.index}">${l.title}</option>`
             ).join('');
+            const activeLine = parseInt(lineSelect.value, 10) || 0;
+            window.scrollToInteractiveLine(activeLine);
         } else if (mode === 'measure') {
             lineSelect.style.display = 'inline-block';
             measureSelect.style.display = 'inline-block';
@@ -667,6 +689,7 @@
             optionsHtml += `<option value="${i}">🎼 Ô Nhịp ${i + 1}</option>`;
         }
         measureSelect.innerHTML = optionsHtml;
+        window.scrollToInteractiveLine(lineIdx);
     };
 
     // Auto Play Piano Solo Song (Parses current ABC string & plays actual notes on Piano Virtual Keyboard based on selected range)
