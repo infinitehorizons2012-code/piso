@@ -684,20 +684,25 @@ window.fetchLibrary = async function(forceRefresh = false) {
             } catch (e) {}
 
             const mergedMap = new Map();
+            const existingCloudKeys = new Set();
+
             songsList.forEach(item => {
                 if (!item) return;
-                const cleanTitleKey = `${(item.title || '').trim().toLowerCase()}_${item.folderPath || '/'}`;
-                mergedMap.set(cleanTitleKey, item);
-                if (item.id) mergedMap.set(String(item.id), item);
+                const key = item.id ? String(item.id) : `${(item.title || '').trim().toLowerCase()}_${item.folderPath || '/'}`;
+                const titleKey = `${(item.title || '').trim().toLowerCase()}_${item.folderPath || '/'}`;
+                mergedMap.set(key, item);
+                existingCloudKeys.add(key);
+                existingCloudKeys.add(titleKey);
             });
+
             if (Array.isArray(localCache)) {
                 localCache.forEach(item => {
                     if (!item) return;
-                    const cleanTitleKey = `${(item.title || '').trim().toLowerCase()}_${item.folderPath || '/'}`;
-                    const existsById = item.id ? mergedMap.has(String(item.id)) : false;
-                    const existsByTitle = mergedMap.has(cleanTitleKey);
-                    if (!existsById && !existsByTitle) {
-                        mergedMap.set(cleanTitleKey, item);
+                    const itemKey = item.id ? String(item.id) : `${(item.title || '').trim().toLowerCase()}_${item.folderPath || '/'}`;
+                    const titleKey = `${(item.title || '').trim().toLowerCase()}_${item.folderPath || '/'}`;
+                    
+                    if (!existingCloudKeys.has(itemKey) && !existingCloudKeys.has(titleKey)) {
+                        mergedMap.set(itemKey, item);
                     }
                 });
             }
