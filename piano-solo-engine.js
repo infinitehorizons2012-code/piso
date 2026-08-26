@@ -2248,6 +2248,18 @@
             });
             const data = await res.json();
             if (data.success) {
+                if (data.id) {
+                    newSong.id = data.id;
+                    try {
+                        let cached = localStorage.getItem('piso_library_cache');
+                        let items = cached ? JSON.parse(cached) : [];
+                        const tempIdx = items.findIndex(i => i.title === titleName && String(i.id).startsWith('song_'));
+                        if (tempIdx !== -1) {
+                            items[tempIdx].id = data.id;
+                            localStorage.setItem('piso_library_cache', JSON.stringify(items));
+                        }
+                    } catch(e) {}
+                }
                 alert(`🎉 Đã lưu bản nhạc '${titleName}' thành công vào Thư viện!`);
             } else {
                 throw new Error(data.error || 'Server error');

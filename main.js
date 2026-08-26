@@ -684,11 +684,18 @@ window.fetchLibrary = async function(forceRefresh = false) {
             } catch (e) {}
 
             const mergedMap = new Map();
-            songsList.forEach(item => mergedMap.set(item.id || item.title, item));
+            songsList.forEach(item => {
+                const key = item.id || `${item.title}_${item.folderPath || '/'}`;
+                mergedMap.set(key, item);
+            });
             if (Array.isArray(localCache)) {
                 localCache.forEach(item => {
-                    if (item && item.id && !mergedMap.has(item.id)) {
-                        mergedMap.set(item.id, item);
+                    if (!item) return;
+                    const byId = item.id ? mergedMap.has(item.id) : false;
+                    const byTitleKey = `${item.title}_${item.folderPath || '/'}`;
+                    const byTitle = mergedMap.has(byTitleKey);
+                    if (!byId && !byTitle) {
+                        mergedMap.set(item.id || byTitleKey, item);
                     }
                 });
             }
