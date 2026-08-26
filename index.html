@@ -772,8 +772,24 @@ w: * | C~E~G *    | * | *</pre>
         </div>
         
         <div class="panel-content editor-content">
-          <!-- Text area for ABC Notation -->
-          <div class="abc-input-container" id="abc-view">
+          <!-- Editor Mode Switcher Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 6px 10px; border-radius: 10px; margin-bottom: 8px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.03); flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button id="editor-mode-visual-btn" onclick="window.switchEditorMode('visual')" style="font-size: 0.8rem; padding: 4px 10px; font-weight: 800; border-radius: 8px; border: 1.5px solid #0284c7; background: #0284c7; color: white; cursor: pointer; transition: all 0.2s;">🎨 Giao Diện Thẻ 2 Tay (Khóa Sol & Fa)</button>
+              <button id="editor-mode-code-btn" onclick="window.switchEditorMode('code')" style="font-size: 0.8rem; padding: 4px 10px; font-weight: 800; border-radius: 8px; border: 1.5px solid #cbd5e1; background: #f8fafc; color: #475569; cursor: pointer; transition: all 0.2s;">📝 Soạn Thảo Mã ABC</button>
+            </div>
+            <div id="visual-editor-actions" style="display: flex; gap: 6px;">
+              <button onclick="window.addVisualEditorLine()" style="font-size: 0.78rem; font-weight: 800; background: #10b981; color: white; border: none; padding: 4px 10px; border-radius: 8px; cursor: pointer; box-shadow: 0 2px 4px rgba(16,185,129,0.2);">➕ Thêm Dòng Mới</button>
+            </div>
+          </div>
+
+          <!-- Structured Visual Form View (Circle 2 style) -->
+          <div id="visual-editor-view" style="display: block; overflow-y: auto; max-height: calc(100vh - 220px); padding-right: 4px;">
+            <!-- Rendered dynamically by JS -->
+          </div>
+
+          <!-- Text area for ABC Notation (Code Mode) -->
+          <div class="abc-input-container" id="abc-view" style="display: none;">
             <!-- Scrollable Section Tab Bar -->
             <div class="editor-tab-bar-container" style="display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 6px 10px; border-radius: 10px; border: 1px solid #cbd5e1; gap: 10px;">
               <div id="editor-tabs-wrapper" style="display: flex; gap: 6px; overflow-x: auto; flex: 1; scrollbar-width: thin; white-space: nowrap; padding-bottom: 2px;">

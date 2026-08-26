@@ -2001,3 +2001,404 @@ window.saveTransposedToCloud = async function() {
         alert("Lỗi kết nối máy chủ: " + err.message);
     }
 };
+
+/* ==========================================================================
+   VISUAL CARD EDITOR IMPLEMENTATION (TAB VIẾT NHẠC CARD VIEW LIKE CIRCLE 2)
+   ========================================================================== */
+
+window.currentEditorMode = 'visual';
+
+window.switchEditorMode = function(mode) {
+    window.currentEditorMode = mode;
+    const visualView = document.getElementById('visual-editor-view');
+    const abcView = document.getElementById('abc-view');
+    const visualBtn = document.getElementById('editor-mode-visual-btn');
+    const codeBtn = document.getElementById('editor-mode-code-btn');
+    const visualActions = document.getElementById('visual-editor-actions');
+
+    if (mode === 'visual') {
+        if (visualView) visualView.style.display = 'block';
+        if (abcView) abcView.style.display = 'none';
+        if (visualActions) visualActions.style.display = 'flex';
+
+        if (visualBtn) {
+            visualBtn.style.background = '#0284c7';
+            visualBtn.style.color = 'white';
+            visualBtn.style.borderColor = '#0284c7';
+        }
+        if (codeBtn) {
+            codeBtn.style.background = '#f8fafc';
+            codeBtn.style.color = '#475569';
+            codeBtn.style.borderColor = '#cbd5e1';
+        }
+
+        window.renderVisualEditor();
+    } else {
+        if (visualView) visualView.style.display = 'none';
+        if (abcView) abcView.style.display = 'block';
+        if (visualActions) visualActions.style.display = 'none';
+
+        if (codeBtn) {
+            codeBtn.style.background = '#0284c7';
+            codeBtn.style.color = 'white';
+            codeBtn.style.borderColor = '#0284c7';
+        }
+        if (visualBtn) {
+            visualBtn.style.background = '#f8fafc';
+            visualBtn.style.color = '#475569';
+            visualBtn.style.borderColor = '#cbd5e1';
+        }
+
+        const abcEl = document.getElementById('abc-code');
+        if (abcEl && window.combineSectionsToAbc) {
+            abcEl.value = window.combineSectionsToAbc();
+        }
+    }
+};
+
+window.parseAbcToVisualStructure = function(abcText) {
+    const rawLines = (abcText || '').split('\n');
+    let title = 'Bản Nhạc Của Bé';
+    let meter = '4/4';
+    let key = 'C';
+
+    let currentLineTitle = 'DÒNG 1';
+    let lineBlocks = [];
+    let curTrebleMeasures = [];
+    let curBassMeasures = [];
+
+    rawLines.forEach(l => {
+        const trimmed = l.trim();
+        if (!trimmed) return;
+
+        if (trimmed.startsWith('T:')) {
+            title = trimmed.replace(/^T:\s*/, '').trim() || title;
+        } else if (trimmed.startsWith('M:')) {
+            meter = trimmed.replace(/^M:\s*/, '').trim() || meter;
+        } else if (trimmed.startsWith('K:')) {
+            key = trimmed.replace(/^K:\s*/, '').trim() || key;
+        } else if (trimmed.startsWith('% ===')) {
+            const titleMatch = trimmed.match(/%\s*==+\s*(.*?)\s*==+/);
+            if (titleMatch && titleMatch[1]) {
+                if (curTrebleMeasures.length > 0 || curBassMeasures.length > 0) {
+                    lineBlocks.push({
+                        title: currentLineTitle,
+                        trebleMeasures: curTrebleMeasures,
+                        bassMeasures: curBassMeasures
+                    });
+                    curTrebleMeasures = [];
+                    curBassMeasures = [];
+                }
+                currentLineTitle = titleMatch[1].trim();
+            }
+        } else if (!trimmed.startsWith('X:') && !trimmed.startsWith('L:') && !trimmed.startsWith('Q:') && !trimmed.startsWith('%%') && !trimmed.startsWith('V:1') && !trimmed.startsWith('V:2')) {
+            const measures = trimmed.split('|').map(m => m.trim()).filter((m, idx, arr) => !(idx === arr.length - 1 && m === ''));
+            if (curTrebleMeasures.length === 0) {
+                curTrebleMeasures = measures;
+            } else if (curBassMeasures.length === 0) {
+                curBassMeasures = measures;
+            } else {
+                lineBlocks.push({
+                    title: currentLineTitle,
+                    trebleMeasures: curTrebleMeasures,
+                    bassMeasures: curBassMeasures
+                });
+                curTrebleMeasures = measures;
+                curBassMeasures = [];
+            }
+        }
+    });
+
+    if (curTrebleMeasures.length > 0 || curBassMeasures.length > 0) {
+        lineBlocks.push({
+            title: currentLineTitle,
+            trebleMeasures: curTrebleMeasures,
+            bassMeasures: curBassMeasures
+        });
+    }
+
+    if (lineBlocks.length === 0) {
+        lineBlocks.push({
+            title: 'DÒNG 1',
+            trebleMeasures: ['"C" G3 A', 'C3 G', 'C3 E'],
+            bassMeasures: ['C, E, G,2', 'C, E, G,2', 'C, E, G,2']
+        });
+    }
+
+    return { title, meter, key, lineBlocks };
+};
+
+window.renderVisualEditor = function() {
+    const container = document.getElementById('visual-editor-view');
+    if (!container) return;
+
+    const abcEl = document.getElementById('abc-code');
+    const abcText = abcEl ? abcEl.value : '';
+    const parsed = window.parseAbcToVisualStructure(abcText);
+
+    let html = `
+        <div style="background: white; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+            <div style="flex: 2; min-width: 160px;">
+              <label style="font-weight: 800; font-size: 0.78rem; color: #334155; display: block; margin-bottom: 3px;">🎵 Tên Bài Hát (Title):</label>
+              <input type="text" id="visual-title-input" value="${parsed.title}" oninput="window.onVisualEditorChange()" style="width: 100%; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #0284c7; font-weight: 700; font-size: 0.85rem; color: #0369a1; outline: none;">
+            </div>
+            <div style="flex: 1; min-width: 90px;">
+              <label style="font-weight: 800; font-size: 0.78rem; color: #334155; display: block; margin-bottom: 3px;">⏱️ Nhịp (Meter):</label>
+              <select id="visual-meter-select" onchange="window.onVisualEditorChange()" style="width: 100%; padding: 6px 8px; border-radius: 8px; border: 1.5px solid #0284c7; font-weight: 800; font-size: 0.85rem; color: #0369a1; outline: none; cursor: pointer; background: white;">
+                <option value="2/4" ${parsed.meter === '2/4' ? 'selected' : ''}>2/4</option>
+                <option value="3/4" ${parsed.meter === '3/4' ? 'selected' : ''}>3/4</option>
+                <option value="4/4" ${parsed.meter === '4/4' ? 'selected' : ''}>4/4</option>
+                <option value="6/8" ${parsed.meter === '6/8' ? 'selected' : ''}>6/8</option>
+              </select>
+            </div>
+            <div style="flex: 1; min-width: 90px;">
+              <label style="font-weight: 800; font-size: 0.78rem; color: #334155; display: block; margin-bottom: 3px;">🔑 Giọng (Key):</label>
+              <select id="visual-key-select" onchange="window.onVisualEditorChange()" style="width: 100%; padding: 6px 8px; border-radius: 8px; border: 1.5px solid #0284c7; font-weight: 800; font-size: 0.85rem; color: #0369a1; outline: none; cursor: pointer; background: white;">
+                <option value="C" ${parsed.key === 'C' ? 'selected' : ''}>C (Đô Trưởng)</option>
+                <option value="Am" ${parsed.key === 'Am' ? 'selected' : ''}>Am (La Thứ)</option>
+                <option value="G" ${parsed.key === 'G' ? 'selected' : ''}>G (Sol Trưởng)</option>
+                <option value="Em" ${parsed.key === 'Em' ? 'selected' : ''}>Em (Mi Thứ)</option>
+                <option value="F" ${parsed.key === 'F' ? 'selected' : ''}>F (Fa Trưởng)</option>
+                <option value="Dm" ${parsed.key === 'Dm' ? 'selected' : ''}>Dm (Rê Thứ)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+    `;
+
+    parsed.lineBlocks.forEach((line, lIdx) => {
+        const numMeasures = Math.max(line.trebleMeasures.length, line.bassMeasures.length, 1);
+        let measuresHtml = '';
+
+        for (let mIdx = 0; mIdx < numMeasures; mIdx++) {
+            const trebleVal = line.trebleMeasures[mIdx] || '';
+            const bassVal = line.bassMeasures[mIdx] || '';
+
+            measuresHtml += `
+                <div style="background: white; border: 1.5px solid #86efac; border-radius: 12px; padding: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); min-width: 180px; flex: 1;">
+                  <div style="font-weight: 800; color: #15803d; font-size: 0.84rem; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>🎼 Ô Nhịp ${mIdx + 1}</span>
+                    <button type="button" onclick="window.removeVisualEditorMeasure(${lIdx}, ${mIdx})" title="Xóa ô nhịp này" style="border: none; background: #fee2e2; color: #ef4444; border-radius: 6px; padding: 1px 6px; font-weight: 800; cursor: pointer; font-size: 0.72rem;">✕</button>
+                  </div>
+
+                  <div style="margin-bottom: 6px;">
+                    <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.75rem; margin-bottom: 2px;">🫱 Tay Phải (Khóa Sol):</label>
+                    <textarea class="visual-measure-treble" data-line="${lIdx}" data-m="${mIdx}" oninput="window.onVisualEditorChange()" style="width: 100%; height: 38px; padding: 5px 8px; border-radius: 6px; border: 1.5px solid #38bdf8; font-weight: 700; font-size: 0.82rem; color: #0369a1; outline: none; background: #f0f9ff; resize: none;">${trebleVal}</textarea>
+                  </div>
+
+                  <div>
+                    <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.75rem; margin-bottom: 2px;">🫲 Tay Trái (Khóa Fa):</label>
+                    <textarea class="visual-measure-bass" data-line="${lIdx}" data-m="${mIdx}" oninput="window.onVisualEditorChange()" style="width: 100%; height: 38px; padding: 5px 8px; border-radius: 6px; border: 1.5px solid #f43f5e; font-weight: 700; font-size: 0.82rem; color: #881337; outline: none; background: #fff1f2; resize: none;">${bassVal}</textarea>
+                  </div>
+                </div>
+            `;
+        }
+
+        html += `
+            <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 12px; margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                <span style="background: #0284c7; color: white; font-weight: 800; padding: 3px 12px; border-radius: 10px; font-size: 0.85rem;">📌 ${line.title || ('DÒNG ' + (lIdx + 1))}</span>
+                <div style="display: flex; gap: 6px;">
+                  <button type="button" onclick="window.addVisualEditorMeasure(${lIdx})" style="background: #0284c7; color: white; border: none; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.76rem; cursor: pointer;">➕ Thêm Ô Nhịp</button>
+                  ${parsed.lineBlocks.length > 1 ? `<button type="button" onclick="window.removeVisualEditorLine(${lIdx})" style="background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 0.76rem; cursor: pointer;">🗑️ Xóa Dòng</button>` : ''}
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                ${measuresHtml}
+              </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+};
+
+window.onVisualEditorChange = function() {
+    const titleInput = document.getElementById('visual-title-input');
+    const meterSelect = document.getElementById('visual-meter-select');
+    const keySelect = document.getElementById('visual-key-select');
+
+    const title = titleInput ? titleInput.value.trim() || 'Bản Nhạc Của Bé' : 'Bản Nhạc Của Bé';
+    const meter = meterSelect ? meterSelect.value : '4/4';
+    const key = keySelect ? keySelect.value : 'C';
+
+    const trebleEls = Array.from(document.querySelectorAll('.visual-measure-treble'));
+    const bassEls = Array.from(document.querySelectorAll('.visual-measure-bass'));
+
+    let lineMap = {};
+
+    trebleEls.forEach(el => {
+        const lIdx = parseInt(el.getAttribute('data-line'), 10);
+        const mIdx = parseInt(el.getAttribute('data-m'), 10);
+        if (!lineMap[lIdx]) lineMap[lIdx] = { title: `DÒNG ${lIdx + 1}`, trebleMeasures: [], bassMeasures: [] };
+        lineMap[lIdx].trebleMeasures[mIdx] = el.value;
+    });
+
+    bassEls.forEach(el => {
+        const lIdx = parseInt(el.getAttribute('data-line'), 10);
+        const mIdx = parseInt(el.getAttribute('data-m'), 10);
+        if (!lineMap[lIdx]) lineMap[lIdx] = { title: `DÒNG ${lIdx + 1}`, trebleMeasures: [], bassMeasures: [] };
+        lineMap[lIdx].bassMeasures[mIdx] = el.value;
+    });
+
+    let output = [
+        `X:1`,
+        `T:${title}`,
+        `M:${meter}`,
+        `L:1/4`,
+        `K:${key}`,
+        `%%score {1 | 2}`
+    ];
+
+    Object.keys(lineMap).sort((a, b) => a - b).forEach((lIdxKey) => {
+        const block = lineMap[lIdxKey];
+        output.push(`\n% ===================================`);
+        output.push(`% ${block.title}`);
+        output.push(`% ===================================`);
+
+        const numM = Math.max(block.trebleMeasures.length, block.bassMeasures.length, 1);
+        let trebleParts = [];
+        let bassParts = [];
+
+        for (let i = 0; i < numM; i++) {
+            trebleParts.push((block.trebleMeasures[i] || 'z4').trim());
+            bassParts.push((block.bassMeasures[i] || 'z4').trim());
+        }
+
+        output.push('V:1 clef=treble');
+        output.push(trebleParts.join(' | ') + ' |');
+        output.push('V:2 clef=bass');
+        output.push(bassParts.join(' | ') + ' |');
+    });
+
+    const fullAbc = output.join('\n');
+    const abcEl = document.getElementById('abc-code');
+    if (abcEl) {
+        abcEl.value = fullAbc;
+        if (window.parseAbcToSections) {
+            window.editorSections = window.parseAbcToSections(fullAbc);
+            if (window.renderEditorTabs) window.renderEditorTabs();
+        }
+    }
+
+    if (window.renderSheetMusic) window.renderSheetMusic();
+};
+
+window.addVisualEditorLine = function() {
+    const abcEl = document.getElementById('abc-code');
+    const abcText = abcEl ? abcEl.value : '';
+    const parsed = window.parseAbcToVisualStructure(abcText);
+    const nextLineNum = parsed.lineBlocks.length + 1;
+
+    parsed.lineBlocks.push({
+        title: `DÒNG ${nextLineNum}`,
+        trebleMeasures: ['C D E F', 'G A B c'],
+        bassMeasures: ['C, E, G,2', 'C, E, G,2']
+    });
+
+    const compiledAbc = window.compileVisualStructureToAbc([
+        `X:1`, `T:${parsed.title}`, `M:${parsed.meter}`, `L:1/4`, `K:${parsed.key}`
+    ], parsed.lineBlocks);
+
+    if (abcEl) abcEl.value = compiledAbc;
+    window.renderVisualEditor();
+    if (window.renderSheetMusic) window.renderSheetMusic();
+};
+
+window.removeVisualEditorLine = function(lIdx) {
+    const abcEl = document.getElementById('abc-code');
+    const abcText = abcEl ? abcEl.value : '';
+    const parsed = window.parseAbcToVisualStructure(abcText);
+
+    if (parsed.lineBlocks.length <= 1) return;
+    parsed.lineBlocks.splice(lIdx, 1);
+
+    const compiledAbc = window.compileVisualStructureToAbc([
+        `X:1`, `T:${parsed.title}`, `M:${parsed.meter}`, `L:1/4`, `K:${parsed.key}`
+    ], parsed.lineBlocks);
+
+    if (abcEl) abcEl.value = compiledAbc;
+    window.renderVisualEditor();
+    if (window.renderSheetMusic) window.renderSheetMusic();
+};
+
+window.addVisualEditorMeasure = function(lIdx) {
+    const abcEl = document.getElementById('abc-code');
+    const abcText = abcEl ? abcEl.value : '';
+    const parsed = window.parseAbcToVisualStructure(abcText);
+
+    if (parsed.lineBlocks[lIdx]) {
+        parsed.lineBlocks[lIdx].trebleMeasures.push('z4');
+        parsed.lineBlocks[lIdx].bassMeasures.push('C, E, G,2');
+    }
+
+    const compiledAbc = window.compileVisualStructureToAbc([
+        `X:1`, `T:${parsed.title}`, `M:${parsed.meter}`, `L:1/4`, `K:${parsed.key}`
+    ], parsed.lineBlocks);
+
+    if (abcEl) abcEl.value = compiledAbc;
+    window.renderVisualEditor();
+    if (window.renderSheetMusic) window.renderSheetMusic();
+};
+
+window.removeVisualEditorMeasure = function(lIdx, mIdx) {
+    const abcEl = document.getElementById('abc-code');
+    const abcText = abcEl ? abcEl.value : '';
+    const parsed = window.parseAbcToVisualStructure(abcText);
+
+    if (parsed.lineBlocks[lIdx]) {
+        if (parsed.lineBlocks[lIdx].trebleMeasures.length > 1) {
+            parsed.lineBlocks[lIdx].trebleMeasures.splice(mIdx, 1);
+        }
+        if (parsed.lineBlocks[lIdx].bassMeasures.length > 1) {
+            parsed.lineBlocks[lIdx].bassMeasures.splice(mIdx, 1);
+        }
+    }
+
+    const compiledAbc = window.compileVisualStructureToAbc([
+        `X:1`, `T:${parsed.title}`, `M:${parsed.meter}`, `L:1/4`, `K:${parsed.key}`
+    ], parsed.lineBlocks);
+
+    if (abcEl) abcEl.value = compiledAbc;
+    window.renderVisualEditor();
+    if (window.renderSheetMusic) window.renderSheetMusic();
+};
+
+window.compileVisualStructureToAbc = function(headerLines, lineBlocks) {
+    let output = [...headerLines];
+    if (!output.some(l => l.includes('%%score'))) {
+        output.push('%%score {1 | 2}');
+    }
+
+    lineBlocks.forEach((block, idx) => {
+        output.push(`\n% ===================================`);
+        output.push(`% ${block.title || ('DÒNG ' + (idx + 1))}`);
+        output.push(`% ===================================`);
+
+        const numM = Math.max(block.trebleMeasures.length, block.bassMeasures.length, 1);
+        let trebleParts = [];
+        let bassParts = [];
+
+        for (let i = 0; i < numM; i++) {
+            trebleParts.push((block.trebleMeasures[i] || 'z4').trim());
+            bassParts.push((block.bassMeasures[i] || 'z4').trim());
+        }
+
+        output.push('V:1 clef=treble');
+        output.push(trebleParts.join(' | ') + ' |');
+        output.push('V:2 clef=bass');
+        output.push(bassParts.join(' | ') + ' |');
+    });
+
+    return output.join('\n');
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        if (document.getElementById('visual-editor-view')) {
+            window.renderVisualEditor();
+        }
+    }, 500);
+});

@@ -1255,20 +1255,40 @@
 
     window.getChordIntervalNotes = function(chord, intervalPattern) {
         const chordDict = {
-            'C': { '1': 'C,', '3': 'E,', '5': 'G,', '8': 'C' },
-            'Am': { '1': 'A,,', '3': 'C,', '5': 'E,', '8': 'A,' },
-            'F': { '1': 'F,,', '3': 'A,,', '5': 'C,', '8': 'F,' },
-            'Dm': { '1': 'D,,', '3': 'F,,', '5': 'A,,', '8': 'D,' },
-            'G': { '1': 'G,,', '3': 'B,,', '5': 'D,', '8': 'G,' },
-            'Em': { '1': 'E,,', '3': 'G,,', '5': 'B,,', '8': 'E,' },
-            'E7': { '1': 'E,,', '3': '^G,,', '5': 'B,,', '8': 'E,' },
-            'Bm': { '1': 'B,,', '3': 'D,', '5': 'F,', '8': 'B,' },
-            'D': { '1': 'D,,', '3': '^F,,', '5': 'A,,', '8': 'D,' }
+            'C':  { '1': 'C,',  '3': 'E,',  '5': 'G,',  '8': 'C',  '1 cao': 'C',  '5 cao': 'G',  '3 cao': 'E' },
+            'Am': { '1': 'A,,', '3': 'C,',  '5': 'E,',  '8': 'A,', '1 cao': 'A,', '5 cao': 'E',  '3 cao': 'C' },
+            'F':  { '1': 'F,,', '3': 'A,,', '5': 'C,',  '8': 'F,', '1 cao': 'F,', '5 cao': 'C',  '3 cao': 'A,' },
+            'Dm': { '1': 'D,,', '3': 'F,,', '5': 'A,,', '8': 'D,', '1 cao': 'D,', '5 cao': 'A,', '3 cao': 'F,' },
+            'G':  { '1': 'G,,', '3': 'B,,', '5': 'D,',  '8': 'G,', '1 cao': 'G,', '5 cao': 'D',  '3 cao': 'B,' },
+            'Em': { '1': 'E,,', '3': 'G,,', '5': 'B,,', '8': 'E,', '1 cao': 'E,', '5 cao': 'B,', '3 cao': 'G,' },
+            'E7': { '1': 'E,,', '3': '^G,,', '5': 'B,,', '8': 'E,', '1 cao': 'E,', '5 cao': 'B,', '3 cao': '^G,' },
+            'Bm': { '1': 'B,,', '3': 'D,',  '5': 'F,',  '8': 'B,', '1 cao': 'B,', '5 cao': 'F',  '3 cao': 'D' },
+            'D':  { '1': 'D,,', '3': '^F,,', '5': 'A,,', '8': 'D,', '1 cao': 'D,', '5 cao': 'A,', '3 cao': '^F,' }
         };
 
         const dict = chordDict[chord] || chordDict['C'];
-        const digits = (intervalPattern || '1-3-5').match(/[1358]/g) || ['1', '3', '5'];
-        return digits.map(d => dict[d] || dict['1']);
+        
+        let degreeStr = (intervalPattern || '1-3-5');
+        if (degreeStr.includes('/')) {
+            degreeStr = degreeStr.split('/')[1].trim();
+        }
+
+        const tokens = [];
+        const rawTokens = degreeStr.split(/[-–\s]+/);
+        for (let i = 0; i < rawTokens.length; i++) {
+            const tok = rawTokens[i].trim();
+            if (!tok) continue;
+            if ((tok === '1' || tok === '5' || tok === '3') && rawTokens[i + 1] && rawTokens[i + 1].toLowerCase() === 'cao') {
+                tokens.push(`${tok} cao`);
+                i++;
+            } else if (/[1358]/.test(tok)) {
+                tokens.push(tok.match(/[1358]/)[0]);
+            }
+        }
+
+        if (tokens.length === 0) tokens.push('1', '3', '5');
+
+        return tokens.map(d => dict[d] || dict['1']);
     };
 
     window.getBassRhythmNotes = function(chord, rhythmText, intervalText) {
@@ -1280,6 +1300,7 @@
         const n1 = notes[0] || 'C,';
         const n2 = notes[1] || notes[0] || 'E,';
         const n3 = notes[2] || notes[1] || 'G,';
+        const n4 = notes[3] || notes[1] || 'E,';
 
         const cleanRhythm = (rhythmText || '').toLowerCase().trim();
 
@@ -1295,7 +1316,7 @@
 
         // 3. "4 nốt đơn" or "bon_don"
         if (cleanRhythm.includes('bon_don') || cleanRhythm.includes('4_beat') || cleanRhythm.includes('4 nốt đơn') || cleanRhythm.includes('4 đơn')) {
-            return `${n1} ${n2} ${n3} ${n2}`;
+            return `${n1} ${n2} ${n3} ${n4}`;
         }
 
         // 4. "nốt trắng" or "trang"
@@ -1626,19 +1647,40 @@
     };
 
     window.updateMeasureConfig = function(lineIdx, mIdx, field, value) {
+        if (!window.week1State.measureConfigs) {
+            window.week1State.measureConfigs = {};
+        }
         const key = `${lineIdx}_${mIdx}`;
         if (!window.week1State.measureConfigs[key]) {
-            window.week1State.measureConfigs[key] = { chord: 'C', rhythmPattern: '3_beat', chordVoicing: '3_note' };
+            window.week1State.measureConfigs[key] = { chord: 'C', rhythmText: '1 đơn 2 đơn 3 đen', intervalText: '3-3-5 / 1-3-5', fingeringText: '1 3 5' };
         }
         window.week1State.measureConfigs[key][field] = value;
 
         if (field === 'chord' && value === 'None') {
-            window.week1State.measureConfigs[key].rhythmPattern = 'none';
-        } else if (field === 'chord' && value !== 'None' && window.week1State.measureConfigs[key].rhythmPattern === 'none') {
-            window.week1State.measureConfigs[key].rhythmPattern = '3_beat';
+            window.week1State.measureConfigs[key].rhythmText = 'Nghỉ';
         }
 
-        window.renderWeek1Step1Lines();
+        // Instantly recalculate and update Step 2 bass measure cache!
+        const cfg = window.week1State.measureConfigs[key];
+        const newBass = window.getBassRhythmNotes(cfg.chord, cfg.rhythmText, cfg.intervalText);
+        if (!window.week1State.step2BassMeasures) {
+            window.week1State.step2BassMeasures = {};
+        }
+        window.week1State.step2BassMeasures[key] = newBass;
+
+        // Re-render Step 1 paper snippet
+        window.updateStep1Paper(lineIdx);
+
+        // If Step 2 UI is currently open, update Step 2 DOM elements in real-time
+        if (window.week1State.parsedLines && window.week1State.parsedLines[lineIdx]) {
+            const lineObj = window.week1State.parsedLines[lineIdx];
+            const grandTextarea = document.getElementById(`week1-step2-abc-text-${lineIdx}`);
+            if (grandTextarea) {
+                const updatedGrandAbc = window.generateWeek1LineGrandStaffAbc(lineObj, lineIdx);
+                grandTextarea.value = updatedGrandAbc;
+                window.updateStep2GrandStaffAbc(lineIdx, updatedGrandAbc);
+            }
+        }
     };
 
     window.updateStep1Paper = function(lineIdx) {
@@ -1922,7 +1964,7 @@
             const measureControlsHtml = measures.map((mObj, mIdx) => {
                 const cfg = window.getMeasureConfig(idx, mIdx, mObj.chord);
                 const customBassKey = `${idx}_${mIdx}`;
-                const defaultBass = window.getBassRhythmNotes(cfg.chord, cfg.rhythmPattern);
+                const defaultBass = window.getBassRhythmNotes(cfg.chord, cfg.rhythmText, cfg.intervalText);
                 const mBassAbc = (window.week1State.step2BassMeasures && window.week1State.step2BassMeasures[customBassKey] !== undefined)
                     ? window.week1State.step2BassMeasures[customBassKey]
                     : defaultBass;
