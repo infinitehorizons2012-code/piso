@@ -686,7 +686,7 @@
         const count = targetLine ? targetLine.measuresCount : 4;
         let optionsHtml = '';
         for (let i = 0; i < count; i++) {
-            optionsHtml += `<option value="${i}">🎼 Ô Nhịp ${i + 1}</option>`;
+            optionsHtml += `<option value="${i}">Ô ${i + 1}</option>`;
         }
         measureSelect.innerHTML = optionsHtml;
         window.scrollToInteractiveLine(lineIdx);
