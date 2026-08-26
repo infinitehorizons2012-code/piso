@@ -1059,6 +1059,7 @@ window.loadSong = function(song) {
     switchTab('tab-btn-write', 'tab-write');
     renderSheetMusic();
     if (window.renderStudioSheet) window.renderStudioSheet();
+    if (window.renderVisualEditor) window.renderVisualEditor();
 };
 
 window.saveToCloud = async function() {
@@ -1653,6 +1654,7 @@ window.createNewSong = function() {
         window.syncCurrentEditorTab();
         renderSheetMusic();
         if (window.renderStudioSheet) window.renderStudioSheet();
+        if (window.renderVisualEditor) window.renderVisualEditor();
         
         const img = document.getElementById('uploaded-image');
         const prompt = document.getElementById('upload-prompt');
@@ -1948,6 +1950,7 @@ window.executeTranspose = function(delta, targetKey) {
     syncCurrentEditorTab();
     renderSheetMusic();
     if (window.renderStudioSheet) window.renderStudioSheet();
+    if (window.renderVisualEditor) window.renderVisualEditor();
 
     window.closeTransposeModal();
 
