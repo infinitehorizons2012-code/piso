@@ -685,17 +685,19 @@ window.fetchLibrary = async function(forceRefresh = false) {
 
             const mergedMap = new Map();
             songsList.forEach(item => {
-                const key = item.id || `${item.title}_${item.folderPath || '/'}`;
-                mergedMap.set(key, item);
+                if (!item) return;
+                const cleanTitleKey = `${(item.title || '').trim().toLowerCase()}_${item.folderPath || '/'}`;
+                mergedMap.set(cleanTitleKey, item);
+                if (item.id) mergedMap.set(String(item.id), item);
             });
             if (Array.isArray(localCache)) {
                 localCache.forEach(item => {
                     if (!item) return;
-                    const byId = item.id ? mergedMap.has(item.id) : false;
-                    const byTitleKey = `${item.title}_${item.folderPath || '/'}`;
-                    const byTitle = mergedMap.has(byTitleKey);
-                    if (!byId && !byTitle) {
-                        mergedMap.set(item.id || byTitleKey, item);
+                    const cleanTitleKey = `${(item.title || '').trim().toLowerCase()}_${item.folderPath || '/'}`;
+                    const existsById = item.id ? mergedMap.has(String(item.id)) : false;
+                    const existsByTitle = mergedMap.has(cleanTitleKey);
+                    if (!existsById && !existsByTitle) {
+                        mergedMap.set(cleanTitleKey, item);
                     }
                 });
             }

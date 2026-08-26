@@ -2221,51 +2221,52 @@
         if (!titleName || !abcContent) return;
         const CF_WORKER_URL = 'https://piano-library.infinite-horizons-2012.workers.dev';
         
-        const newSong = {
-            id: 'song_' + Date.now(),
-            title: titleName,
-            abc: abcContent,
-            folderPath: folderPath || '/',
-            createdAt: new Date().toISOString()
-        };
-
-        // Always save to localStorage immediately so it's instantly available in all Library views
-        try {
-            const cached = localStorage.getItem('piso_library_cache');
-            let items = cached ? JSON.parse(cached) : [];
-            items.unshift(newSong);
-            localStorage.setItem('piso_library_cache', JSON.stringify(items));
-        } catch (e) {
-            console.warn('Error updating piso_library_cache:', e);
-        }
+        const payload = { title: titleName, abc: abcContent, folderPath: folderPath || '/' };
 
         try {
-            const payload = { title: titleName, abc: abcContent, folderPath: folderPath || '/' };
             const res = await fetch(CF_WORKER_URL + '/api/songs', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
-            if (data.success) {
-                if (data.id) {
-                    newSong.id = data.id;
-                    try {
-                        let cached = localStorage.getItem('piso_library_cache');
-                        let items = cached ? JSON.parse(cached) : [];
-                        const tempIdx = items.findIndex(i => i.title === titleName && String(i.id).startsWith('song_'));
-                        if (tempIdx !== -1) {
-                            items[tempIdx].id = data.id;
-                            localStorage.setItem('piso_library_cache', JSON.stringify(items));
-                        }
-                    } catch(e) {}
-                }
+            if (data && data.success) {
+                const songObj = {
+                    id: data.id || ('song_' + Date.now()),
+                    title: titleName,
+                    abc: abcContent,
+                    folderPath: folderPath || '/',
+                    createdAt: new Date().toISOString()
+                };
+
+                try {
+                    let cached = localStorage.getItem('piso_library_cache');
+                    let items = cached ? JSON.parse(cached) : [];
+                    items = items.filter(i => !(i.title === titleName && (i.folderPath || '/') === (folderPath || '/')));
+                    items.unshift(songObj);
+                    localStorage.setItem('piso_library_cache', JSON.stringify(items));
+                } catch (e) {}
+
                 alert(`🎉 Đã lưu bản nhạc '${titleName}' thành công vào Thư viện!`);
             } else {
-                throw new Error(data.error || 'Server error');
+                throw new Error((data && data.error) || 'Server error');
             }
         } catch(err) {
-            console.warn('Cloud save fallback to localStorage:', err);
+            console.warn('Cloud save fallback to local:', err);
+            const fallbackSong = {
+                id: 'song_' + Date.now(),
+                title: titleName,
+                abc: abcContent,
+                folderPath: folderPath || '/',
+                createdAt: new Date().toISOString()
+            };
+            try {
+                let cached = localStorage.getItem('piso_library_cache');
+                let items = cached ? JSON.parse(cached) : [];
+                items = items.filter(i => !(i.title === titleName && (i.folderPath || '/') === (folderPath || '/')));
+                items.unshift(fallbackSong);
+                localStorage.setItem('piso_library_cache', JSON.stringify(items));
+            } catch (e) {}
             alert(`🎉 Đã lưu bản nhạc '${titleName}' vào Thư Viện!`);
         }
 
