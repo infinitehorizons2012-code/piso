@@ -2231,8 +2231,42 @@
         }
     };
 
+    window.loadStep1ToInteractiveTab = function() {
+        if (!window.week1State.parsedLines || window.week1State.parsedLines.length === 0) {
+            window.parseWeek1Lines();
+        }
+        const abcContent = window.generateFullSongStep1MelodyAbc();
+        const textarea = document.getElementById('piano-solo-abc-editor');
+        if (textarea) {
+            textarea.value = abcContent;
+        }
+        window.renderPianoSoloSheet(abcContent);
+        if (typeof window.switchPianoSubTab === 'function') {
+            window.switchPianoSubTab('interactive');
+        }
+        alert('🚀 Đã nạp thành công bản nhạc Bước 1 (Giai Điệu) sang Tab Tương Tác!');
+    };
+
+    window.loadStep2ToInteractiveTab = function() {
+        if (!window.week1State.parsedLines || window.week1State.parsedLines.length === 0) {
+            window.parseWeek1Lines();
+        }
+        const abcContent = window.generateFullSongGrandStaffAbc();
+        const textarea = document.getElementById('piano-solo-abc-editor');
+        if (textarea) {
+            textarea.value = abcContent;
+        }
+        window.renderPianoSoloSheet(abcContent);
+        if (typeof window.switchPianoSubTab === 'function') {
+            window.switchPianoSubTab('interactive');
+        }
+        alert('🚀 Đã nạp thành công bản nhạc Bước 2 (2 Tay Piano Solo) sang Tab Tương Tác!');
+    };
+
     window.saveStep1ToLibrary = async function() {
-        window.parseWeek1Lines();
+        if (!window.week1State.parsedLines || window.week1State.parsedLines.length === 0) {
+            window.parseWeek1Lines();
+        }
         const abcContent = window.generateFullSongStep1MelodyAbc();
         const songTitleMatch = abcContent.match(/T:\s*(.+)/);
         const defaultTitle = songTitleMatch ? songTitleMatch[1].trim() + ' (Bước 1 Giai Điệu)' : 'Bản Nhạc Bước 1 Giai Điệu';
@@ -2240,11 +2274,17 @@
         const userTitle = prompt('Nhập tên bản nhạc muốn lưu vào Thư Viện (Bước 1 - Giai Điệu):', defaultTitle);
         if (!userTitle) return;
 
-        window.saveSongToLibrary(userTitle, abcContent, '/Tuần 1 - Giai Điệu');
+        await window.saveSongToLibrary(userTitle, abcContent, '/Tuần 1 - Giai Điệu');
+        
+        const textarea = document.getElementById('piano-solo-abc-editor');
+        if (textarea) textarea.value = abcContent;
+        window.renderPianoSoloSheet(abcContent);
     };
 
     window.saveStep2ToLibrary = async function() {
-        window.parseWeek1Lines();
+        if (!window.week1State.parsedLines || window.week1State.parsedLines.length === 0) {
+            window.parseWeek1Lines();
+        }
         const abcContent = window.generateFullSongGrandStaffAbc();
         const songTitleMatch = abcContent.match(/T:\s*(.+)/);
         const defaultTitle = songTitleMatch ? songTitleMatch[1].trim() + ' (Bước 2 Piano Solo 2 Tay)' : 'Bản Nhạc Bước 2 Piano Solo';
@@ -2252,7 +2292,11 @@
         const userTitle = prompt('Nhập tên bản nhạc muốn lưu vào Thư Viện (Bước 2 - 2 Tay Sol & Fa):', defaultTitle);
         if (!userTitle) return;
 
-        window.saveSongToLibrary(userTitle, abcContent, '/Tuần 1 - Piano Solo 2 Tay');
+        await window.saveSongToLibrary(userTitle, abcContent, '/Tuần 1 - Piano Solo 2 Tay');
+        
+        const textarea = document.getElementById('piano-solo-abc-editor');
+        if (textarea) textarea.value = abcContent;
+        window.renderPianoSoloSheet(abcContent);
     };
 
     window.initWeek1PedagogyView = function() {
