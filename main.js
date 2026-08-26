@@ -2112,8 +2112,24 @@ window.parseAbcToVisualStructure = function(abcText) {
         // 3. Lyrics (w: or W:)
         if (trimmed.toLowerCase().startsWith('w:')) {
             const lyricStr = trimmed.replace(/^[wW]:\s*/, '');
-            const lyricMeasures = lyricStr.split('|').map(m => m.trim());
-            curTrebleLyrics = lyricMeasures;
+            if (lyricStr.includes('|')) {
+                curTrebleLyrics = lyricStr.split('|').map(m => m.trim());
+            } else {
+                const words = lyricStr.trim().split(/\s+/).filter(Boolean);
+                const numM = curTrebleMeasures.length || 1;
+                const wordsPerM = Math.max(1, Math.ceil(words.length / numM));
+                let list = [];
+                for (let i = 0; i < numM; i++) {
+                    const start = i * wordsPerM;
+                    const end = Math.min(start + wordsPerM, words.length);
+                    if (start < words.length) {
+                        list.push(words.slice(start, end).join(' '));
+                    } else {
+                        list.push('');
+                    }
+                }
+                curTrebleLyrics = list;
+            }
             return; // NEVER treat lyrics lines as bass measures!
         }
 
@@ -2228,12 +2244,12 @@ window.renderVisualEditor = function() {
 
                   <div style="margin-bottom: 6px;">
                     <label style="display: block; font-weight: 700; color: #0369a1; font-size: 0.75rem; margin-bottom: 2px;">🫱 Tay Phải (Khóa Sol):</label>
-                    <textarea class="visual-measure-treble" data-line="${lIdx}" data-m="${mIdx}" oninput="window.onVisualEditorChange()" style="width: 100%; height: 38px; padding: 5px 8px; border-radius: 6px; border: 1.5px solid #38bdf8; font-weight: 700; font-size: 0.82rem; color: #0369a1; outline: none; background: #f0f9ff; resize: none;">${trebleVal}</textarea>
+                    <textarea class="visual-measure-treble" data-line="${lIdx}" data-m="${mIdx}" oninput="window.onVisualEditorChange()" style="width: 100%; height: 88px; line-height: 1.35; padding: 6px 8px; border-radius: 8px; border: 1.5px solid #38bdf8; font-weight: 700; font-size: 0.82rem; color: #0369a1; outline: none; background: #f0f9ff; resize: vertical;">${trebleVal}</textarea>
                   </div>
 
                   <div>
                     <label style="display: block; font-weight: 700; color: #be123c; font-size: 0.75rem; margin-bottom: 2px;">🫲 Tay Trái (Khóa Fa):</label>
-                    <textarea class="visual-measure-bass" data-line="${lIdx}" data-m="${mIdx}" oninput="window.onVisualEditorChange()" style="width: 100%; height: 38px; padding: 5px 8px; border-radius: 6px; border: 1.5px solid #f43f5e; font-weight: 700; font-size: 0.82rem; color: #881337; outline: none; background: #fff1f2; resize: none;">${bassVal}</textarea>
+                    <textarea class="visual-measure-bass" data-line="${lIdx}" data-m="${mIdx}" oninput="window.onVisualEditorChange()" style="width: 100%; height: 50px; line-height: 1.35; padding: 6px 8px; border-radius: 8px; border: 1.5px solid #f43f5e; font-weight: 700; font-size: 0.82rem; color: #881337; outline: none; background: #fff1f2; resize: vertical;">${bassVal}</textarea>
                   </div>
                 </div>
             `;
