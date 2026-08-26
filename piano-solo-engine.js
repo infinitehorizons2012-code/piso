@@ -792,6 +792,8 @@
         const mode = modeSelect.value;
         const parsedLines = window.getInteractiveParsedLines();
 
+        const savedLineValue = lineSelect.value;
+
         if (mode === 'all') {
             lineSelect.style.display = 'none';
             measureSelect.style.display = 'none';
@@ -803,6 +805,11 @@
             lineSelect.innerHTML = parsedLines.map((l, idx) => 
                 `<option value="${l.index}">${l.title}</option>`
             ).join('');
+
+            if (savedLineValue && parsedLines.some(l => l.index == savedLineValue)) {
+                lineSelect.value = savedLineValue;
+            }
+
             const activeLine = parseInt(lineSelect.value, 10) || 0;
             window.scrollToInteractiveLine(activeLine);
         } else if (mode === 'measure') {
@@ -813,17 +820,23 @@
                 `<option value="${l.index}">${l.title}</option>`
             ).join('');
 
-            window.updateInteractiveMeasureDropdown();
+            if (savedLineValue && parsedLines.some(l => l.index == savedLineValue)) {
+                lineSelect.value = savedLineValue;
+            }
+
+            window.updateInteractiveMeasureDropdown(true);
             return;
         }
 
         window.refreshInteractiveSheetDisplay();
     };
 
-    window.updateInteractiveMeasureDropdown = function() {
+    window.updateInteractiveMeasureDropdown = function(keepMeasureSelection = false) {
         const lineSelect = document.getElementById('interactive-line-select');
         const measureSelect = document.getElementById('interactive-measure-select');
         if (!lineSelect || !measureSelect) return;
+
+        const savedMeasureValue = measureSelect.value;
 
         const lineIdx = parseInt(lineSelect.value, 10) || 0;
         const parsedLines = window.getInteractiveParsedLines();
@@ -835,6 +848,11 @@
             optionsHtml += `<option value="${i}">Ô ${i + 1}</option>`;
         }
         measureSelect.innerHTML = optionsHtml;
+
+        if (keepMeasureSelection && savedMeasureValue !== '' && savedMeasureValue !== null && parseInt(savedMeasureValue, 10) < count) {
+            measureSelect.value = savedMeasureValue;
+        }
+
         window.scrollToInteractiveLine(lineIdx);
         window.refreshInteractiveSheetDisplay();
     };
@@ -846,7 +864,7 @@
         const textarea = document.getElementById('piano-solo-abc-editor');
         const abcCode = textarea && textarea.value.trim() ? textarea.value : PIANO_SOLO_SONGS.fur_elise.abc;
 
-        window.renderPianoSoloSheet(abcCode);
+        window.refreshInteractiveSheetDisplay();
 
         const modeSelect = document.getElementById('interactive-play-mode-select');
         const lineSelect = document.getElementById('interactive-line-select');
