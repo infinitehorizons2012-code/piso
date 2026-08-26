@@ -672,12 +672,33 @@ window.fetchLibrary = async function(forceRefresh = false) {
             throw new Error("Vui lòng thay thế CF_WORKER_URL trong main.js bằng URL của Worker bạn đã deploy.");
         }
         const res = await fetch(CF_WORKER_URL + '/api/songs');
-        const items = await res.json();
+        const data = await res.json();
+        const songsList = Array.isArray(data) ? data : (data && Array.isArray(data.songs) ? data.songs : []);
         
-        if (Array.isArray(items)) {
-            libraryItemsCache = items;
-            localStorage.setItem('piso_library_cache', JSON.stringify(items));
+        if (songsList) {
+            // Merge with local unsynced cache if any
+            let localCache = [];
+            try {
+                const c = localStorage.getItem('piso_library_cache');
+                if (c) localCache = JSON.parse(c);
+            } catch (e) {}
+
+            const mergedMap = new Map();
+            songsList.forEach(item => mergedMap.set(item.id || item.title, item));
+            if (Array.isArray(localCache)) {
+                localCache.forEach(item => {
+                    if (item && item.id && !mergedMap.has(item.id)) {
+                        mergedMap.set(item.id, item);
+                    }
+                });
+            }
+
+            libraryItemsCache = Array.from(mergedMap.values());
+            localStorage.setItem('piso_library_cache', JSON.stringify(libraryItemsCache));
             window.renderLibraryCurrentView();
+            if (typeof window.populateWeek1LibraryDropdown === 'function') {
+                window.populateWeek1LibraryDropdown();
+            }
         }
     } catch (err) {
         if (!cachedData) {
