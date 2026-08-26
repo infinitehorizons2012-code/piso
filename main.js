@@ -998,8 +998,9 @@ window.deleteLibraryItem = async function(item) {
             if (itemFolder === folderFullPath || itemFolder.startsWith(folderFullPath + '/')) return false;
             return true;
         } else {
-            if (i.id && item.id && String(i.id) === String(item.id)) return false;
-            if (i.title === item.title && (i.folderPath || '/') === (item.folderPath || '/')) return false;
+            // Delete ONLY the specific song matching exact ID or object reference
+            if (item.id && i.id && String(i.id) === String(item.id)) return false;
+            if (i === item) return false;
             return true;
         }
     });
