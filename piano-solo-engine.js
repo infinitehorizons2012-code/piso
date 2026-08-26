@@ -760,7 +760,7 @@
                 }
             });
 
-            return [...headerLines, `% --- CHỈ HIỂN THỊ Ô ${targetMeasureIdx + 1} (DÒNG ${targetLineIdx + 1}) ---`, ...slicedBlock.join('\n')].join('\n');
+            return [...headerLines, `% --- CHỈ HIỂN THỊ Ô ${targetMeasureIdx + 1} (DÒNG ${targetLineIdx + 1}) ---`, ...slicedBlock].join('\n');
         }
 
         return abcCode;
