@@ -717,7 +717,11 @@
 
         isPlayingSong = true;
         const btnPlay = document.getElementById('btn-play-sheet-abc');
-        if (btnPlay) btnPlay.innerHTML = `🔄 Đang Phát (${playLabel} - ${noteEvents.length} Nốt)...`;
+        if (btnPlay) {
+            btnPlay.innerHTML = `⏹️ Dừng Độc Tấu (${playLabel})`;
+            btnPlay.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            btnPlay.style.boxShadow = '0 4px 12px rgba(239,68,68,0.35)';
+        }
 
         let maxEndMs = 0;
 
@@ -739,13 +743,25 @@
         activePlaybackTimers.push(stopTimer);
     };
 
+    window.togglePlayPianoSoloSong = function() {
+        if (isPlayingSong) {
+            window.stopPianoSoloSong();
+        } else {
+            window.playPianoSoloSong();
+        }
+    };
+
     window.stopPianoSoloSong = function() {
         isPlayingSong = false;
         activePlaybackTimers.forEach(t => clearTimeout(t));
         activePlaybackTimers = [];
 
         const btnPlay = document.getElementById('btn-play-sheet-abc');
-        if (btnPlay) btnPlay.innerHTML = '▶️ Nghe Độc Tấu';
+        if (btnPlay) {
+            btnPlay.innerHTML = '▶️ Nghe Độc Tấu';
+            btnPlay.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            btnPlay.style.boxShadow = '0 4px 12px rgba(16,185,129,0.35)';
+        }
     };
 
     window.switchPianoSubTab = function(tabName) {

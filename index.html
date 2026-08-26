@@ -78,14 +78,22 @@
               <h2 style="margin: 0; color: white; font-size: 1.6rem; font-weight: 800;">Độc Tấu Piano Solo & Luyện Phím Tương Tác</h2>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-              <button onclick="window.togglePianoSustainPedal()" id="btn-piano-pedal" style="padding: 10px 16px; border-radius: 16px; font-weight: 800; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s;">
-                🌊 Pedal Vang: OFF
+              <!-- 1. NẠP SHEET TỪ THƯ VIỆN -->
+              <button onclick="window.openWeek1LibraryModal('interactive')" style="padding: 10px 18px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(2,132,199,0.3);">
+                📂 Nạp Sheet Từ Thư Viện
               </button>
+
+              <!-- 2. TÊN NỐT ON/OFF -->
               <button onclick="window.togglePianoKeyLabels()" id="btn-piano-labels" style="padding: 10px 16px; border-radius: 16px; font-weight: 800; background: #fde047; color: #431407; border: none; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: all 0.2s;">
                 🏷️ Tên Nốt: ON
               </button>
 
-              <!-- PLAYBACK RANGE SELECTION CONTROLS -->
+              <!-- 3. PEDAL VANG -->
+              <button onclick="window.togglePianoSustainPedal()" id="btn-piano-pedal" style="padding: 10px 16px; border-radius: 16px; font-weight: 800; background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4); cursor: pointer; transition: all 0.2s;">
+                🌊 Pedal Vang: OFF
+              </button>
+
+              <!-- 4. PHẠM VI ĐỘC TẤU -->
               <div style="display: flex; gap: 6px; align-items: center; background: rgba(0,0,0,0.25); padding: 4px 10px; border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.3);">
                 <label style="font-weight: 800; font-size: 0.84rem; color: #fde047; white-space: nowrap;">🎯 Phạm Vi Độc Tấu:</label>
                 <select id="interactive-play-mode-select" onchange="window.updateInteractivePlayControls()" style="padding: 6px 10px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.85rem; color: #0f172a; background: white; outline: none; cursor: pointer;">
@@ -103,17 +111,9 @@
                 </select>
               </div>
 
-              <button onclick="window.playPianoSoloSong()" id="btn-play-sheet-abc" style="padding: 10px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.35); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
+              <!-- 5. NGHE ĐỘC TẤU (TOGGLE PLAY/STOP 1 NÚT) -->
+              <button onclick="window.togglePlayPianoSoloSong()" id="btn-play-sheet-abc" style="padding: 10px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.35); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
                 ▶️ Nghe Độc Tấu
-              </button>
-              <button onclick="window.stopPianoSoloSong()" style="padding: 10px 16px; border-radius: 16px; font-weight: 800; background: #ef4444; color: white; border: none; cursor: pointer; font-size: 0.9rem;">
-                ⏹️ Dừng
-              </button>
-              <button onclick="window.togglePianoSoloEditor()" id="btn-toggle-piano-editor" style="padding: 10px 16px; border-radius: 16px; background: white; color: #be123c; border: none; font-weight: 800; cursor: pointer; font-size: 0.88rem; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-                ✏️ Bật/Tắt Soạn Thảo
-              </button>
-              <button onclick="window.openWeek1LibraryModal('interactive')" style="padding: 10px 18px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(2,132,199,0.3);">
-                📂 Nạp Sheet Từ Thư Viện
               </button>
             </div>
           </div>
@@ -142,8 +142,8 @@
             <!-- ABC SHEET MUSIC PAPER -->
             <div id="piano-solo-paper" style="min-height: 240px; background: #f8fafc; border-radius: 16px; padding: 16px; border: 2px dashed #cbd5e1; margin-bottom: 16px;"></div>
 
-            <!-- EDITABLE ABC TEXTAREA (COLLAPSIBLE) -->
-            <div id="piano-solo-editor-container" style="display: none; margin-top: 14px;">
+            <!-- EDITABLE ABC TEXTAREA (ALWAYS ON BY DEFAULT) -->
+            <div id="piano-solo-editor-container" style="display: block; margin-top: 14px;">
               <label style="display: block; font-weight: 800; color: #475569; margin-bottom: 6px; font-size: 0.9rem;">📝 Chỉnh sửa Mã ABC Trực Tiếp (Có Ngoặc Nhọn {} Cho Piano Grand Staff):</label>
               <textarea id="piano-solo-abc-editor" oninput="window.renderPianoSoloAbcFromEditor()" style="width: 100%; height: 140px; padding: 12px; border-radius: 12px; border: 1.5px solid #cbd5e1; font-family: monospace; font-size: 0.95rem; outline: none; background: #fafafa; color: #1e293b; line-height: 1.5;"></textarea>
             </div>
