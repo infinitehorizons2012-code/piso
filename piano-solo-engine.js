@@ -648,25 +648,75 @@
         const lines = abcCode.split('\n');
         const headerLines = [];
         const lineBlocks = [];
-        let currentBlock = [];
 
-        for (let line of lines) {
+        let bodyStartIndex = lines.length;
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
             const trimmed = line.trim();
+
             if (trimmed.startsWith('X:') || trimmed.startsWith('T:') || trimmed.startsWith('M:') || 
                 trimmed.startsWith('L:') || trimmed.startsWith('Q:') || trimmed.startsWith('K:') || 
-                trimmed.startsWith('%%') || (trimmed.startsWith('V:') && trimmed.includes('clef='))) {
+                trimmed.startsWith('%%')) {
                 headerLines.push(line);
-            } else if (trimmed.startsWith('% --- DÒNG') || (trimmed.startsWith('%') && !trimmed.startsWith('%%'))) {
-                if (currentBlock.length > 0) {
-                    lineBlocks.push([...currentBlock]);
-                    currentBlock = [];
-                }
             } else if (trimmed.length > 0) {
-                currentBlock.push(line);
+                bodyStartIndex = i;
+                break;
             }
         }
-        if (currentBlock.length > 0) {
-            lineBlocks.push([...currentBlock]);
+
+        const hasVoiceTags = abcCode.includes('V:1') || abcCode.includes('[V:1]');
+
+        if (hasVoiceTags) {
+            let i = bodyStartIndex;
+            let activeBlock = [];
+
+            while (i < lines.length) {
+                const line = lines[i];
+                const trimmed = line.trim();
+
+                if (trimmed.startsWith('% --- DÒNG') || (trimmed.startsWith('%') && !trimmed.startsWith('%%'))) {
+                    if (activeBlock.length > 0) {
+                        lineBlocks.push([...activeBlock]);
+                        activeBlock = [];
+                    }
+                    i++;
+                    continue;
+                }
+
+                if (trimmed.length === 0) {
+                    i++;
+                    continue;
+                }
+
+                const isV1 = trimmed.startsWith('V:1') || trimmed.startsWith('[V:1]');
+                const hasV1 = activeBlock.some(l => l.trim().startsWith('V:1') || l.trim().startsWith('[V:1]'));
+                const hasV2 = activeBlock.some(l => l.trim().startsWith('V:2') || l.trim().startsWith('[V:2]'));
+
+                if (isV1 && (hasV1 && (hasV2 || activeBlock.length > 1))) {
+                    lineBlocks.push([...activeBlock]);
+                    activeBlock = [];
+                }
+
+                activeBlock.push(line);
+                i++;
+            }
+            if (activeBlock.length > 0) lineBlocks.push([...activeBlock]);
+        } else {
+            let currentBlock = [];
+            for (let i = bodyStartIndex; i < lines.length; i++) {
+                const line = lines[i];
+                const trimmed = line.trim();
+
+                if (trimmed.startsWith('% --- DÒNG') || (trimmed.startsWith('%') && !trimmed.startsWith('%%'))) {
+                    if (currentBlock.length > 0) {
+                        lineBlocks.push([...currentBlock]);
+                        currentBlock = [];
+                    }
+                } else if (trimmed.length > 0) {
+                    currentBlock.push(line);
+                }
+            }
+            if (currentBlock.length > 0) lineBlocks.push([...currentBlock]);
         }
 
         if (lineBlocks.length === 0) return abcCode;
@@ -674,25 +724,43 @@
         const selectedBlock = lineBlocks[Math.min(targetLineIdx, lineBlocks.length - 1)] || lineBlocks[0];
 
         if (mode === 'line') {
-            return [...headerLines, `% --- CHỈ HIỂN THỊ DÒNG ${targetLineIdx + 1} ---`, selectedBlock.join('\n')].join('\n');
+            return [...headerLines, `% --- CHỈ HIỂN THỊ DÒNG ${targetLineIdx + 1} ---`, ...selectedBlock].join('\n');
         }
 
         if (mode === 'measure') {
-            const slicedLines = selectedBlock.map(l => {
-                if (!l.includes('|')) return l;
-                let prefix = '';
-                let musicStr = l;
-                const vMatch = l.match(/^(\[V:\d+\]|V:\d+)\s*(.*)/);
-                if (vMatch) {
-                    prefix = vMatch[1] + ' ';
-                    musicStr = vMatch[2];
+            const slicedBlock = [];
+            selectedBlock.forEach(l => {
+                const trimmed = l.trim();
+                if (trimmed.startsWith('V:') || trimmed.startsWith('[V:')) {
+                    const match = l.match(/^((?:\[V:\d+\]|V:\d+)(?:\s+clef=[^\s]+)?)\s*(.*)/);
+                    if (match) {
+                        const vHeader = match[1];
+                        const musicContent = match[2];
+                        if (!musicContent || !musicContent.includes('|')) {
+                            slicedBlock.push(l);
+                        } else {
+                            const measures = musicContent.split('|').map(m => m.trim()).filter(m => m.length > 0);
+                            const targetM = measures[Math.min(targetMeasureIdx, measures.length - 1)] || measures[0] || '';
+                            slicedBlock.push(`${vHeader} ${targetM} |`);
+                        }
+                    } else {
+                        slicedBlock.push(l);
+                    }
+                } else if (trimmed.startsWith('w:')) {
+                    const lyricContent = trimmed.replace(/^w:\s*/, '');
+                    const measures = lyricContent.split('|').map(m => m.trim());
+                    const targetM = measures[Math.min(targetMeasureIdx, measures.length - 1)] || measures[0] || '*';
+                    slicedBlock.push(`w: ${targetM}`);
+                } else if (trimmed.includes('|')) {
+                    const measures = trimmed.split('|').map(m => m.trim()).filter(m => m.length > 0);
+                    const targetM = measures[Math.min(targetMeasureIdx, measures.length - 1)] || measures[0] || '';
+                    slicedBlock.push(`${targetM} |`);
+                } else {
+                    slicedBlock.push(l);
                 }
-                const measures = musicStr.split('|').map(m => m.trim()).filter(m => m.length > 0);
-                const targetM = measures[Math.min(targetMeasureIdx, measures.length - 1)] || measures[0] || '';
-                return prefix + targetM + ' |';
             });
 
-            return [...headerLines, `% --- CHỈ HIỂN THỊ Ô ${targetMeasureIdx + 1} (DÒNG ${targetLineIdx + 1}) ---`, slicedLines.join('\n')].join('\n');
+            return [...headerLines, `% --- CHỈ HIỂN THỊ Ô ${targetMeasureIdx + 1} (DÒNG ${targetLineIdx + 1}) ---`, ...slicedBlock.join('\n')].join('\n');
         }
 
         return abcCode;
