@@ -1069,9 +1069,26 @@
                 (item.title || item.name || '').toLowerCase().includes(searchVal)
             );
         } else {
-            displayItems = libraryItems.filter(item => {
+            const subfolderNames = new Set();
+            libraryItems.forEach(item => {
                 const itemFolder = item.folderPath || '/';
-                return itemFolder === folderPath;
+                if (itemFolder === folderPath) {
+                    displayItems.push(item);
+                } else if (itemFolder.startsWith(folderPath === '/' ? '/' : folderPath + '/')) {
+                    const relative = itemFolder.substring(folderPath === '/' ? 1 : folderPath.length + 1);
+                    const firstPart = relative.split('/')[0];
+                    if (firstPart) subfolderNames.add(firstPart);
+                }
+            });
+
+            subfolderNames.forEach(subName => {
+                if (!displayItems.some(i => i.type === 'folder' && i.title === subName)) {
+                    displayItems.push({
+                        type: 'folder',
+                        title: subName,
+                        folderPath: folderPath
+                    });
+                }
             });
         }
 
@@ -2204,6 +2221,24 @@
         if (!titleName || !abcContent) return;
         const CF_WORKER_URL = 'https://piano-library.infinite-horizons-2012.workers.dev';
         
+        const newSong = {
+            id: 'song_' + Date.now(),
+            title: titleName,
+            abc: abcContent,
+            folderPath: folderPath || '/',
+            createdAt: new Date().toISOString()
+        };
+
+        // Always save to localStorage immediately so it's instantly available in all Library views
+        try {
+            const cached = localStorage.getItem('piso_library_cache');
+            let items = cached ? JSON.parse(cached) : [];
+            items.unshift(newSong);
+            localStorage.setItem('piso_library_cache', JSON.stringify(items));
+        } catch (e) {
+            console.warn('Error updating piso_library_cache:', e);
+        }
+
         try {
             const payload = { title: titleName, abc: abcContent, folderPath: folderPath || '/' };
             const res = await fetch(CF_WORKER_URL + '/api/songs', {
@@ -2213,22 +2248,19 @@
             });
             const data = await res.json();
             if (data.success) {
-                alert(`🎉 Đã lưu bản nhạc '${titleName}' thành công vào Thư viện Cloud!`);
-                if (typeof window.fetchLibrary === 'function') window.fetchLibrary(true);
-                setTimeout(() => { window.populateWeek1LibraryDropdown(); }, 500);
+                alert(`🎉 Đã lưu bản nhạc '${titleName}' thành công vào Thư viện!`);
             } else {
                 throw new Error(data.error || 'Server error');
             }
         } catch(err) {
-            console.warn('Saving fallback to localStorage cache:', err);
-            const cached = localStorage.getItem('piso_library_cache');
-            let items = cached ? JSON.parse(cached) : [];
-            items.push({ id: 'song_' + Date.now(), title: titleName, abc: abcContent, folderPath: folderPath || '/' });
-            localStorage.setItem('piso_library_cache', JSON.stringify(items));
+            console.warn('Cloud save fallback to localStorage:', err);
             alert(`🎉 Đã lưu bản nhạc '${titleName}' vào Thư Viện!`);
-            if (typeof window.renderLibraryCurrentView === 'function') window.renderLibraryCurrentView();
-            window.populateWeek1LibraryDropdown();
         }
+
+        if (typeof window.fetchLibrary === 'function') window.fetchLibrary(true);
+        if (typeof window.renderLibraryCurrentView === 'function') window.renderLibraryCurrentView();
+        if (typeof window.populateWeek1LibraryDropdown === 'function') window.populateWeek1LibraryDropdown();
+        if (typeof window.renderWeek1LibraryModalFolder === 'function') window.renderWeek1LibraryModalFolder('/');
     };
 
     window.loadStep1ToInteractiveTab = function() {
