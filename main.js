@@ -886,6 +886,19 @@ window.navigateToFolder = function(folderPath) {
     window.renderLibraryCurrentView();
 };
 
+function saveLibraryCache(items) {
+    libraryItemsCache = items;
+    try {
+        localStorage.setItem('piso_library_cache', JSON.stringify(items));
+    } catch (e) {
+        console.warn('Error saving piso_library_cache:', e);
+    }
+    window.renderLibraryCurrentView();
+    if (typeof window.populateWeek1LibraryDropdown === 'function') {
+        window.populateWeek1LibraryDropdown();
+    }
+}
+
 window.createFolderInCurrentPath = async function() {
     const name = prompt("Nhập tên thư mục mới:", "Thư Mục Mới");
     if (!name || !name.trim()) return;
@@ -900,26 +913,37 @@ window.createFolderInCurrentPath = async function() {
         return alert("Thư mục này đã tồn tại trong đường dẫn hiện tại!");
     }
     
-    const folderData = {
+    const newFolderObj = {
+        id: 'folder_' + Date.now(),
         title: folderName,
         type: 'folder',
-        folderPath: currentFolderPath
+        folderPath: currentFolderPath,
+        createdAt: new Date().toISOString()
     };
     
+    // 1. Instant local update (0ms latency)
+    let cache = [...libraryItemsCache];
+    cache.unshift(newFolderObj);
+    saveLibraryCache(cache);
+
+    // 2. Background Cloud Sync
     try {
         const res = await fetch(CF_WORKER_URL + '/api/songs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(folderData)
+            body: JSON.stringify({
+                title: folderName,
+                type: 'folder',
+                folderPath: currentFolderPath
+            })
         });
         const data = await res.json();
-        if (data.success) {
-            window.fetchLibrary(true);
-        } else {
-            alert("Lỗi khi tạo thư mục: " + data.error);
+        if (data && data.id) {
+            newFolderObj.id = data.id;
+            saveLibraryCache(libraryItemsCache);
         }
     } catch(err) {
-        alert("Không thể kết nối đến máy chủ: " + err.message);
+        console.warn("Cloud worker folder create sync fallback to local:", err);
     }
 };
 
@@ -943,42 +967,59 @@ window.moveItemToFolder = async function(item) {
     
     const targetFolder = availableFolders[idx];
     item.folderPath = targetFolder;
+    saveLibraryCache(libraryItemsCache);
     
     try {
-        const res = await fetch(CF_WORKER_URL + '/api/songs', {
+        await fetch(CF_WORKER_URL + '/api/songs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(item)
         });
-        const data = await res.json();
-        if (data.success) {
-            alert(`Đã chuyển bài '${item.title}' sang thư mục '${targetFolder}'!`);
-            window.fetchLibrary(true);
-        }
     } catch(err) {
-        alert("Lỗi khi chuyển thư mục: " + err.message);
+        console.warn("Cloud move error (local already updated):", err);
     }
 };
 
 window.deleteLibraryItem = async function(item) {
     const isFolder = item.type === 'folder';
     const msg = isFolder 
-        ? `Bạn có chắc chắn muốn xóa thư mục '${item.title}'?`
+        ? `Bạn có chắc chắn muốn xóa thư mục '${item.title}' cùng toàn bộ bản nhạc bên trong?`
         : `Bạn có chắc chắn muốn xóa bản nhạc '${item.title}'?`;
         
     if (!confirm(msg)) return;
     
+    const folderFullPath = (item.folderPath === '/' ? '' : item.folderPath) + '/' + item.title;
+
+    // 1. Instant local removal (0ms latency!)
+    let newCache = libraryItemsCache.filter(i => {
+        if (isFolder) {
+            if (i.id === item.id || (i.type === 'folder' && i.title === item.title)) return false;
+            const itemFolder = i.folderPath || '/';
+            if (itemFolder === folderFullPath || itemFolder.startsWith(folderFullPath + '/')) return false;
+            return true;
+        } else {
+            if (i.id && item.id && String(i.id) === String(item.id)) return false;
+            if (i.title === item.title && (i.folderPath || '/') === (item.folderPath || '/')) return false;
+            return true;
+        }
+    });
+
+    saveLibraryCache(newCache);
+
+    // 2. Background Cloud Sync
     try {
-        const res = await fetch(CF_WORKER_URL + '/api/songs', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: item.id })
-        });
-        if (res.ok) {
-            if (isFolder) {
-                const subPath = (item.folderPath === '/' ? '' : item.folderPath) + '/' + item.title;
-                const childItems = libraryItemsCache.filter(i => (i.folderPath || '').startsWith(subPath));
-                for (const child of childItems) {
+        if (item.id && !String(item.id).startsWith('folder_') && !String(item.id).startsWith('song_')) {
+            await fetch(CF_WORKER_URL + '/api/songs', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: item.id })
+            });
+        }
+        
+        if (isFolder) {
+            const childItems = libraryItemsCache.filter(i => (i.folderPath || '').startsWith(folderFullPath));
+            for (const child of childItems) {
+                if (child.id && !String(child.id).startsWith('folder_') && !String(child.id).startsWith('song_')) {
                     await fetch(CF_WORKER_URL + '/api/songs', {
                         method: 'DELETE',
                         headers: { 'Content-Type': 'application/json' },
@@ -986,10 +1027,9 @@ window.deleteLibraryItem = async function(item) {
                     });
                 }
             }
-            window.fetchLibrary(true);
         }
     } catch(err) {
-        alert("Lỗi khi xóa: " + err.message);
+        console.warn("Cloud delete sync fallback (local updated):", err);
     }
 };
 
