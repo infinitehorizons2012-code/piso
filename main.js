@@ -2071,15 +2071,27 @@ window.parseAbcToVisualStructure = function(abcText) {
         const trimmed = l.trim();
         if (!trimmed) return;
 
+        // 1. Header fields
         if (trimmed.startsWith('T:')) {
             title = trimmed.replace(/^T:\s*/, '').trim() || title;
-        } else if (trimmed.startsWith('M:')) {
+            return;
+        }
+        if (trimmed.startsWith('M:')) {
             meter = trimmed.replace(/^M:\s*/, '').trim() || meter;
-        } else if (trimmed.startsWith('K:')) {
+            return;
+        }
+        if (trimmed.startsWith('K:')) {
             key = trimmed.replace(/^K:\s*/, '').trim() || key;
-        } else if (trimmed.startsWith('% ===')) {
-            const titleMatch = trimmed.match(/%\s*==+\s*(.*?)\s*==+/);
-            if (titleMatch && titleMatch[1]) {
+            return;
+        }
+        if (trimmed.startsWith('X:') || trimmed.startsWith('L:') || trimmed.startsWith('Q:') || trimmed.startsWith('%%') || trimmed.startsWith('V:1') || trimmed.startsWith('V:2')) {
+            return;
+        }
+
+        // 2. Comments (%)
+        if (trimmed.startsWith('%')) {
+            const cleanComment = trimmed.replace(/^%\s*==*/, '').replace(/==*$/, '').replace(/^%\s*/, '').trim();
+            if (cleanComment && cleanComment.toUpperCase().includes('DÒNG')) {
                 if (curTrebleMeasures.length > 0 || curBassMeasures.length > 0) {
                     lineBlocks.push({
                         title: currentLineTitle,
@@ -2089,23 +2101,25 @@ window.parseAbcToVisualStructure = function(abcText) {
                     curTrebleMeasures = [];
                     curBassMeasures = [];
                 }
-                currentLineTitle = titleMatch[1].trim();
+                currentLineTitle = cleanComment;
             }
-        } else if (!trimmed.startsWith('X:') && !trimmed.startsWith('L:') && !trimmed.startsWith('Q:') && !trimmed.startsWith('%%') && !trimmed.startsWith('V:1') && !trimmed.startsWith('V:2')) {
-            const measures = trimmed.split('|').map(m => m.trim()).filter((m, idx, arr) => !(idx === arr.length - 1 && m === ''));
-            if (curTrebleMeasures.length === 0) {
-                curTrebleMeasures = measures;
-            } else if (curBassMeasures.length === 0) {
-                curBassMeasures = measures;
-            } else {
-                lineBlocks.push({
-                    title: currentLineTitle,
-                    trebleMeasures: curTrebleMeasures,
-                    bassMeasures: curBassMeasures
-                });
-                curTrebleMeasures = measures;
-                curBassMeasures = [];
-            }
+            return; // ALWAYS ignore comment lines from being parsed as music notes!
+        }
+
+        // 3. Music note lines
+        const measures = trimmed.split('|').map(m => m.trim()).filter((m, idx, arr) => !(idx === arr.length - 1 && m === ''));
+        if (curTrebleMeasures.length === 0) {
+            curTrebleMeasures = measures;
+        } else if (curBassMeasures.length === 0) {
+            curBassMeasures = measures;
+        } else {
+            lineBlocks.push({
+                title: currentLineTitle,
+                trebleMeasures: curTrebleMeasures,
+                bassMeasures: curBassMeasures
+            });
+            curTrebleMeasures = measures;
+            curBassMeasures = [];
         }
     });
 
