@@ -422,7 +422,7 @@
         sustainPedal = !sustainPedal;
         const btn = document.getElementById('btn-piano-pedal');
         if (btn) {
-            btn.innerHTML = sustainPedal ? '🌊 Pedal Vang: ON (Ngân Rút)' : '🌊 Pedal Vang: OFF';
+            btn.innerHTML = sustainPedal ? '🌊 Pedal: ON' : '🌊 Pedal: OFF';
             btn.style.background = sustainPedal ? 'linear-gradient(135deg, #0284c7, #0369a1)' : 'rgba(255,255,255,0.2)';
         }
     };
@@ -431,7 +431,7 @@
         showKeyLabels = !showKeyLabels;
         const btn = document.getElementById('btn-piano-labels');
         if (btn) {
-            btn.innerHTML = showKeyLabels ? '🏷️ Tên Nốt: ON' : '🏷️ Tên Nốt: OFF';
+            btn.innerHTML = showKeyLabels ? '🏷️ Nốt: ON' : '🏷️ Nốt: OFF';
         }
         window.renderVirtualPianoKeyboard();
     };
@@ -758,7 +758,7 @@
 
         const btnPlay = document.getElementById('btn-play-sheet-abc');
         if (btnPlay) {
-            btnPlay.innerHTML = '▶️ Nghe Độc Tấu';
+            btnPlay.innerHTML = '▶️ Nghe';
             btnPlay.style.background = 'linear-gradient(135deg, #10b981, #059669)';
             btnPlay.style.boxShadow = '0 4px 12px rgba(16,185,129,0.35)';
         }
