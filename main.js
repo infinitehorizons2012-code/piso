@@ -2428,8 +2428,17 @@ window.removeVisualEditorMeasure = function(lIdx, mIdx) {
 
 window.compileVisualStructureToAbc = function(headerLines, lineBlocks) {
     let output = [...headerLines];
-    if (!output.some(l => l.includes('%%score'))) {
-        output.push('%%score {1 | 2}');
+
+    let hasBassContent = lineBlocks.some(block => 
+        block.bassMeasures && block.bassMeasures.some(b => b && b.trim() !== '' && b.trim() !== 'z4')
+    );
+
+    if (hasBassContent) {
+        if (!output.some(l => l.includes('%%score'))) {
+            output.push('%%score {1 | 2}');
+        }
+    } else {
+        output = output.filter(l => !l.includes('%%score'));
     }
 
     lineBlocks.forEach((block, idx) => {
@@ -2463,7 +2472,7 @@ window.compileVisualStructureToAbc = function(headerLines, lineBlocks) {
             trebleNotes.push(noteStr || 'z4');
             if (lyricStr) trebleLyrics.push(lyricStr);
 
-            bassParts.push((block.bassMeasures[i] || 'z4').trim());
+            bassParts.push((block.bassMeasures[i] || '').trim());
         }
 
         output.push('V:1 clef=treble');
@@ -2472,8 +2481,10 @@ window.compileVisualStructureToAbc = function(headerLines, lineBlocks) {
             output.push('w: ' + trebleLyrics.join(' | '));
         }
 
-        output.push('V:2 clef=bass');
-        output.push(bassParts.join(' | ') + ' |');
+        if (hasBassContent) {
+            output.push('V:2 clef=bass');
+            output.push(bassParts.map(b => b || 'z4').join(' | ') + ' |');
+        }
     });
 
     return output.join('\n');
