@@ -85,14 +85,32 @@
                 🏷️ Tên Nốt: ON
               </button>
 
+              <!-- PLAYBACK RANGE SELECTION CONTROLS -->
+              <div style="display: flex; gap: 6px; align-items: center; background: rgba(0,0,0,0.25); padding: 4px 10px; border-radius: 16px; border: 1.5px solid rgba(255,255,255,0.3);">
+                <label style="font-weight: 800; font-size: 0.84rem; color: #fde047; white-space: nowrap;">🎯 Phạm Vi Độc Tấu:</label>
+                <select id="interactive-play-mode-select" onchange="window.updateInteractivePlayControls()" style="padding: 6px 10px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.85rem; color: #0f172a; background: white; outline: none; cursor: pointer;">
+                  <option value="all">🎼 Phát Cả Bài</option>
+                  <option value="line">📌 Phát Dòng Nhạc...</option>
+                  <option value="measure">🎼 Phát Ô Nhịp Cụ Thể...</option>
+                </select>
+
+                <!-- Dynamic Line Select -->
+                <select id="interactive-line-select" onchange="window.updateInteractiveMeasureDropdown()" style="display: none; padding: 6px 10px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.85rem; color: #0369a1; background: #e0f2fe; outline: none; cursor: pointer;">
+                </select>
+
+                <!-- Dynamic Measure Select -->
+                <select id="interactive-measure-select" style="display: none; padding: 6px 10px; border-radius: 10px; border: none; font-weight: 800; font-size: 0.85rem; color: #15803d; background: #dcfce7; outline: none; cursor: pointer;">
+                </select>
+              </div>
+
               <button onclick="window.playPianoSoloSong()" id="btn-play-sheet-abc" style="padding: 10px 20px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,0.35); font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">
-                ▶️ Nghe Độc Tấu Sheet ABC Này
+                ▶️ Nghe Độc Tấu
               </button>
               <button onclick="window.stopPianoSoloSong()" style="padding: 10px 16px; border-radius: 16px; font-weight: 800; background: #ef4444; color: white; border: none; cursor: pointer; font-size: 0.9rem;">
                 ⏹️ Dừng
               </button>
               <button onclick="window.togglePianoSoloEditor()" id="btn-toggle-piano-editor" style="padding: 10px 16px; border-radius: 16px; background: white; color: #be123c; border: none; font-weight: 800; cursor: pointer; font-size: 0.88rem; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
-                ✏️ Bật/Tắt Trình Soạn Thảo ABC
+                ✏️ Bật/Tắt Soạn Thảo
               </button>
               <button onclick="window.openWeek1LibraryModal('interactive')" style="padding: 10px 18px; border-radius: 16px; font-weight: 800; background: linear-gradient(135deg, #0284c7, #0369a1); color: white; border: none; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(2,132,199,0.3);">
                 📂 Nạp Sheet Từ Thư Viện

@@ -584,25 +584,112 @@
         }
     }
 
-    // Auto Play Piano Solo Song (Parses current ABC string & plays actual notes on Piano Virtual Keyboard)
+    // Playback Range Selection Engine (Cả Bài / Dòng Nào / Ô Nhịp Nào)
+    window.getInteractiveParsedLines = function() {
+        const textarea = document.getElementById('piano-solo-abc-editor');
+        const abcCode = textarea && textarea.value.trim() ? textarea.value : PIANO_SOLO_SONGS.fur_elise.abc;
+        return window.parseWeek1Lines(abcCode);
+    };
+
+    window.updateInteractivePlayControls = function() {
+        const modeSelect = document.getElementById('interactive-play-mode-select');
+        const lineSelect = document.getElementById('interactive-line-select');
+        const measureSelect = document.getElementById('interactive-measure-select');
+
+        if (!modeSelect || !lineSelect || !measureSelect) return;
+
+        const mode = modeSelect.value;
+        const parsedLines = window.getInteractiveParsedLines();
+
+        if (mode === 'all') {
+            lineSelect.style.display = 'none';
+            measureSelect.style.display = 'none';
+        } else if (mode === 'line') {
+            lineSelect.style.display = 'inline-block';
+            measureSelect.style.display = 'none';
+
+            lineSelect.innerHTML = parsedLines.map((l, idx) => 
+                `<option value="${idx}">📌 ${l.title || 'Dòng ' + (idx + 1)}</option>`
+            ).join('');
+        } else if (mode === 'measure') {
+            lineSelect.style.display = 'inline-block';
+            measureSelect.style.display = 'inline-block';
+
+            lineSelect.innerHTML = parsedLines.map((l, idx) => 
+                `<option value="${idx}">📌 ${l.title || 'Dòng ' + (idx + 1)}</option>`
+            ).join('');
+
+            window.updateInteractiveMeasureDropdown();
+        }
+    };
+
+    window.updateInteractiveMeasureDropdown = function() {
+        const lineSelect = document.getElementById('interactive-line-select');
+        const measureSelect = document.getElementById('interactive-measure-select');
+        if (!lineSelect || !measureSelect) return;
+
+        const lineIdx = parseInt(lineSelect.value, 10) || 0;
+        const parsedLines = window.getInteractiveParsedLines();
+        const targetLine = parsedLines[lineIdx];
+
+        if (targetLine) {
+            const measures = window.parseLineMeasures(targetLine.abcContent);
+            measureSelect.innerHTML = measures.map((m, mIdx) => 
+                `<option value="${mIdx}">🎼 Ô Nhịp ${m.index}</option>`
+            ).join('');
+        } else {
+            measureSelect.innerHTML = `<option value="0">🎼 Ô Nhịp 1</option>`;
+        }
+    };
+
+    // Auto Play Piano Solo Song (Parses current ABC string & plays actual notes on Piano Virtual Keyboard based on selected range)
     window.playPianoSoloSong = function() {
         window.stopPianoSoloSong();
 
         const textarea = document.getElementById('piano-solo-abc-editor');
-        const abcCode = textarea ? textarea.value : (PIANO_SOLO_SONGS.fur_elise.abc);
+        const abcCode = textarea && textarea.value.trim() ? textarea.value : PIANO_SOLO_SONGS.fur_elise.abc;
 
         window.renderPianoSoloSheet(abcCode);
 
-        const noteEvents = parseAbcToNoteEvents(abcCode);
+        const modeSelect = document.getElementById('interactive-play-mode-select');
+        const lineSelect = document.getElementById('interactive-line-select');
+        const measureSelect = document.getElementById('interactive-measure-select');
+        const mode = modeSelect ? modeSelect.value : 'all';
+
+        let abcToPlay = abcCode;
+        let playLabel = 'Cả Bài';
+
+        if (mode !== 'all') {
+            const parsedLines = window.getInteractiveParsedLines();
+            const lineIdx = lineSelect ? (parseInt(lineSelect.value, 10) || 0) : 0;
+            const targetLine = parsedLines[lineIdx];
+
+            if (targetLine) {
+                const headerStr = targetLine.snippetHeader || 'M: 2/4\nL: 1/8\nK: C';
+                if (mode === 'line') {
+                    abcToPlay = `${headerStr}\n${targetLine.abcContent}`;
+                    playLabel = `Dòng ${lineIdx + 1}`;
+                } else if (mode === 'measure') {
+                    const mIdx = measureSelect ? (parseInt(measureSelect.value, 10) || 0) : 0;
+                    const measures = window.parseLineMeasures(targetLine.abcContent);
+                    if (measures[mIdx]) {
+                        abcToPlay = `${headerStr}\n${measures[mIdx].notes || measures[mIdx].text}`;
+                        playLabel = `Ô ${mIdx + 1} - Dòng ${lineIdx + 1}`;
+                    }
+                }
+            }
+        }
+
+        const noteEvents = parseAbcToNoteEvents(abcToPlay);
 
         if (noteEvents.length === 0) {
-            alert('Không tìm thấy nốt nhạc hợp lệ trong mã ABC! Vui lòng kiểm tra lại mã ABC.');
+            alert('Không tìm thấy nốt nhạc hợp lệ trong phạm vi đã chọn! Vui lòng kiểm tra lại.');
             return;
         }
 
         isPlayingSong = true;
         const btnPlay = document.getElementById('btn-play-sheet-abc');
-        if (btnPlay) btnPlay.innerHTML = `🔄 Đang Phát (${noteEvents.length} Nốt ABC Soundfont)...`;
+        if (btnPlay) btnPlay.innerHTML = `🔄 Đang Phát (${playLabel} - ${noteEvents.length} Nốt)...`;
 
         let maxEndMs = 0;
 
@@ -630,7 +717,7 @@
         activePlaybackTimers = [];
 
         const btnPlay = document.getElementById('btn-play-sheet-abc');
-        if (btnPlay) btnPlay.innerHTML = '▶️ Nghe Độc Tấu Sheet ABC Này';
+        if (btnPlay) btnPlay.innerHTML = '▶️ Nghe Độc Tấu';
     };
 
     window.switchPianoSubTab = function(tabName) {
