@@ -744,16 +744,34 @@ window.renderLibraryCurrentView = function() {
     
     listEl.innerHTML = '';
     
-    // Filter items
+    // Filter items & auto-discover subfolders
     let displayItems = [];
     if (searchVal) {
         displayItems = libraryItemsCache.filter(item => 
             (item.title || item.name || '').toLowerCase().includes(searchVal)
         );
     } else {
-        displayItems = libraryItemsCache.filter(item => {
+        const subfolderNames = new Set();
+        libraryItemsCache.forEach(item => {
             const itemFolder = item.folderPath || '/';
-            return itemFolder === currentFolderPath;
+            if (itemFolder === currentFolderPath) {
+                displayItems.push(item);
+            } else if (itemFolder.startsWith(currentFolderPath === '/' ? '/' : currentFolderPath + '/')) {
+                const relative = itemFolder.substring(currentFolderPath === '/' ? 1 : currentFolderPath.length + 1);
+                const firstPart = relative.split('/')[0];
+                if (firstPart) subfolderNames.add(firstPart);
+            }
+        });
+
+        subfolderNames.forEach(subName => {
+            if (!displayItems.some(i => i.title === subName)) {
+                displayItems.push({
+                    id: 'folder_' + subName,
+                    title: subName,
+                    type: 'folder',
+                    folderPath: currentFolderPath
+                });
+            }
         });
     }
     

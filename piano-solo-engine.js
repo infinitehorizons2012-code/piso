@@ -2306,7 +2306,7 @@
         const userTitle = prompt('Nhập tên bản nhạc muốn lưu vào Thư Viện (Bước 1 - Giai Điệu):', defaultTitle);
         if (!userTitle) return;
 
-        await window.saveSongToLibrary(userTitle, abcContent, '/Tuần 1 - Giai Điệu');
+        await window.saveSongToLibrary(userTitle, abcContent, '/');
         
         const textarea = document.getElementById('piano-solo-abc-editor');
         if (textarea) textarea.value = abcContent;
@@ -2324,7 +2324,7 @@
         const userTitle = prompt('Nhập tên bản nhạc muốn lưu vào Thư Viện (Bước 2 - 2 Tay Sol & Fa):', defaultTitle);
         if (!userTitle) return;
 
-        await window.saveSongToLibrary(userTitle, abcContent, '/Tuần 1 - Piano Solo 2 Tay');
+        await window.saveSongToLibrary(userTitle, abcContent, '/');
         
         const textarea = document.getElementById('piano-solo-abc-editor');
         if (textarea) textarea.value = abcContent;
